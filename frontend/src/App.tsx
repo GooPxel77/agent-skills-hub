@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { I18nProvider } from "./i18n/I18nContext";
@@ -16,21 +16,21 @@ function App() {
     <ErrorBoundary>
       <AuthProvider>
         <ThemeProvider>
-        <I18nProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/skill/:id" element={<SkillDetailPage />} />
-              <Route path="/skill/:owner/:repo" element={<SkillDetailPage />} />
-              <Route path="/category/:slug" element={<CategoryPage />} />
-              <Route path="/compare" element={<ComparePage />} />
-              <Route path="/verify-email" element={<VerifyEmailPage />} />
-              <Route path="/admin/*" element={<AdminLayout />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-            <CompareBar />
-          </BrowserRouter>
-        </I18nProvider>
+          <I18nProvider>
+            <HashRouter>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/skill/:id" element={<SkillDetailPage />} />
+                <Route path="/skill/:owner/:repo" element={<SkillDetailPage />} />
+                <Route path="/category/:slug" element={<CategoryPage />} />
+                <Route path="/compare" element={<ComparePage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
+                <Route path="/admin/*" element={<AdminLayout />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+              <CompareBar />
+            </HashRouter>
+          </I18nProvider>
         </ThemeProvider>
       </AuthProvider>
     </ErrorBoundary>
