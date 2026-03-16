@@ -29,9 +29,13 @@ else:
     logger.info("Using default local SQLite database")
 
 from app.scheduler.jobs import sync_all_skills  # noqa: E402
+from app.database import Base, engine
 
 
 def main():
+    logger.info("Ensuring database tables exist...")
+    Base.metadata.create_all(bind=engine)
+    
     logger.info("Starting sync runner...")
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
