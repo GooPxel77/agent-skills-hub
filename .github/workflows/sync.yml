@@ -9,6 +9,10 @@ on:
       - "data/curated/**"
   workflow_dispatch: # Manual trigger
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
