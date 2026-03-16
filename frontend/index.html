@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function(){var t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme:dark)").matches)){document.documentElement.classList.add("dark")}})();
+    </script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Skills Hub - Discover Agent Skills, Tools & MCP Servers</title>
+    <meta name="description" content="Discover, compare and explore 17,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills. Find the best skills for your AI agent workflow." />
+    <meta name="keywords" content="Agent Skills, MCP Server, Claude Skills, AI Tools, Open Source, GitHub, Agent Tools, LLM Plugins, Codex Skills" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Agent Skills Hub - Discover Agent Skills, Tools & MCP Servers" />
+    <meta property="og:description" content="Discover, compare and explore 17,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://agentskillshub.top" />
+    <meta property="og:site_name" content="Agent Skills Hub" />
+    <meta property="og:image" content="https://agentskillshub.top/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Agent Skills Hub" />
+    <meta name="twitter:description" content="Discover 17,000+ open-source Agent Skills, AI tools & MCP servers." />
+    <meta name="twitter:site" content="@GoSailGlobal" />
+    <meta name="twitter:image" content="https://agentskillshub.top/og-image.png" />
+    <meta name="twitter:image:alt" content="Agent Skills Hub - 17,000+ Agent Skills, Tools & MCP Servers" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://agentskillshub.top" />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Agent Skills Hub",
+      "url": "https://agentskillshub.top",
+      "description": "Discover, compare and explore 17,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills.",
+      "image": "https://agentskillshub.top/og-image.png",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Agent Skills Hub",
+        "url": "https://github.com/ZhuYansen/agent-skills-hub"
+      }
+    }
+    </script>
+
+    <!-- Preconnect for faster Supabase queries -->
+    <link rel="preconnect" href="https://vknzzecmzsfmohglpfgm.supabase.co" />
+    <link rel="dns-prefetch" href="https://avatars.githubusercontent.com" />
+  </head>
+  <body>
+    <!-- GitHub Pages SPA redirect handler -->
+    <script type="text/javascript">
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

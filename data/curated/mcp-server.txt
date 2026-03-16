@@ -1,0 +1,4 @@
+# MCP Servers - one owner/repo per line
+# Lines starting with # are ignored
+# Example:
+# anthropics/mcp-server-example
