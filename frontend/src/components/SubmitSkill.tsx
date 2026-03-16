@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, ShieldCheck, Zap, Check } from "lucide-react";
 import { CrayfishIcon } from "./icons/CrayfishIcon";
-import { submitSkill } from "../api/client";
+import { submitSkill, submitMasterApplication, submitWorkflow } from "../api/client";
 import { useI18n } from "../i18n/I18nContext";
 import type { TransKey } from "../i18n/translations";
 
@@ -11,9 +11,15 @@ export function SubmitSkill() {
   const navigate = useNavigate();
 
   return (
-    <section className="mt-10 mb-4">
+    <section className="mt-10 mb-4 space-y-4">
       <div className="ps-card p-5 sm:p-6">
         <SkillForm t={t} navigate={navigate} />
+      </div>
+      <div className="ps-card p-5 sm:p-6">
+        <MasterForm t={t} />
+      </div>
+      <div className="ps-card p-5 sm:p-6">
+        <WorkflowForm t={t} />
       </div>
     </section>
   );
