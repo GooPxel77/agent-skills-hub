@@ -16,7 +16,7 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 120  # Allow up to 2 hours for rate limit waits
+    timeout-minutes: 360  # Allow up to 6 hours for rate limit waits and heavy algorithms
     defaults:
       run:
         working-directory: backend
