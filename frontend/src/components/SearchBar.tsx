@@ -163,7 +163,15 @@ export function SearchBar({ value, onChange }: Props) {
 
       {/* Dropdown */}
       {showDropdown && (
-        <div className="absolute top-full left-0 right-0 mt-1 ps-card overflow-hidden z-50" style={{ boxShadow: '0 0 30px rgba(0, 240, 255, 0.08)' }}>
+        <div
+          className="absolute top-full left-0 right-0 mt-2 ps-card overflow-hidden z-[100]"
+          style={{
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 240, 255, 0.08)',
+            background: 'var(--ps-bg)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)'
+          }}
+        >
           {/* Recent searches when empty */}
           {!local.trim() && recentSearches.length > 0 && (
             <div className="px-3 py-2" style={{ borderBottom: '1px solid var(--ps-border)' }}>
@@ -259,8 +267,8 @@ export function SearchBar({ value, onChange }: Props) {
                       {skill.stars.toLocaleString()}
                     </span>
                     <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${skill.score >= 70 ? "ps-badge-new" :
-                        skill.score >= 40 ? "ps-badge" :
-                          "ps-badge-purple"
+                      skill.score >= 40 ? "ps-badge" :
+                        "ps-badge-purple"
                       }`}>
                       {skill.score.toFixed(0)}
                     </span>

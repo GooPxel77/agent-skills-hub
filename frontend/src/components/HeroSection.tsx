@@ -147,7 +147,15 @@ export function HeroSection({ stats, onSearch }: Props) {
 
           {/* Dropdown */}
           {showDropdown && (query.trim() || results.length > 0) && (
-            <div className="absolute top-full left-0 right-0 mt-2 ps-card overflow-hidden z-50" style={{ boxShadow: '0 0 40px rgba(0, 240, 255, 0.1)' }}>
+            <div
+              className="absolute top-full left-0 right-0 mt-2 ps-card overflow-hidden z-[100]"
+              style={{
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 240, 255, 0.1)',
+                background: 'var(--ps-bg)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)'
+              }}
+            >
               {searching && (
                 <div className="px-4 py-4 text-center">
                   <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: 'var(--ps-neon-cyan)', borderTopColor: 'transparent' }} />
