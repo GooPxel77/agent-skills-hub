@@ -1,0 +1,33 @@
+name: Daily Heavy Compute
+
+on:
+  schedule:
+    - cron: '30 2 * * *'  # Run every day at 02:30 UTC
+  workflow_dispatch:
+
+jobs:
+  heavy-compute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Run Daily Heavy Computations
+        working-directory: ./backend
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DAILY_HEAVY_LIMIT: 100
+        run: python daily_heavy_runner.py

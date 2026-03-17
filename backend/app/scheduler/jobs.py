@@ -287,7 +287,7 @@ def _get_last_successful_sync(db: "Session") -> Optional[datetime]:
     return last.finished_at if last else None
 
 
-async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool = True) -> None:
+async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool = True, only_extra_repos: bool = False) -> None:
     """Main scheduled sync: fetch GitHub data, clean, upsert, and re-score.
 
     Rate limit strategy:
@@ -358,7 +358,7 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
             logger.warning("Could not load DB search queries: %s", exc)
 
         # ── Load DB-managed extra repos ──
-        extra_repos_list = list(EXTRA_REPOS)
+        extra_repos_list = list(EXTRA_REPOS) if not only_extra_repos else []
         try:
             from app.models.admin import ExtraRepo as ERModel
             db_extras = db.query(ERModel).filter(ERModel.is_active == True).all()  # noqa: E712
@@ -395,29 +395,33 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
             # Phase 1: Search GitHub for repos
             # ═══════════════════════════════════════════════════════
             search_start = time.time()
-            for i, query in enumerate(all_queries):
-                effective_query = query + pushed_filter if pushed_filter else query
-                try:
-                    for page in range(1, 4):  # up to 3 pages per query
-                        data = await _github_request(
-                            client,
-                            "https://api.github.com/search/repositories",
-                            params={"q": effective_query, "per_page": 100, "page": page, "sort": "stars"},
-                        )
-                        items = data.get("items", [])
-                        for repo in items:
-                            fn = repo.get("full_name", "")
-                            if fn and fn not in all_repos:
-                                all_repos[fn] = repo
-                        if len(items) < 100:
-                            break
-                        # Respect search rate limit: 30 req/min → ~2s per request
-                        await asyncio.sleep(2.5)
-                except Exception as exc:
-                    logger.error("Search failed [%s]: %s", query, exc)
-                await asyncio.sleep(2)
+            if not only_extra_repos:
+                for i, query in enumerate(all_queries):
+                    effective_query = query + pushed_filter if pushed_filter else query
+                    try:
+                        for page in range(1, 4):  # up to 3 pages per query
+                            data = await _github_request(
+                                client,
+                                "https://api.github.com/search/repositories",
+                                params={"q": effective_query, "per_page": 100, "page": page, "sort": "stars"},
+                            )
+                            items = data.get("items", [])
+                            for repo in items:
+                                fn = repo.get("full_name", "")
+                                if fn and fn not in all_repos:
+                                    all_repos[fn] = repo
+                            if len(items) < 100:
+                                break
+                            # Respect search rate limit: 30 req/min → ~2s per request
+                            await asyncio.sleep(2.5)
+                    except Exception as exc:
+                        logger.error("Search failed [%s]: %s", query, exc)
+                    await asyncio.sleep(2)
 
-            logger.info("Phase 1 complete: %d unique repos from search (%.0fs)", len(all_repos), time.time() - search_start)
+            if not only_extra_repos:
+                logger.info("Phase 1 complete: %d unique repos from search (%.0fs)", len(all_repos), time.time() - search_start)
+            else:
+                logger.info("Phase 1 skipped (only_extra_repos=True)")
 
             # ── Inter-phase rate check ──
             await _ensure_rate_limit(client, min_remaining=50)
@@ -425,27 +429,31 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
             # ═══════════════════════════════════════════════════════
             # Phase 2: Fetch repos for masters (by username)
             # ═══════════════════════════════════════════════════════
-            for username in masters_list:
-                try:
-                    for page in range(1, 4):
-                        data = await _github_request(
-                            client,
-                            f"https://api.github.com/users/{username}/repos",
-                            params={"per_page": 100, "page": page, "sort": "stars"},
-                        )
-                        items = data if isinstance(data, list) else data.get("items", [])
-                        for repo in items:
-                            fn = repo.get("full_name", "")
-                            if fn and fn not in all_repos:
-                                all_repos[fn] = repo
-                        if len(items) < 100:
-                            break
-                        await asyncio.sleep(1)
-                except Exception as exc:
-                    logger.error("Masters fetch failed [%s]: %s", username, exc)
-                await asyncio.sleep(1)
+            if not only_extra_repos:
+                for username in masters_list:
+                    try:
+                        for page in range(1, 4):
+                            data = await _github_request(
+                                client,
+                                f"https://api.github.com/users/{username}/repos",
+                                params={"per_page": 100, "page": page, "sort": "stars"},
+                            )
+                            items = data if isinstance(data, list) else data.get("items", [])
+                            for repo in items:
+                                fn = repo.get("full_name", "")
+                                if fn and fn not in all_repos:
+                                    all_repos[fn] = repo
+                            if len(items) < 100:
+                                break
+                            await asyncio.sleep(1)
+                    except Exception as exc:
+                        logger.error("Masters fetch failed [%s]: %s", username, exc)
+                    await asyncio.sleep(1)
 
-            logger.info("Phase 2 complete: %d unique repos after masters", len(all_repos))
+            if not only_extra_repos:
+                logger.info("Phase 2 complete: %d unique repos after masters", len(all_repos))
+            else:
+                logger.info("Phase 2 skipped (only_extra_repos=True)")
 
             # ── Inter-phase rate check ──
             await _ensure_rate_limit(client, min_remaining=30)
@@ -471,44 +479,48 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
             # ═══════════════════════════════════════════════════════
             # Phase 4: Enrich with owner followers
             # ═══════════════════════════════════════════════════════
-            try:
-                existing_skills = db.query(Skill.author_name, Skill.author_followers).all()
-                for name, followers in existing_skills:
-                    if name and name not in owner_cache:
-                        owner_cache[name] = followers or 0
-                if owner_cache:
-                    logger.info("Pre-loaded %d owner followers from DB cache", len(owner_cache))
-            except Exception:
-                pass
+            if not only_extra_repos:
+                try:
+                    existing_skills = db.query(Skill.author_name, Skill.author_followers).all()
+                    for name, followers in existing_skills:
+                        if name and name not in owner_cache:
+                            owner_cache[name] = followers or 0
+                    if owner_cache:
+                        logger.info("Pre-loaded %d owner followers from DB cache", len(owner_cache))
+                except Exception:
+                    pass
 
-            # Check budget before enrichment
-            await _ensure_rate_limit(client, min_remaining=100)
+                # Check budget before enrichment
+                await _ensure_rate_limit(client, min_remaining=100)
 
-            enriched_count = 0
-            skipped_enrichment = 0
-            ENRICHMENT_BUDGET = 500  # Max API calls for enrichment per sync
-            for fn, repo in all_repos.items():
-                owner_login = repo.get("owner", {}).get("login", "")
-                if owner_login and owner_login not in owner_cache:
-                    if enriched_count >= ENRICHMENT_BUDGET:
-                        owner_cache[owner_login] = 0
-                        skipped_enrichment += 1
-                    else:
-                        try:
-                            user_data = await _github_request(
-                                client, f"https://api.github.com/users/{owner_login}"
-                            )
-                            owner_cache[owner_login] = user_data.get("followers", 0)
-                            enriched_count += 1
-                            await asyncio.sleep(0.3)
-                        except Exception:
+                enriched_count = 0
+                skipped_enrichment = 0
+                ENRICHMENT_BUDGET = 500  # Max API calls for enrichment per sync
+                for fn, repo in all_repos.items():
+                    owner_login = repo.get("owner", {}).get("login", "")
+                    if owner_login and owner_login not in owner_cache:
+                        if enriched_count >= ENRICHMENT_BUDGET:
                             owner_cache[owner_login] = 0
                             skipped_enrichment += 1
-                repo["_owner_followers"] = owner_cache.get(owner_login, 0)
-                repo["_total_issues"] = repo.get("open_issues_count", 0) + repo.get("_closed_issues", 0)
-                repo["_total_commits"] = repo.get("_total_commits", 0)
+                        else:
+                            try:
+                                user_data = await _github_request(
+                                    client, f"https://api.github.com/users/{owner_login}"
+                                )
+                                owner_cache[owner_login] = user_data.get("followers", 0)
+                                enriched_count += 1
+                                await asyncio.sleep(0.3)
+                            except Exception:
+                                owner_cache[owner_login] = 0
+                                skipped_enrichment += 1
+                    repo["_owner_followers"] = owner_cache.get(owner_login, 0)
+                    repo["_total_issues"] = repo.get("open_issues_count", 0) + repo.get("_closed_issues", 0)
+                    repo["_total_commits"] = repo.get("_total_commits", 0)
 
-            logger.info("Phase 4 complete: enriched %d owners, skipped %d (budget %d)", enriched_count, skipped_enrichment, ENRICHMENT_BUDGET)
+            if not only_extra_repos:
+                logger.info("Phase 4 complete: enriched %d owners, skipped %d (budget %d)", enriched_count, skipped_enrichment, ENRICHMENT_BUDGET)
+            else:
+                logger.info("Phase 4 skipped (only_extra_repos=True)")
 
         # ═══════════════════════════════════════════════════════
         # Phase 5: Fetch README content
@@ -632,24 +644,33 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
 
         logger.info("Database upsert complete: %d new, %d updated", new_count, updated_count)
 
-        scoring_engine = ScoringEngine()
-        scoring_engine.score_all(db)
+        skip_scoring = os.environ.get("SKIP_SCORING") == "1"
+        skip_composability = os.environ.get("SKIP_COMPOSABILITY") == "1"
+
+        if skip_scoring:
+            logger.info("Scoring check skipped via SKIP_SCORING env variable")
+        else:
+            scoring_engine = ScoringEngine()
+            scoring_engine.score_all(db)
 
         from app.services.composability import ComposabilityEngine
-        if new_count > 0 and new_repo_names:
-            # Only recompute composability for truly NEW skills, not all updated ones.
-            # Using last_synced >= started_at would include all updated skills (thousands),
-            # making composability take hours. Instead, only pass new skill IDs.
-            new_skill_ids = {
-                s.id for s in db.query(Skill.id)
-                .filter(Skill.repo_full_name.in_(new_repo_names))
-                .all()
-            }
-            logger.info("Composability: %d truly new skills (not %d updated)", len(new_skill_ids), updated_count)
-            ComposabilityEngine().compute_all(db, changed_ids=new_skill_ids)
+        if skip_composability:
+            logger.info("Composability check skipped via SKIP_COMPOSABILITY env variable")
         else:
-            logger.info("Composability: full recompute (no new skills or first run)")
-            ComposabilityEngine().compute_all(db)
+            if new_count > 0 and new_repo_names:
+                # Only recompute composability for truly NEW skills, not all updated ones.
+                # Using last_synced >= started_at would include all updated skills (thousands),
+                # making composability take hours. Instead, only pass new skill IDs.
+                new_skill_ids = {
+                    s.id for s in db.query(Skill.id)
+                    .filter(Skill.repo_full_name.in_(new_repo_names))
+                    .all()
+                }
+                logger.info("Composability: %d truly new skills (not %d updated)", len(new_skill_ids), updated_count)
+                ComposabilityEngine().compute_all(db, changed_ids=new_skill_ids)
+            else:
+                logger.info("Composability: full recompute (no new skills or first run)")
+                ComposabilityEngine().compute_all(db)
 
         # Take weekly trending snapshot (non-fatal if fails)
         maybe_take_weekly_snapshot(db)

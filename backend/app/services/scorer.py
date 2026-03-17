@@ -73,19 +73,19 @@ class ScoringEngine:
         "javascript": 0.0, "python": 0.0,
     }
 
-    def score_all(self, db: Session) -> int:
-        """Re-score every skill: quality analysis, platform inference, token estimation, then scoring."""
+    def score_all(self, db: Session, changed_ids: set[int] | None = None) -> int:
+        """Re-score skills. If changed_ids provided, only update their scores."""
         # Run quality analysis first (populates quality_* fields)
         analyzer = QualityAnalyzer()
-        analyzer.analyze_all(db)
+        analyzer.analyze_all(db, changed_ids)
 
         # Infer platforms
         inferrer = PlatformInferrer()
-        inferrer.infer_all(db)
+        inferrer.infer_all(db, changed_ids)
 
         # Estimate tokens
         estimator = TokenEstimator()
-        estimator.estimate_all(db)
+        estimator.estimate_all(db, changed_ids)
 
         # Now compute overall scores
         skills: List[Skill] = db.query(Skill).all()
@@ -111,6 +111,9 @@ class ScoringEngine:
 
         updated = 0
         for i, skill in enumerate(skills):
+            if changed_ids is not None and skill.id not in changed_ids:
+                continue
+
             norm_stars = self._log_normalize(stars_log[i], stars_log)
             norm_forks = self._log_normalize(forks_log[i], forks_log)
             norm_followers = self._log_normalize(followers_log[i], followers_log)

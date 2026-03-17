@@ -31,8 +31,11 @@ class QualityAnalyzer:
     8. Instruction Quality (10%) - Output paths, constraints, success criteria (NEW from paper)
     """
 
-    def analyze_all(self, db: Session) -> int:
-        skills = db.query(Skill).all()
+    def analyze_all(self, db: Session, changed_ids: set[int] | None = None) -> int:
+        query = db.query(Skill)
+        if changed_ids:
+            query = query.filter(Skill.id.in_(changed_ids))
+        skills = query.all()
         for skill in skills:
             self._analyze(skill)
         db.commit()

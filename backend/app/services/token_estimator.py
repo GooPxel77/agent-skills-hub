@@ -33,8 +33,11 @@ class TokenEstimator:
         "Shell": 0.05,
     }
 
-    def estimate_all(self, db: Session) -> int:
-        skills = db.query(Skill).all()
+    def estimate_all(self, db: Session, changed_ids: set[int] | None = None) -> int:
+        query = db.query(Skill)
+        if changed_ids:
+            query = query.filter(Skill.id.in_(changed_ids))
+        skills = query.all()
         for skill in skills:
             skill.estimated_tokens = self._estimate(skill)
         db.commit()

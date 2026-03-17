@@ -51,6 +51,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SKIP_SCORING: 1
+          SKIP_COMPOSABILITY: 1
         run: python sync_runner.py
 
   notify-failure:

@@ -66,8 +66,11 @@ class PlatformInferrer:
         "makefile": "cli",
     }
 
-    def infer_all(self, db: Session) -> int:
-        skills = db.query(Skill).all()
+    def infer_all(self, db: Session, changed_ids: set[int] | None = None) -> int:
+        query = db.query(Skill)
+        if changed_ids:
+            query = query.filter(Skill.id.in_(changed_ids))
+        skills = query.all()
         for skill in skills:
             platforms = self._infer(skill)
             skill.platforms = json.dumps(platforms)
