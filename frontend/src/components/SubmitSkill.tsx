@@ -15,12 +15,14 @@ export function SubmitSkill() {
       <div className="ps-card p-5 sm:p-6">
         <SkillForm t={t} navigate={navigate} />
       </div>
+      {/* 
       <div className="ps-card p-5 sm:p-6">
         <MasterForm t={t} />
       </div>
       <div className="ps-card p-5 sm:p-6">
         <WorkflowForm t={t} />
       </div>
+      */}
     </section>
   );
 }
@@ -106,7 +108,7 @@ function SkillForm({ t, navigate }: { t: (key: TransKey) => string; navigate: Re
 }
 
 /* ── Master Application Form ── */
-function MasterForm({ t }: { t: (key: TransKey) => string }) {
+export function MasterForm({ t }: { t: (key: TransKey) => string }) {
   const [github, setGithub] = useState("");
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -186,7 +188,7 @@ interface WorkflowStep {
   description: string;
 }
 
-function WorkflowForm({ t }: { t: (key: TransKey) => string }) {
+export function WorkflowForm({ t }: { t: (key: TransKey) => string }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [steps, setSteps] = useState<WorkflowStep[]>([

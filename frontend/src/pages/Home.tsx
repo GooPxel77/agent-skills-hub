@@ -19,7 +19,7 @@ import { SkillWorkflows } from "../components/SkillWorkflows";
 import { PlatformRecommendations } from "../components/PlatformRecommendations";
 import { SortControls } from "../components/SortControls";
 // import { SkillsMasters } from "../components/SkillsMasters";
-import { TopRatedSection } from "../components/TopRatedSection";
+// import { TopRatedSection } from "../components/TopRatedSection";
 import { TrendingSection } from "../components/TrendingSection";
 import { ViewToggle } from "../components/ViewToggle";
 import { SubmitSkill } from "../components/SubmitSkill";
@@ -136,11 +136,6 @@ export function Home() {
                   </>
                 ) : (
                   <>
-                    <TopRatedSection
-                      onSelect={handleOpenRepo}
-                      onShowDetail={handleShowDetail}
-                      initialData={landingData?.top_rated}
-                    />
                     <HallOfFame
                       onSelect={handleOpenRepo}
                       onShowDetail={handleShowDetail}
@@ -221,11 +216,10 @@ export function Home() {
                   <button
                     key={s}
                     onClick={() => updateParams({ size_category: params.size_category === s ? undefined : s })}
-                    className={`px-2.5 py-1 text-xs rounded-full border transition-colors cursor-pointer ${
-                      params.size_category === s
+                    className={`px-2.5 py-1 text-xs rounded-full border transition-colors cursor-pointer ${params.size_category === s
                         ? "bg-blue-600 text-white border-blue-600"
                         : "bg-[var(--ps-bg-card)] text-[var(--ps-text-secondary)] border-[var(--ps-border)] hover:border-blue-300"
-                    }`}
+                      }`}
                   >
                     {s.charAt(0).toUpperCase() + s.slice(1)}
                   </button>
@@ -236,11 +230,10 @@ export function Home() {
                   <button
                     key={p}
                     onClick={() => updateParams({ platform: params.platform === p ? undefined : p })}
-                    className={`px-2.5 py-1 text-xs rounded-full border transition-colors cursor-pointer ${
-                      params.platform === p
+                    className={`px-2.5 py-1 text-xs rounded-full border transition-colors cursor-pointer ${params.platform === p
                         ? "bg-blue-600 text-white border-blue-600"
                         : "bg-[var(--ps-bg-card)] text-[var(--ps-text-secondary)] border-[var(--ps-border)] hover:border-blue-300"
-                    }`}
+                      }`}
                   >
                     {p.charAt(0).toUpperCase() + p.slice(1)}
                   </button>
@@ -299,7 +292,7 @@ export function Home() {
                 {/* Empty State */}
                 {!loading && data && data.items.length === 0 && (
                   <div className="text-center py-16">
-                    <svg className="w-10 h-10 text-[var(--ps-text-muted)] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                    <svg className="w-10 h-10 text-[var(--ps-text-muted)] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
                     <h3 className="text-lg font-medium text-[var(--ps-text-primary)]">{t("explore.noResults")}</h3>
                     <p className="text-sm text-[var(--ps-text-secondary)] mt-1">
                       {t("explore.noResultsHint")}
