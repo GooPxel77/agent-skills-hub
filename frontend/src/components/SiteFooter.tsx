@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Search, Settings } from "lucide-react";
+import { Search, Settings, Heart } from "lucide-react";
 import { CrayfishIcon } from "./icons/CrayfishIcon";
 import { useI18n } from "../i18n/I18nContext";
 
@@ -61,11 +61,11 @@ export function SiteFooter() {
             </h4>
             <ul className="space-y-2">
               {[
-                { id: "trending", zh: "热门趋势", en: "Trending" },
-                { id: "top-rated", zh: "高分项目", en: "Top Rated" },
-                { id: "categories", zh: "分类浏览", en: "Categories" },
-                { id: "workflows", zh: "工作流", en: "Workflows" },
-                { id: "submit-skill", zh: "添加技能", en: "Add Skill" },
+                { id: "new-this-week", zh: "本周新增", en: "New This Week" },
+                { id: "categories", zh: "分类浏览", en: "Browse by Category" },
+                { id: "scenarios", zh: "工作流", en: "Scenario Workflows" },
+                { id: "discover", zh: "发现更多", en: "Discover More" },
+                { id: "add-skill", zh: "添加技能", en: "Add a Skill" },
               ].map((sec) => (
                 <li key={sec.id}>
                   <button
@@ -96,6 +96,16 @@ export function SiteFooter() {
                 >
                   <Search className="w-3.5 h-3.5" />
                   {t("tab.explore")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/?tab=favorites" className="text-sm transition-colors flex items-center gap-1.5"
+                  style={{ color: 'var(--ps-text-secondary)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-secondary)'}
+                >
+                  <Heart className="w-3.5 h-3.5" />
+                  {t("tab.favorites") || "My Favorites"}
                 </Link>
               </li>
               <li>

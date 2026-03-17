@@ -33,10 +33,10 @@ export function useUrlParams() {
     return { page, page_size, sort_by, sort_order, search, category, platform, size_category, quality_tiers, min_stars };
   }, [searchParams]);
 
-  const tab = (searchParams.get("tab") || "overview") as "overview" | "explore";
+  const tab = (searchParams.get("tab") || "overview") as "overview" | "explore" | "favorites";
 
   const setTab = useCallback(
-    (newTab: "overview" | "explore") => {
+    (newTab: "overview" | "explore" | "favorites") => {
       setSearchParams((prev) => {
         const next = new URLSearchParams(prev);
         if (newTab === "overview") {

@@ -13,6 +13,7 @@ export const translations = {
     // Tabs
     "tab.overview": "概览",
     "tab.explore": "浏览全部",
+    "tab.favorites": "我的收藏",
 
     // Sections
     "trending.title": "热门趋势",
@@ -144,6 +145,8 @@ export const translations = {
     "nav.topRated": "最高评分",
     "nav.categories": "分类精选",
     "nav.workflows": "场景组合",
+    "nav.newThisWeek": "本周新增",
+    "nav.discover": "发现更多",
     "nav.newsletter": "订阅",
 
     // Scenarios
@@ -285,6 +288,7 @@ export const translations = {
 
     "tab.overview": "Overview",
     "tab.explore": "Explore All",
+    "tab.favorites": "My Favorites",
 
     "trending.title": "Trending",
     "trending.subtitle": "Hottest projects recently, stay on top of trends",
@@ -414,6 +418,8 @@ export const translations = {
     "nav.topRated": "Top Rated",
     "nav.categories": "Categories",
     "nav.workflows": "Workflows",
+    "nav.newThisWeek": "New This Week",
+    "nav.discover": "Discover More",
     "nav.newsletter": "Newsletter",
 
     // Scenarios

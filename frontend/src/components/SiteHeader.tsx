@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, Search, ChevronRight } from "lucide-react";
+import { BarChart3, Search, ChevronRight, Heart } from "lucide-react";
 import { CrayfishIcon } from "./icons/CrayfishIcon";
 import { LanguageToggle } from "./LanguageToggle";
 import { ThemeToggle } from "./ThemeToggle";
@@ -10,8 +10,8 @@ import { timeAgo } from "../utils/time";
 interface Props {
   /** Show tab navigation (only on Home page) */
   showTabs?: boolean;
-  tab?: "overview" | "explore";
-  onTabChange?: (tab: "overview" | "explore") => void;
+  tab?: "overview" | "explore" | "favorites";
+  onTabChange?: (tab: "overview" | "explore" | "favorites") => void;
   /** Breadcrumb items for detail pages */
   breadcrumb?: { label: string }[];
 }
@@ -93,6 +93,17 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
                 <Search className="w-4 h-4 inline -mt-0.5 mr-1" />
                 {t("tab.explore")}
               </button>
+              <button
+                onClick={() => onTabChange("favorites")}
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 text-sm font-medium border-b-2 transition-colors cursor-pointer`}
+                style={{
+                  borderBottomColor: tab === "favorites" ? 'var(--ps-neon-cyan)' : 'transparent',
+                  color: tab === "favorites" ? 'var(--ps-neon-cyan)' : 'var(--ps-text-secondary)',
+                }}
+              >
+                <Heart className="w-4 h-4 inline -mt-0.5 mr-1" />
+                {t("tab.favorites") || "My Favorites"}
+              </button>
             </div>
             {/* Section quick navigation (overview tab only) */}
             {tab === "overview" && (
@@ -102,12 +113,11 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
                 )}
                 <div ref={subNavRef} className="flex items-center gap-1.5 py-2 overflow-x-auto scrollbar-hide">
                   {[
-                    { id: "trending", label: t("nav.trending") },
-                    { id: "recent", label: t("nav.recent") },
-                    { id: "top-rated", label: t("nav.topRated") },
-                    { id: "categories", label: t("nav.categories") },
-                    { id: "workflows", label: t("nav.workflows") },
-                    { id: "submit-skill", label: t("submit.tabSkill") },
+                    { id: "new-this-week", label: t("nav.newThisWeek") || "New This Week" },
+                    { id: "categories", label: t("nav.categories") || "Browse by Category" },
+                    { id: "scenarios", label: t("nav.workflows") || "Scenario Workflows" },
+                    { id: "discover", label: t("nav.discover") || "Discover More" },
+                    { id: "add-skill", label: t("submit.tabSkill") || "Add a Skill" },
                   ].map((sec) => (
                     <button
                       key={sec.id}

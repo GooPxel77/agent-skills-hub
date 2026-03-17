@@ -149,6 +149,18 @@ export async function fetchSkillBySlug(slug: string): Promise<SkillDetail> {
   return request<SkillDetail>(`/api/skills/by-slug/${encodeURIComponent(slug)}`);
 }
 
+export async function fetchSkillsByIds(ids: number[]): Promise<Skill[]> {
+  if (ids.length === 0) return [];
+  if (USE_SUPABASE) {
+    const { data, error } = await supabase!.from("skills").select("*").in("id", ids);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Skill[];
+  }
+  // Local API fallback - fetch individually
+  const results = await Promise.all(ids.map(id => request<SkillDetail>(`/api/skills/${id}`).catch(() => null)));
+  return results.filter(Boolean) as Skill[];
+}
+
 export async function fetchLanguageStats(): Promise<{ language: string; count: number }[]> {
   if (USE_SUPABASE) return sbFetchLanguageStats();
   return request(`/api/language-stats?limit=10`);
