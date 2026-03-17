@@ -27,7 +27,7 @@ jobs:
         working-directory: ./backend
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           SKIP_SCORING: 1
           SKIP_COMPOSABILITY: 1
         run: python extra_repos_sync_runner.py
