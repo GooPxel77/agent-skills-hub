@@ -33,7 +33,7 @@ def run_heavy():
         # 1. Scoring Missing ones
         skills_to_score = db.query(Skill).filter(
             or_(Skill.score == 0, Skill.quality_score == 0)
-        ).order_by(Skill.first_seen_at.desc().nullslast(), Skill.id.desc()).limit(limit).all()
+        ).order_by(Skill.first_seen.desc().nullslast(), Skill.id.desc()).limit(limit).all()
         
         score_ids = {s.id for s in skills_to_score}
         if score_ids:
@@ -47,7 +47,7 @@ def run_heavy():
         skills_without_comp = db.query(Skill).outerjoin(
             SkillComposition, Skill.id == SkillComposition.skill_id
         ).filter(SkillComposition.id == None, Skill.stars >= 5).order_by(
-            Skill.first_seen_at.desc().nullslast(), Skill.id.desc()
+            Skill.first_seen.desc().nullslast(), Skill.id.desc()
         ).limit(limit).all()
         
         comp_ids = {s.id for s in skills_without_comp}

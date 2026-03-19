@@ -699,6 +699,7 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
                 db.commit()
         except Exception:
             logger.error("Could not update sync log after failure: %s", exc)
+        raise
     finally:
         db.close()
 
