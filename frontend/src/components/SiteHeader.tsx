@@ -56,8 +56,12 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
           </div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <span className="text-sm items-center gap-1.5 hidden lg:flex" style={{ color: 'var(--ps-text-muted)' }}>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              {t("header.lastUpdated")} {stats?.last_sync_at ? timeAgo(stats.last_sync_at) : "No sync yet"}
+              {stats?.last_sync_at && (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  {t("header.lastUpdated")} {timeAgo(stats.last_sync_at)}
+                </>
+              )}
             </span>
             <ThemeToggle />
             <LanguageToggle />
