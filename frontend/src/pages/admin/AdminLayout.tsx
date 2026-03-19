@@ -4,10 +4,9 @@ import { MasterApplicationsPage } from "./MasterApplicationsPage";
 import { ExtraReposPage } from "./ExtraReposPage";
 import { SearchQueriesPage } from "./SearchQueriesPage";
 import { SkillsPage } from "./SkillsPage";
-import { SubscribersPage } from "./SubscribersPage";
 import { SyncPage } from "./SyncPage";
 
-type AdminTab = "masters" | "applications" | "skills" | "repos" | "queries" | "subscribers" | "sync";
+type AdminTab = "masters" | "applications" | "skills" | "repos" | "queries" | "sync";
 
 const TABS: { key: AdminTab; label: string }[] = [
   { key: "masters", label: "Masters" },
@@ -15,7 +14,6 @@ const TABS: { key: AdminTab; label: string }[] = [
   { key: "skills", label: "Skills" },
   { key: "repos", label: "Extra Repos" },
   { key: "queries", label: "Search Queries" },
-  { key: "subscribers", label: "Subscribers" },
   { key: "sync", label: "Sync" },
 ];
 
@@ -112,7 +110,6 @@ export function AdminLayout() {
         {tab === "skills" && <SkillsPage token={token} />}
         {tab === "repos" && <ExtraReposPage token={token} />}
         {tab === "queries" && <SearchQueriesPage token={token} />}
-        {tab === "subscribers" && <SubscribersPage token={token} />}
         {tab === "sync" && <SyncPage token={token} />}
       </main>
     </div>

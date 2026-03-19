@@ -9,7 +9,6 @@ import { ComparePage } from "./pages/ComparePage";
 import { CompareBar } from "./components/CompareBar";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { CategoryPage } from "./pages/CategoryPage";
-import { VerifyEmailPage } from "./pages/VerifyEmailPage";
 
 function App() {
   return (
@@ -24,7 +23,6 @@ function App() {
                 <Route path="/skill/:owner/:repo" element={<SkillDetailPage />} />
                 <Route path="/category/:slug" element={<CategoryPage />} />
                 <Route path="/compare" element={<ComparePage />} />
-                <Route path="/verify-email" element={<VerifyEmailPage />} />
                 <Route path="/admin/*" element={<AdminLayout />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
