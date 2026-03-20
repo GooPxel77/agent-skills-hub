@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   // Custom domain (agentskillshub.top) → "/"
   // Without custom domain on GitHub Pages → "/My-Skills-Hub/"
-  base: "/My-Skills-Hub/",
+  base: "/",
   plugins: [react(), tailwindcss()],
   build: {
     rollupOptions: {
