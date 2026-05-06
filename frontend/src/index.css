@@ -4,76 +4,178 @@
 /* ══════════════════════════════════════════════════════════════
    PostSoma Design Tokens
    ══════════════════════════════════════════════════════════════ */
+
+/* ── :root — constant tokens + dark-first fallback ── */
 :root {
-  /* ── Background & Surface ── */
-  --ps-bg-base: #0a0e14;
-  /* Slightly more muted dark blue-gray */
-  --ps-bg-card: rgba(255, 255, 255, 0.03);
-  --ps-bg-elevated: rgba(255, 255, 255, 0.05);
-  --ps-bg-input: rgba(255, 255, 255, 0.04);
+  /* Design constants (never change with theme) */
+  --ps-radius-card:   16px;
+  --ps-radius-btn:    9999px;
+  --ps-radius-input:  12px;
+  --ps-radius-sm:     8px;
+  --ps-font:          'Inter', system-ui, -apple-system, sans-serif;
 
-  /* ── Border ── */
-  --ps-border: rgba(255, 255, 255, 0.06);
-  --ps-border-glow: rgba(125, 211, 252, 0.2);
-  /* Muted sky blue */
+  /* Dark fallback (overridden by [data-theme] blocks below) */
+  --bg-page:          #090a0b;
+  --bg-surface:       #0f1115;
+  --bg-card:          rgba(255, 255, 255, 0.025);
+  --bg-card-hover:    rgba(255, 255, 255, 0.045);
+  --bg-elevated:      rgba(255, 255, 255, 0.05);
+  --bg-input:         rgba(255, 255, 255, 0.04);
+  --border-subtle:    rgba(255, 255, 255, 0.08);
+  --border-strong:    rgba(255, 255, 255, 0.14);
+  --border-glow:      rgba(56, 189, 248, 0.2);
+  --text-primary:     #f8fafc;
+  --text-secondary:   #a8b3c5;
+  --text-muted:       #64748b;
+  --accent-cyan:      #38bdf8;
+  --accent-violet:    #818cf8;
+  --accent-green:     #22c55e;
+  --accent-amber:     #fbbf24;
+  --shadow-soft:      0 18px 60px rgba(0, 0, 0, 0.35);
+  --grid-color:       rgba(56, 189, 248, 0.055);
+  --cta-bg:           #f8fafc;
+  --cta-text:         #090a0b;
 
-  /* ── Text ── */
-  --ps-text-primary: #cbd5e1;
-  --ps-text-secondary: #94a3b8;
-  --ps-text-muted: #64748b;
-
-  /* ── Neon Accent (Soft & Low Saturation) ── */
-  --ps-neon-cyan: #7dd3fc;
-  /* Sky 300 - muted cyan */
-  --ps-neon-purple: #a78bfa;
-  /* Violet 400 - soft purple */
-  --ps-neon-pink: #f472b6;
-  /* Pink 400 - soft pink */
-  --ps-neon-green: #5eead4;
-  /* Teal 300 - muted teal */
-  --ps-neon-amber: #fbbf24;
-  /* Amber 400 - softer amber */
-
-  /* ── Gradients ── */
-  --ps-gradient-hero: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
-  --ps-gradient-neon: linear-gradient(135deg, #7dd3fc, #a78bfa);
-  --ps-gradient-warm: linear-gradient(135deg, #fbbf24, #f472b6);
-  --ps-gradient-green: linear-gradient(135deg, #5eead4, #34d399);
-
-  /* ── Radius ── */
-  --ps-radius-card: 16px;
-  --ps-radius-btn: 9999px;
-  --ps-radius-input: 12px;
-  --ps-radius-sm: 8px;
-
-  /* ── Shadow & Glow ── */
-  --ps-shadow-glow: 0 0 15px rgba(125, 211, 252, 0.1);
-  --ps-shadow-card: 0 0 24px rgba(125, 211, 252, 0.04);
-  --ps-shadow-btn: 0 0 12px rgba(125, 211, 252, 0.15);
-
-  /* ── Font ── */
-  --ps-font: 'Inter', system-ui, -apple-system, sans-serif;
-
-  /* ── Spacing ── */
-  --ps-space-xs: 4px;
-  --ps-space-sm: 8px;
-  --ps-space-md: 16px;
-  --ps-space-lg: 24px;
-  --ps-space-xl: 32px;
+  /* Legacy ps- aliases pointing to semantic tokens */
+  --ps-bg-base:       var(--bg-page);
+  --ps-bg-card:       var(--bg-card);
+  --ps-bg-elevated:   var(--bg-elevated);
+  --ps-bg-input:      var(--bg-input);
+  --ps-bg-surface:    var(--bg-surface);
+  --ps-border:        var(--border-subtle);
+  --ps-border-glow:   var(--border-glow);
+  --ps-text-primary:  var(--text-primary);
+  --ps-text-secondary:var(--text-secondary);
+  --ps-text-muted:    var(--text-muted);
+  --ps-neon-cyan:     var(--accent-cyan);
+  --ps-neon-purple:   var(--accent-violet);
+  --ps-neon-green:    var(--accent-green);
+  --ps-neon-amber:    var(--accent-amber);
+  --ps-shadow-glow:   0 0 10px rgba(56, 189, 248, 0.05);
+  --ps-shadow-card:   var(--shadow-soft);
+  --ps-shadow-btn:    0 2px 8px rgba(0, 0, 0, 0.3);
+  --ps-gradient-neon: linear-gradient(135deg, #38bdf8, #818cf8);
 }
 
-.dark {
-  --ps-bg-base: #08090d;
-  --ps-bg-card: rgba(255, 255, 255, 0.02);
-  --ps-bg-elevated: rgba(255, 255, 255, 0.04);
-  --ps-bg-input: rgba(255, 255, 255, 0.03);
-  --ps-border: rgba(255, 255, 255, 0.05);
-  --ps-border-glow: rgba(0, 240, 255, 0.2);
-  --ps-text-primary: #cbd5e1;
-  --ps-text-secondary: #64748b;
-  --ps-text-muted: #334155;
-  --ps-neon-cyan: #00d4e6;
+/* ══════════════════════════════════════════════════════════════
+   Dark Theme — Quiet Premium Archive
+   ══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-page:          #090a0b;
+  --bg-surface:       #0f1115;
+  --bg-card:          rgba(255, 255, 255, 0.025);
+  --bg-card-hover:    rgba(255, 255, 255, 0.045);
+  --bg-elevated:      rgba(255, 255, 255, 0.05);
+  --bg-input:         rgba(255, 255, 255, 0.04);
+
+  /* Borders */
+  --border-subtle:    rgba(255, 255, 255, 0.08);
+  --border-strong:    rgba(255, 255, 255, 0.14);
+  --border-glow:      rgba(56, 189, 248, 0.2);
+
+  /* Text */
+  --text-primary:     #f8fafc;
+  --text-secondary:   #a8b3c5;
+  --text-muted:       #64748b;
+
+  /* Accents */
+  --accent-cyan:      #38bdf8;
+  --accent-violet:    #818cf8;
+  --accent-green:     #22c55e;
+  --accent-amber:     #fbbf24;
+
+  /* Shadows */
+  --shadow-soft:      0 18px 60px rgba(0, 0, 0, 0.35);
+
+  /* Grid overlay */
+  --grid-color:       rgba(56, 189, 248, 0.055);
+
+  /* CTA button */
+  --cta-bg:           #f8fafc;
+  --cta-text:         #090a0b;
+
+  /* Legacy ps- aliases (keeps old component styles working) */
+  --ps-bg-base:       var(--bg-page);
+  --ps-bg-card:       var(--bg-card);
+  --ps-bg-elevated:   var(--bg-elevated);
+  --ps-bg-input:      var(--bg-input);
+  --ps-bg-surface:    var(--bg-surface);
+  --ps-border:        var(--border-subtle);
+  --ps-border-glow:   var(--border-glow);
+  --ps-text-primary:  var(--text-primary);
+  --ps-text-secondary:var(--text-secondary);
+  --ps-text-muted:    var(--text-muted);
+  --ps-neon-cyan:     var(--accent-cyan);
+  --ps-neon-purple:   var(--accent-violet);
+  --ps-neon-green:    var(--accent-green);
+  --ps-neon-amber:    var(--accent-amber);
+  --ps-shadow-glow:   0 0 10px rgba(56, 189, 248, 0.05);
+  --ps-shadow-card:   var(--shadow-soft);
+  --ps-shadow-btn:    0 2px 8px rgba(0, 0, 0, 0.3);
+  --ps-gradient-neon: linear-gradient(135deg, #38bdf8, #818cf8);
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Light Theme — Calm Archive White
+   ══════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-page:          #f7f8fb;
+  --bg-surface:       #ffffff;
+  --bg-card:          rgba(255, 255, 255, 0.92);
+  --bg-card-hover:    #ffffff;
+  --bg-elevated:      rgba(15, 23, 42, 0.04);
+  --bg-input:         #ffffff;
+
+  /* Borders */
+  --border-subtle:    rgba(15, 23, 42, 0.10);
+  --border-strong:    rgba(15, 23, 42, 0.16);
+  --border-glow:      rgba(2, 132, 199, 0.25);
+
+  /* Text */
+  --text-primary:     #0f172a;
+  --text-secondary:   #475569;
+  --text-muted:       #94a3b8;
+
+  /* Accents */
+  --accent-cyan:      #0284c7;
+  --accent-violet:    #4f46e5;
+  --accent-green:     #16a34a;
+  --accent-amber:     #d97706;
+
+  /* Shadows */
+  --shadow-soft:      0 18px 50px rgba(15, 23, 42, 0.08);
+
+  /* Grid overlay */
+  --grid-color:       rgba(15, 23, 42, 0.045);
+
+  /* CTA button */
+  --cta-bg:           #0f172a;
+  --cta-text:         #ffffff;
+
+  /* Legacy ps- aliases */
+  --ps-bg-base:       var(--bg-page);
+  --ps-bg-card:       var(--bg-card);
+  --ps-bg-elevated:   var(--bg-elevated);
+  --ps-bg-input:      var(--bg-input);
+  --ps-bg-surface:    var(--bg-surface);
+  --ps-border:        var(--border-subtle);
+  --ps-border-glow:   var(--border-glow);
+  --ps-text-primary:  var(--text-primary);
+  --ps-text-secondary:var(--text-secondary);
+  --ps-text-muted:    var(--text-muted);
+  --ps-neon-cyan:     var(--accent-cyan);
+  --ps-neon-purple:   var(--accent-violet);
+  --ps-neon-green:    var(--accent-green);
+  --ps-neon-amber:    var(--accent-amber);
+  --ps-shadow-glow:   0 0 10px rgba(2, 132, 199, 0.08);
+  --ps-shadow-card:   var(--shadow-soft);
+  --ps-shadow-btn:    0 2px 8px rgba(15, 23, 42, 0.12);
+  --ps-gradient-neon: linear-gradient(135deg, #0284c7, #4f46e5);
+}
+
+
 
 /* ══════════════════════════════════════════════════════════════
    Global Base
@@ -81,22 +183,24 @@
 body {
   margin: 0;
   font-family: var(--ps-font);
-  background-color: var(--ps-bg-base);
-  color: var(--ps-text-primary);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* CSS-only grid background */
+/* CSS-only grid background — color adapts to theme via --grid-color */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
   background-image:
-    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
   background-size: 60px 60px;
   pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -138,7 +242,7 @@ body::before {
 .ps-btn:hover {
   border-color: var(--ps-border-glow);
   box-shadow: var(--ps-shadow-btn);
-  background: rgba(0, 240, 255, 0.08);
+  background: var(--bg-elevated);
 }
 
 .ps-btn:disabled {
@@ -177,11 +281,11 @@ body::before {
 }
 
 .ps-input:focus {
-  border-color: var(--ps-neon-cyan);
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.2), inset 0 0 8px rgba(0, 240, 255, 0.05);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
 }
 
-/* ── Neon Badge ── */
+/* ── Badge ── */
 .ps-badge {
   display: inline-flex;
   align-items: center;
@@ -189,27 +293,27 @@ body::before {
   border-radius: var(--ps-radius-btn);
   font-size: 10px;
   font-weight: 600;
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  background: rgba(0, 240, 255, 0.08);
-  color: var(--ps-neon-cyan);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
 }
 
 .ps-badge-hot {
-  border-color: rgba(245, 158, 11, 0.3);
-  background: rgba(245, 158, 11, 0.1);
-  color: var(--ps-neon-amber);
+  border-color: rgba(245, 158, 11, 0.25);
+  background: rgba(245, 158, 11, 0.08);
+  color: var(--accent-amber);
 }
 
 .ps-badge-new {
-  border-color: rgba(34, 211, 238, 0.3);
-  background: rgba(34, 211, 238, 0.1);
-  color: var(--ps-neon-green);
+  border-color: rgba(34, 197, 94, 0.25);
+  background: rgba(34, 197, 94, 0.08);
+  color: var(--accent-green);
 }
 
 .ps-badge-purple {
-  border-color: rgba(168, 85, 247, 0.3);
-  background: rgba(168, 85, 247, 0.1);
-  color: var(--ps-neon-purple);
+  border-color: var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
 }
 
 .ps-badge-pink {
@@ -218,11 +322,11 @@ body::before {
   color: var(--ps-neon-pink);
 }
 
-/* ── Neon Divider ── */
+/* ── Divider ── */
 .ps-divider {
   border: none;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--ps-border-glow), transparent);
+  background: var(--border-subtle);
 }
 
 /* ── Neon text utility ── */
@@ -255,7 +359,7 @@ body::before {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 240, 255, 0.2);
+  background: var(--border-strong);
   border-radius: 3px;
 }
 
@@ -447,5 +551,5 @@ body::before {
    Hero gradient (PostSoma)
    ══════════════════════════════════════════════════════════════ */
 .hero-gradient {
-  background: var(--ps-gradient-hero);
+  background: var(--bg-page);
 }

@@ -18,6 +18,7 @@ import { SortControls } from "../components/SortControls";
 import { ViewToggle } from "../components/ViewToggle";
 import { SubmitSkill } from "../components/SubmitSkill";
 import { NewThisWeek } from "../components/NewThisWeek";
+import { PicksSection } from "../components/PicksSection";
 import { FilterSidebar } from "../components/FilterSidebar";
 import { SiteHeader } from "../components/SiteHeader";
 import { ScrollToTop } from "../components/ScrollToTop";
@@ -149,9 +150,14 @@ export function Home() {
                 setTab("explore");
               }}
             />
-            <div id="new-this-week" className="scroll-mt-44">
+            <div id="new-this-week" className="scroll-mt-44 mt-6">
               <LazySection>
                 <NewThisWeek onShowDetail={handleShowDetail} />
+              </LazySection>
+            </div>
+            <div id="picks" className="scroll-mt-44 mt-6">
+              <LazySection>
+                <PicksSection />
               </LazySection>
             </div>
             <div id="categories" className="scroll-mt-44">
@@ -169,10 +175,26 @@ export function Home() {
                 <PlatformRecommendations />
               </LazySection>
             </div>
-            <div id="add-skill" className="scroll-mt-44">
+            <div id="add-skill" className="scroll-mt-44 mt-6">
               <LazySection minHeight="100px">
                 <SubmitSkill />
               </LazySection>
+            </div>
+            
+            {/* About this Hub Section */}
+            <div className="mt-16 mb-8 max-w-3xl mx-auto text-center border-t border-[var(--ps-border)] pt-12">
+              <h2 className="text-2xl font-bold text-[var(--ps-text-primary)] mb-4">About this Hub</h2>
+              <div className="text-[var(--ps-text-secondary)] space-y-4 text-base">
+                <p>
+                  My Skills Hub is a personal AI Agent skills library maintained by postsoma-2050. 
+                  It automatically indexes AI skills, MCP servers, agent tools, and automation scripts 
+                  from GitHub and the open-source AI agent ecosystem.
+                </p>
+                <p>
+                  The goal is not to collect more tools, but to make useful skills easier to find, 
+                  evaluate, bookmark, and reuse in real workflows.
+                </p>
+              </div>
             </div>
           </div>
         )}

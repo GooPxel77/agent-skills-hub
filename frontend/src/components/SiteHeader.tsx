@@ -40,7 +40,7 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
   }, [tab]);
 
   return (
-    <header className="sticky top-0 z-10 backdrop-blur-xl" style={{ background: 'rgba(10, 14, 26, 0.85)', borderBottom: '1px solid var(--ps-border)' }}>
+    <header className="sticky top-0 z-10 backdrop-blur-xl" style={{ background: 'color-mix(in srgb, var(--bg-surface) 90%, transparent)', borderBottom: '1px solid var(--border-subtle)' }}>
       <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between mb-3">
           <div className="min-w-0">
@@ -117,11 +117,10 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
                 )}
                 <div ref={subNavRef} className="flex items-center gap-1.5 py-2 overflow-x-auto scrollbar-hide">
                   {[
-                    { id: "new-this-week", label: t("nav.newThisWeek") || "New This Week" },
-                    { id: "categories", label: t("nav.categories") || "Browse by Category" },
-                    { id: "scenarios", label: t("nav.workflows") || "Scenario Workflows" },
-                    { id: "discover", label: t("nav.discover") || "Discover More" },
-                    { id: "add-skill", label: t("submit.tabSkill") || "Add a Skill" },
+                    { id: "new-this-week", label: "New" },
+                    { id: "picks", label: "Picks" },
+                    { id: "scenarios", label: "Workflows" },
+                    { id: "add-skill", label: "Add Skill" },
                   ].map((sec) => (
                     <button
                       key={sec.id}

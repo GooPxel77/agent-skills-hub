@@ -1,27 +1,15 @@
 import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, Star } from "lucide-react";
-import { CrayfishIcon } from "./icons/CrayfishIcon";
+import { Search, X, Star, Zap, Server, ShieldCheck } from "lucide-react";
 import { fetchQuickSearch } from "../api/client";
-import { useI18n } from "../i18n/I18nContext";
-import type { Skill, Stats } from "../types/skill";
-
-const TRENDING_TAGS = [
-  "mcp-server",
-  "claude-skill",
-  "langchain",
-  "browser-use",
-  "coding-agent",
-  "openai",
-];
+import type { Skill } from "../types/skill";
 
 interface Props {
-  stats: Stats | null;
+  stats: any; // Kept for compatibility but unused
   onSearch: (query: string) => void;
 }
 
-export function HeroSection({ stats, onSearch }: Props) {
-  const { t } = useI18n();
+export function HeroSection({ onSearch }: Props) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Skill[]>([]);
@@ -75,42 +63,52 @@ export function HeroSection({ stats, onSearch }: Props) {
     }
   };
 
-  const handleTagClick = (tag: string) => {
-    setQuery(tag);
-    onSearch(tag);
-  };
-
-  const totalSkills = stats?.total_skills ?? 17000;
-  const countDisplay = `${Math.floor(totalSkills / 1000).toLocaleString()},000+`;
-
-  const mcpCount = stats?.categories.find((c) => c.name === "mcp-server")?.count ?? 6500;
-  const claudeCount = stats?.categories.find((c) => c.name === "claude-skill")?.count ?? 2200;
-  const agentCount = stats?.categories.find((c) => c.name === "agent-tool")?.count ?? 5000;
-
   return (
-    <section className="hero-gradient -mx-4 px-4 pt-10 pb-8 sm:pt-14 sm:pb-10 mb-6 relative overflow-hidden">
-      {/* Subtle radial glow */}
+    <section className="hero-gradient -mx-4 px-4 pt-10 pb-12 sm:pt-16 sm:pb-16 mb-8 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse 60% 40% at 50% 20%, rgba(0,240,255,0.07), transparent)',
+        background: 'radial-gradient(ellipse 60% 40% at 50% 20%, rgba(255,255,255,0.02), transparent)',
       }} />
 
-      <div className="max-w-3xl mx-auto text-center relative z-[1]">
-        <div className="flex justify-center mb-6">
-          <CrayfishIcon className="w-16 h-16 opacity-80" style={{ color: 'var(--ps-neon-cyan)', filter: 'drop-shadow(0 0 12px rgba(125, 211, 252, 0.4))' }} />
+      <div className="max-w-4xl mx-auto text-center relative z-[1]">
+        {/* Byline pill */}
+        <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-[var(--ps-border)] bg-[var(--ps-bg-elevated)] text-xs font-medium text-[var(--ps-text-secondary)]">
+          <ShieldCheck className="w-3.5 h-3.5 text-[var(--ps-neon-cyan)]" />
+          <span>Curated by postsoma-2050 · Auto-synced every 8 hours</span>
         </div>
+
         {/* Main headline */}
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-3 ps-neon-text">
-          {t("hero.title").replace("{count}", countDisplay)}
+        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-5 text-[var(--ps-text-primary)]">
+          My AI Agent Skills Hub
         </h2>
-        <p className="text-base sm:text-lg mb-8 max-w-2xl mx-auto" style={{ color: 'var(--ps-text-secondary)' }}>
-          {t("hero.subtitle")}
+        
+        <p className="text-base sm:text-lg mb-8 max-w-2xl mx-auto text-[var(--ps-text-secondary)] leading-relaxed">
+          A personal AI agent skills library curated by postsoma-2050.
+          Automatically collecting, classifying, and scoring AI skills, MCP servers,
+          agent tools, and automation scripts for fast discovery and reuse.
         </p>
 
+        {/* CTAs */}
+        <div className="flex items-center justify-center gap-4 mb-10">
+          <button
+            onClick={() => onSearch("")}
+            className="px-6 py-3 rounded-full font-semibold transition-opacity hover:opacity-90"
+            style={{ background: 'var(--cta-bg)', color: 'var(--cta-text)' }}
+          >
+            Explore Skills
+          </button>
+          <a
+            href="#scenarios"
+            className="px-6 py-3 rounded-full border font-medium transition-colors"
+            style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-primary)', background: 'var(--bg-elevated)' }}
+          >
+            View Workflows
+          </a>
+        </div>
+
         {/* Search bar */}
-        <div className="relative max-w-2xl mx-auto mb-5" ref={containerRef}>
+        <div className="relative max-w-2xl mx-auto mb-16" ref={containerRef}>
           <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 z-10"
-            style={{ color: 'var(--ps-text-muted)' }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 z-10 text-[var(--ps-text-muted)]"
           />
           <input
             ref={inputRef}
@@ -119,26 +117,14 @@ export function HeroSection({ stats, onSearch }: Props) {
             onChange={(e) => handleChange(e.target.value)}
             onKeyDown={handleKeyDown}
             onFocus={() => { if (query.trim() || results.length > 0) setShowDropdown(true); }}
-            placeholder={t("hero.searchPlaceholder")}
+            placeholder="Search MCP servers, Claude skills, Codex skills, agent tools..."
             aria-label="Search skills"
-            className="ps-input"
-            style={{
-              paddingLeft: '48px',
-              paddingRight: '48px',
-              paddingTop: '16px',
-              paddingBottom: '16px',
-              fontSize: '16px',
-              borderRadius: '16px',
-              boxShadow: '0 0 40px rgba(0, 240, 255, 0.08)',
-            }}
+            className="ps-input pl-12 pr-12 py-4 text-base rounded-2xl shadow-sm"
           />
           {query && (
             <button
               onClick={() => { setQuery(""); setResults([]); setShowDropdown(false); }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 cursor-pointer z-10 transition-colors"
-              style={{ color: 'var(--ps-text-muted)' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-muted)'}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 cursor-pointer z-10 text-[var(--ps-text-muted)] hover:text-[var(--ps-neon-cyan)] transition-colors"
               aria-label="Clear"
             >
               <X className="w-5 h-5" />
@@ -148,17 +134,11 @@ export function HeroSection({ stats, onSearch }: Props) {
           {/* Dropdown */}
           {showDropdown && (query.trim() || results.length > 0) && (
             <div
-              className="absolute top-full left-0 right-0 mt-2 ps-card overflow-hidden z-[100]"
-              style={{
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 240, 255, 0.1)',
-                background: 'var(--ps-bg)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)'
-              }}
+              className="absolute top-full left-0 right-0 mt-2 ps-card overflow-hidden z-[100] text-left shadow-lg"
             >
               {searching && (
                 <div className="px-4 py-4 text-center">
-                  <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: 'var(--ps-neon-cyan)', borderTopColor: 'transparent' }} />
+                  <div className="w-5 h-5 border-2 rounded-full animate-spin mx-auto border-[var(--ps-neon-cyan)] border-t-transparent" />
                 </div>
               )}
               {!searching && results.length > 0 && (
@@ -168,21 +148,18 @@ export function HeroSection({ stats, onSearch }: Props) {
                       key={skill.id}
                       onClick={() => { navigate(`/skill/${skill.repo_full_name}`); setShowDropdown(false); }}
                       onMouseEnter={() => setActiveIdx(i)}
-                      className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors"
-                      style={{
-                        background: i === activeIdx ? 'rgba(0, 240, 255, 0.06)' : 'transparent',
-                      }}
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${i === activeIdx ? 'bg-[rgba(255,255,255,0.05)]' : ''}`}
                     >
                       <img src={skill.author_avatar_url} alt="" width={32} height={32} className="w-8 h-8 rounded-full shrink-0" />
-                      <div className="flex-1 min-w-0 text-left">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold truncate" style={{ color: 'var(--ps-text-primary)' }}>{skill.repo_name}</span>
-                          <span className="text-xs shrink-0" style={{ color: 'var(--ps-text-muted)' }}>{skill.author_name}</span>
+                          <span className="text-sm font-semibold truncate text-[var(--ps-text-primary)]">{skill.repo_name}</span>
+                          <span className="text-xs shrink-0 text-[var(--ps-text-muted)]">{skill.author_name}</span>
                         </div>
-                        <p className="text-xs truncate" style={{ color: 'var(--ps-text-secondary)' }}>{skill.description}</p>
+                        <p className="text-xs truncate text-[var(--ps-text-secondary)]">{skill.description}</p>
                       </div>
-                      <span className="text-xs flex items-center gap-0.5 shrink-0" style={{ color: 'var(--ps-text-secondary)' }}>
-                        <Star className="w-3.5 h-3.5" style={{ color: 'var(--ps-neon-amber)', fill: 'var(--ps-neon-amber)' }} />
+                      <span className="text-xs flex items-center gap-0.5 shrink-0 text-[var(--ps-text-secondary)]">
+                        <Star className="w-3.5 h-3.5 text-[var(--ps-neon-amber)] fill-[var(--ps-neon-amber)]" />
                         {skill.stars >= 1000 ? `${(skill.stars / 1000).toFixed(1)}k` : skill.stars.toLocaleString()}
                       </span>
                     </div>
@@ -190,50 +167,47 @@ export function HeroSection({ stats, onSearch }: Props) {
                 </div>
               )}
               {!searching && query.trim() && results.length === 0 && (
-                <div className="px-4 py-4 text-center text-sm" style={{ color: 'var(--ps-text-muted)' }}>
-                  {t("explore.noResults")}
+                <div className="px-4 py-4 text-center text-sm text-[var(--ps-text-muted)]">
+                  No skills found.
                 </div>
               )}
             </div>
           )}
         </div>
 
-        {/* Trending tags */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-          <span className="text-xs font-medium" style={{ color: 'var(--ps-text-muted)' }}>{t("hero.trending")}:</span>
-          {TRENDING_TAGS.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => handleTagClick(tag)}
-              className="ps-badge cursor-pointer transition-all"
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--ps-neon-cyan)'; e.currentTarget.style.boxShadow = '0 0 8px rgba(0,240,255,0.2)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(0, 240, 255, 0.2)'; e.currentTarget.style.boxShadow = 'none'; }}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
+        {/* Value Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-4xl mx-auto">
+          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center mb-4">
+              <Zap className="w-5 h-5 text-[var(--ps-text-primary)]" />
+            </div>
+            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Auto-collected</h3>
+            <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
+              Automatically collects skills, MCP servers, agent tools, and automation scripts
+              from GitHub and the open-source AI agent ecosystem.
+            </p>
+          </div>
+          
+          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center mb-4">
+              <Star className="w-5 h-5 text-[var(--ps-text-primary)]" />
+            </div>
+            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Classified & Scored</h3>
+            <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
+              Organizes each item by type, platform, use case, freshness, popularity, and
+              reuse potential.
+            </p>
+          </div>
 
-        {/* Key stats */}
-        <div className="flex items-center justify-center gap-6 sm:gap-10">
-          <div className="text-center">
-            <div className="text-xl sm:text-2xl font-bold ps-neon-text">{totalSkills.toLocaleString()}+</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--ps-text-muted)' }}>Skills</div>
-          </div>
-          <div className="w-px h-8" style={{ background: 'var(--ps-border)' }} />
-          <div className="text-center">
-            <div className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--ps-neon-purple)' }}>{mcpCount.toLocaleString()}+</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--ps-text-muted)' }}>MCP Servers</div>
-          </div>
-          <div className="w-px h-8" style={{ background: 'var(--ps-border)' }} />
-          <div className="text-center">
-            <div className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--ps-neon-cyan)' }}>{claudeCount.toLocaleString()}+</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--ps-text-muted)' }}>Claude Skills</div>
-          </div>
-          <div className="w-px h-8 hidden sm:block" style={{ background: 'var(--ps-border)' }} />
-          <div className="text-center hidden sm:block">
-            <div className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--ps-neon-green)' }}>{agentCount.toLocaleString()}+</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--ps-text-muted)' }}>Agent Tools</div>
+          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center mb-4">
+              <Server className="w-5 h-5 text-[var(--ps-text-primary)]" />
+            </div>
+            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Reusable Workflows</h3>
+            <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
+              Turns individual skills into reusable workflows for content creation, research,
+              developer productivity, and automation.
+            </p>
           </div>
         </div>
       </div>

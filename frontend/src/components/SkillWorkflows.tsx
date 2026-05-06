@@ -24,12 +24,12 @@ interface WorkflowData {
 }
 
 const WORKFLOW_META: Record<string, { icon: string; title_zh: string; title_en: string; description_zh: string; description_en: string; sort_order: number }> = {
-  "claude-skill": { icon: "sparkles", title_zh: "Claude 技能", title_en: "Claude Skills", description_zh: "为 Claude 量身打造的实用技能", description_en: "Purpose-built skills for Claude", sort_order: 1 },
-  "mcp-server": { icon: "server", title_zh: "MCP 服务器", title_en: "MCP Servers", description_zh: "模型上下文协议工具集合", description_en: "Model Context Protocol tool collection", sort_order: 2 },
-  "ai-skill": { icon: "cpu", title_zh: "AI 技能", title_en: "AI Skills", description_zh: "跨平台 AI 技能与插件", description_en: "Cross-platform AI skills & plugins", sort_order: 3 },
-  "agent-tool": { icon: "wrench", title_zh: "Agent 工具", title_en: "Agent Tools", description_zh: "AI Agent 框架与工具", description_en: "AI Agent frameworks & tools", sort_order: 4 },
-  "codex-skill": { icon: "code", title_zh: "Codex 技能", title_en: "Codex Skills", description_zh: "OpenAI Codex 专属技能", description_en: "OpenAI Codex skills", sort_order: 6 },
-  "llm-plugin": { icon: "puzzle", title_zh: "LLM 插件", title_en: "LLM Plugins", description_zh: "大语言模型插件与扩展", description_en: "LLM plugins & extensions", sort_order: 7 },
+  "claude-skill": { icon: "sparkles", title_zh: "Claude / Codex 技能", title_en: "Claude / Codex Skills", description_zh: "为 Claude, Codex 等 AI 助手量身打造的技能", description_en: "Skills, prompts, workflows, and extensions for Claude Code, Codex, Cursor, and other AI coding agents.", sort_order: 1 },
+  "mcp-server": { icon: "server", title_zh: "MCP 服务器", title_en: "MCP Servers", description_zh: "连接外部工具与数据源的 MCP 服务器", description_en: "Model Context Protocol servers that connect AI agents to external tools, data sources, and services.", sort_order: 2 },
+  "agent-tool": { icon: "wrench", title_zh: "Agent 工具", title_en: "Agent Tools", description_zh: "构建与增强 AI Agent 的框架与工具", description_en: "Frameworks, CLIs, platforms, and utilities for building, running, observing, or enhancing AI agents.", sort_order: 3 },
+  "ai-skill": { icon: "cpu", title_zh: "自动化脚本", title_en: "Automation Scripts", description_zh: "用于工作流与个人自动化的复用脚本", description_en: "Reusable scripts for content workflows, data sync, notifications, deployment, and personal automation.", sort_order: 4 },
+  "codex-skill": { icon: "code", title_zh: "Codex 技能", title_en: "Codex Skills", description_zh: "OpenAI Codex 专属技能", description_en: "OpenAI Codex skills", sort_order: 5 },
+  "llm-plugin": { icon: "puzzle", title_zh: "LLM 插件", title_en: "LLM Plugins", description_zh: "大语言模型插件与扩展", description_en: "LLM plugins & extensions", sort_order: 6 },
 };
 
 const iconPaths: Record<string, string> = {

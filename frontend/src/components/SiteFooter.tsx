@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Search, Settings, Heart } from "lucide-react";
+import { Search, Heart } from "lucide-react";
 import { CrayfishIcon } from "./icons/CrayfishIcon";
 import { useI18n } from "../i18n/I18nContext";
 
@@ -34,7 +34,7 @@ export function SiteFooter() {
   };
 
   return (
-    <footer className="mt-12" style={{ background: '#060810' }}>
+    <footer className="mt-12" style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border-subtle)' }}>
       {/* Top neon divider */}
       <div className="ps-divider" />
 
@@ -48,9 +48,8 @@ export function SiteFooter() {
               <span className="font-bold text-sm ps-neon-text">My Skills Hub</span>
             </Link>
             <p className="text-xs leading-relaxed" style={{ color: 'var(--ps-text-muted)' }}>
-              {lang === "zh"
-                ? "我的个人 Agent Skills 收藏库。数据来自 GitHub，定时自动更新。"
-                : "My personal Agent Skills collection. Data sourced from GitHub, auto-synced."}
+              Built and maintained by postsoma-2050.<br />
+              Data sourced from GitHub and the open-source AI agent ecosystem.
             </p>
           </div>
 
@@ -61,10 +60,8 @@ export function SiteFooter() {
             </h4>
             <ul className="space-y-2">
               {[
-                { id: "new-this-week", zh: "本周新增", en: "New This Week" },
-                { id: "categories", zh: "分类浏览", en: "Browse by Category" },
-                { id: "scenarios", zh: "工作流", en: "Scenario Workflows" },
-                { id: "discover", zh: "发现更多", en: "Discover More" },
+                { id: "picks", zh: "本周推荐", en: "Picks" },
+                { id: "scenarios", zh: "工作流", en: "Workflows" },
                 { id: "add-skill", zh: "添加技能", en: "Add a Skill" },
               ].map((sec) => (
                 <li key={sec.id}>
@@ -108,16 +105,6 @@ export function SiteFooter() {
                   {t("tab.favorites") || "My Favorites"}
                 </Link>
               </li>
-              <li>
-                <Link to="/admin" className="text-sm transition-colors flex items-center gap-1.5"
-                  style={{ color: 'var(--ps-text-secondary)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-secondary)'}
-                >
-                  <Settings className="w-3.5 h-3.5" />
-                  Admin
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
@@ -131,7 +118,7 @@ export function SiteFooter() {
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--ps-neon-green)' }} />
-          {t("footer.autoUpdated")}
+          Auto-updated every 8 hours.
         </span>
       </div>
     </footer>
