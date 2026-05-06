@@ -1,6 +1,10 @@
 interface Props {
   score: number;
   className?: string;
+  /** @deprecated kept for backward compatibility — no visual effect */
+  size?: "sm" | "md" | "lg";
+  /** @deprecated kept for backward compatibility — no visual effect */
+  showTier?: boolean;
 }
 
 function getScoreColor(score: number): string {
