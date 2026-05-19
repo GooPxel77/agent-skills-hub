@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -117,6 +118,12 @@ class DataCleaner:
             if not full_name or full_name in seen:
                 continue
             seen.add(full_name)
+
+            min_stars = int(os.getenv("MIN_STAR_THRESHOLD", "50"))
+            is_curated = repo.get("_is_curated", False)  # flag set by caller
+            if not is_curated and repo.get("stargazers_count", 0) < min_stars:
+                logger.debug(f"Skipping {full_name}: {repo.get('stargazers_count', 0)} stars < {min_stars}")
+                continue
 
             cleaned = self._clean_single(repo)
             if cleaned:
