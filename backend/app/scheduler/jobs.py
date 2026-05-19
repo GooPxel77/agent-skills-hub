@@ -470,6 +470,7 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
                         client, f"https://api.github.com/repos/{full_name}"
                     )
                     if repo_data.get("full_name"):
+                        repo_data["_is_curated"] = True
                         all_repos[full_name] = repo_data
                     await asyncio.sleep(0.5)
                 except Exception as exc:

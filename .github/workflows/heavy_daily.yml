@@ -9,6 +9,13 @@ on:
         description: "Max skills to process (DAILY_HEAVY_LIMIT)"
         required: false
         default: "100"
+      min_star_threshold:
+        description: 'Minimum stars to ingest (default: 50)'
+        required: false
+        default: '50'
+
+env:
+  MIN_STAR_THRESHOLD: ${{ inputs.min_star_threshold || '50' }}
 
 concurrency:
   group: heavy-daily-${{ github.ref }}
