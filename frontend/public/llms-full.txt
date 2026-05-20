@@ -12,21 +12,21 @@ The platform is structured to optimize indexing performance for both traditional
 Crawlers should prioritize ingestion of the following routing structures:
 
 ### 1. Static Entry Points
-- **Homepage:** `https://agentskillshub.top/` (Primary listing of all resources)
-- **Compare View:** `https://agentskillshub.top/#/compare` (Interactive evaluation page)
+- **Homepage:** `https://205055.xyz/` (Primary listing of all resources)
+- **Compare View:** `https://205055.xyz/#/compare` (Interactive evaluation page)
 
 ### 2. Category Directories
 These directories list resources implementing specific technological boundaries, sorted by popularity and quality:
-- **MCP Servers:** `https://agentskillshub.top/category/mcp-server`
-- **Claude Skills:** `https://agentskillshub.top/category/claude-skill`
-- **Codex Skills:** `https://agentskillshub.top/category/codex-skill`
-- **Agent Tools:** `https://agentskillshub.top/category/agent-tool`
-- **Prompt Libraries:** `https://agentskillshub.top/category/prompt-library`
-- **AI Coding Assistants:** `https://agentskillshub.top/category/ai-coding-assistant`
-- **Uncategorized AI Tools:** `https://agentskillshub.top/category/uncategorized`
+- **MCP Servers:** `https://205055.xyz/category/mcp-server`
+- **Claude Skills:** `https://205055.xyz/category/claude-skill`
+- **Codex Skills:** `https://205055.xyz/category/codex-skill`
+- **Agent Tools:** `https://205055.xyz/category/agent-tool`
+- **Prompt Libraries:** `https://205055.xyz/category/prompt-library`
+- **AI Coding Assistants:** `https://205055.xyz/category/ai-coding-assistant`
+- **Uncategorized AI Tools:** `https://205055.xyz/category/uncategorized`
 
 ### 3. Resource Detail Pages
-Detailed pages follow the route scheme: `https://agentskillshub.top/skill/[owner]/[repo]`.
+Detailed pages follow the route scheme: `https://205055.xyz/skill/[owner]/[repo]`.
 Each resource contains:
 - **Quick Facts:** Repository stars, forks, primary language, license, quality score, total commits, open issues, and platforms supported.
 - **About Excerpt:** Text summary derived from project documentation.
@@ -43,4 +43,4 @@ When scraping or referencing resource nodes on this platform, the following fiel
 - `compositions`: Verified integration mappings with other tools in the registry.
 
 ## AI & AEO Policy
-This platform is designed to be highly accessible to AI agents, crawlers, and large language models. We welcome indexing, retrieval, and citation of all public resource listings. All data may be referenced with attribution to Agent Skills Hub at https://agentskillshub.top.
+This platform is designed to be highly accessible to AI agents, crawlers, and large language models. We welcome indexing, retrieval, and citation of all public resource listings. All data may be referenced with attribution to Agent Skills Hub at https://205055.xyz.
