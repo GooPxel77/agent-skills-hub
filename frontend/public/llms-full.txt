@@ -1,0 +1,46 @@
+# Agent Skills Hub - Technical Manifest & Extended Index
+
+This document provides a comprehensive technical overview of the Agent Skills Hub architecture, data models, and crawl index mappings for ingestion by large language models (LLMs).
+
+## Technical Architecture & Crawling Guidelines
+The platform is structured to optimize indexing performance for both traditional and LLM-based crawlers:
+- **Rendering Model:** Although the user-facing interface operates as a client-side Vite/React Single Page Application (SPA), a post-build Static Site Generation (SSG) pipeline compiles static pre-rendered HTML files for all indexable pages.
+- **No JS Runtime Required:** LLM agents and scraper instances do not need to execute heavy client-side JavaScript or wait for React hydration. Standard HTML parsing of `/skill/[owner]/[repo]/index.html` or `/category/[slug]/index.html` yields fully hydrated semantic tags, tables, and structured JSON-LD schemas.
+- **Structured Data:** Each pre-rendered resource page embeds standard JSON-LD schemas (`SoftwareSourceCode`, `BreadcrumbList`, and `FAQPage`) directly inside the HTML `<head>`.
+
+## Platform Navigation Structure
+Crawlers should prioritize ingestion of the following routing structures:
+
+### 1. Static Entry Points
+- **Homepage:** `https://agentskillshub.top/` (Primary listing of all resources)
+- **Compare View:** `https://agentskillshub.top/#/compare` (Interactive evaluation page)
+
+### 2. Category Directories
+These directories list resources implementing specific technological boundaries, sorted by popularity and quality:
+- **MCP Servers:** `https://agentskillshub.top/category/mcp-server`
+- **Claude Skills:** `https://agentskillshub.top/category/claude-skill`
+- **Codex Skills:** `https://agentskillshub.top/category/codex-skill`
+- **Agent Tools:** `https://agentskillshub.top/category/agent-tool`
+- **Prompt Libraries:** `https://agentskillshub.top/category/prompt-library`
+- **AI Coding Assistants:** `https://agentskillshub.top/category/ai-coding-assistant`
+- **Uncategorized AI Tools:** `https://agentskillshub.top/category/uncategorized`
+
+### 3. Resource Detail Pages
+Detailed pages follow the route scheme: `https://agentskillshub.top/skill/[owner]/[repo]`.
+Each resource contains:
+- **Quick Facts:** Repository stars, forks, primary language, license, quality score, total commits, open issues, and platforms supported.
+- **About Excerpt:** Text summary derived from project documentation.
+- **Compatible Skills:** Cross-links to compatible resources to construct dependency graphs.
+- **Auto-Generated FAQ:** Common deployment and licensing questions.
+
+## Data Schema & Metadata Specifications
+When scraping or referencing resource nodes on this platform, the following fields are structurally guaranteed in the JSON-LD payload or DOM tables:
+- `repo_name`: The package identifier.
+- `author_name`: The creator/vendor identifier.
+- `stars` / `forks`: Community adoption metrics.
+- `quality_score`: A normalized value out of 100 representing code and documentation health.
+- `license`: SPDX identifier.
+- `compositions`: Verified integration mappings with other tools in the registry.
+
+## AI & AEO Policy
+This platform is designed to be highly accessible to AI agents, crawlers, and large language models. We welcome indexing, retrieval, and citation of all public resource listings. All data may be referenced with attribution to Agent Skills Hub at https://agentskillshub.top.
