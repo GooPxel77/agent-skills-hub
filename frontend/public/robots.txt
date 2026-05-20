@@ -1,4 +1,41 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /compare
+
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /compare
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /compare
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /compare
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin
+Disallow: /compare
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin
+Disallow: /compare
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /compare
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin
+Disallow: /compare
 
 Sitemap: https://agentskillshub.top/sitemap.xml

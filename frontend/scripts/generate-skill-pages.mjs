@@ -15,8 +15,8 @@
 import { readFileSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
-const SUPABASE_URL = "https://vknzzecmzsfmohglpfgm.supabase.co";
-const SUPABASE_ANON_KEY =
+const SUPABASE_URL = process.env.SUPABASE_URL || "https://vknzzecmzsfmohglpfgm.supabase.co";
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrbnp6ZWNtenNmbW9oZ2xwZmdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MDQ3MzIsImV4cCI6MjA4ODM4MDczMn0.zFAGZH-lDcL-GwyMkR-9sSV8pJToVzomsJ_fuXZIoDo";
 const SITE = "https://agentskillshub.top";
 
@@ -116,9 +116,30 @@ function shouldIndex(skill) {
 
 /* ── fetch skills from Supabase ────────────────── */
 
+async function fetchWithRetry(url, options = {}, retries = 5, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok) {
+        let errBody = "";
+        try {
+          errBody = await res.text();
+        } catch (_) {}
+        throw new Error(`HTTP error! status: ${res.status}, body: ${errBody}`);
+      }
+      return res;
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      console.warn(`Fetch failed (${err.message}). Retrying in ${delay}ms... (Attempt ${i + 1}/${retries})`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      delay *= 2;
+    }
+  }
+}
+
 async function fetchAllSkills() {
   const skills = [];
-  let offset = 0;
+  let lastId = null;
   const limit = 1000;
   const fields = [
     "id", "repo_full_name", "repo_name", "author_name", "author_avatar_url",
@@ -129,8 +150,11 @@ async function fetchAllSkills() {
   ].join(",");
 
   while (true) {
-    const url = `${SUPABASE_URL}/rest/v1/skills?select=${fields}&order=stars.desc&offset=${offset}&limit=${limit}`;
-    const res = await fetch(url, {
+    let url = `${SUPABASE_URL}/rest/v1/skills?select=${fields}&order=id.asc&limit=${limit}`;
+    if (lastId !== null) {
+      url += `&id=gt.${lastId}`;
+    }
+    const res = await fetchWithRetry(url, {
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
@@ -145,7 +169,7 @@ async function fetchAllSkills() {
       }
       skills.push(row);
     }
-    offset += limit;
+    lastId = data[data.length - 1].id;
     if (data.length < limit) break;
   }
   return skills;
@@ -158,7 +182,7 @@ async function fetchAllCompositions() {
 
   while (true) {
     const url = `${SUPABASE_URL}/rest/v1/skill_compositions?select=skill_id,compatible_skill_id,compatibility_score,reason&order=skill_id.asc,compatibility_score.desc&offset=${offset}&limit=${limit}`;
-    const res = await fetch(url, {
+    const res = await fetchWithRetry(url, {
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
@@ -390,7 +414,7 @@ function buildSkillHtml(skill, assetTags, compositions, skillById, categoryIndex
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${esc(title)}" />
   <meta name="twitter:description" content="${esc(metaDesc)}" />
-  <meta name="twitter:site" content="@GoSailGlobal" />
+  <meta name="twitter:site" content="@postsoma-2050" />
   <meta name="twitter:image" content="${esc(ogImage)}" />
 
   <!-- Canonical -->
@@ -549,7 +573,7 @@ function buildCategoryHtml(catSlug, catSkills, assetTags, allCategories) {
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="${esc(title)}" />
   <meta name="twitter:description" content="${esc(metaDesc)}" />
-  <meta name="twitter:site" content="@GoSailGlobal" />
+  <meta name="twitter:site" content="@postsoma-2050" />
 
   <link rel="canonical" href="${esc(pageUrl)}" />
 
@@ -624,6 +648,8 @@ async function main() {
 
   console.log("Fetching skills from Supabase...");
   const skills = await fetchAllSkills();
+  // Sort in-memory by stars desc
+  skills.sort((a, b) => (b.stars || 0) - (a.stars || 0));
   console.log(`Fetched ${skills.length} skills`);
 
   console.log("Fetching compositions...");

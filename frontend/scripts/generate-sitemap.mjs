@@ -19,8 +19,8 @@
 
 import { writeFileSync } from "fs";
 
-const SUPABASE_URL = "https://vknzzecmzsfmohglpfgm.supabase.co";
-const SUPABASE_ANON_KEY =
+const SUPABASE_URL = process.env.SUPABASE_URL || "https://vknzzecmzsfmohglpfgm.supabase.co";
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrbnp6ZWNtenNmbW9oZ2xwZmdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MDQ3MzIsImV4cCI6MjA4ODM4MDczMn0.zFAGZH-lDcL-GwyMkR-9sSV8pJToVzomsJ_fuXZIoDo";
 const SITE = "https://agentskillshub.top";
 
@@ -45,14 +45,39 @@ function shouldIndex(skill) {
   return false;
 }
 
+async function fetchWithRetry(url, options = {}, retries = 5, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok) {
+        let errBody = "";
+        try {
+          errBody = await res.text();
+        } catch (_) {}
+        throw new Error(`HTTP error! status: ${res.status}, body: ${errBody}`);
+      }
+      return res;
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      console.warn(`Fetch failed (${err.message}). Retrying in ${delay}ms... (Attempt ${i + 1}/${retries})`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      delay *= 2;
+    }
+  }
+}
+
 async function fetchAllSkills() {
   const skills = [];
-  let offset = 0;
+  let lastId = null;
   const limit = 1000;
 
   while (true) {
-    const url = `${SUPABASE_URL}/rest/v1/skills?select=repo_full_name,stars,last_commit_at,category,description,readme_size&order=stars.desc&offset=${offset}&limit=${limit}`;
-    const res = await fetch(url, {
+    let url = `${SUPABASE_URL}/rest/v1/skills?select=id,repo_full_name,stars,last_commit_at,category,description,readme_size&order=id.asc&limit=${limit}`;
+    if (lastId !== null) {
+      url += `&id=gt.${lastId}`;
+    }
+    console.log(`Fetching skills after ID ${lastId || 'start'}...`);
+    const res = await fetchWithRetry(url, {
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
@@ -61,7 +86,7 @@ async function fetchAllSkills() {
     const data = await res.json();
     if (!data.length) break;
     skills.push(...data);
-    offset += limit;
+    lastId = data[data.length - 1].id;
     if (data.length < limit) break;
   }
   return skills;
@@ -106,6 +131,8 @@ ${entries.join("\n")}
 async function main() {
   console.log("Fetching skills from Supabase...");
   const allSkills = await fetchAllSkills();
+  // Sort in-memory by stars desc
+  allSkills.sort((a, b) => (b.stars || 0) - (a.stars || 0));
   console.log(`Found ${allSkills.length} total skills`);
 
   // Filter to only indexed skills
