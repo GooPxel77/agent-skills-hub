@@ -5,21 +5,21 @@ A public registry and discovery platform for AI Agent Skills, Model Context Prot
 ## Metadata
 - **Platform Name:** Agent Skills Hub
 - **Primary Language:** English
-- **Canonical URL:** https://agentskillshub.top
+- **Canonical URL:** https://205055.xyz
 
 ## Platform Topography
 The platform exposes public registry content through the following routing structures:
 
-- **Homepage** ([https://agentskillshub.top/](https://agentskillshub.top/)): The main discovery interface containing global search, filtering options, and popularity metrics for all registered resources.
-- **Compare Dashboard** ([https://agentskillshub.top/#/compare](https://agentskillshub.top/#/compare)): An interactive comparison view for evaluating technical specifications and developer adoption metrics side-by-side.
-- **Category Indexes** (`https://agentskillshub.top/category/[slug]`): Curated resource listings partitioned by technology patterns.
-  - [MCP Servers](https://agentskillshub.top/category/mcp-server): Servers implementing the Model Context Protocol.
-  - [Claude Skills](https://agentskillshub.top/category/claude-skill): Reusable capabilities custom-built for Claude-based agents.
-  - [Codex Skills](https://agentskillshub.top/category/codex-skill): Action routines designed for code generation agents.
-  - [Agent Tools](https://agentskillshub.top/category/agent-tool): Helper utilities and environment tools for agents.
-  - [Prompt Libraries](https://agentskillshub.top/category/prompt-library): Structured prompts for directing agent behaviors.
-  - [AI Coding Assistants](https://agentskillshub.top/category/ai-coding-assistant): Specialized coding plugins and IDE extensions.
-- **Skill Detail Pages** (`https://agentskillshub.top/skill/[owner]/[repo]`): Deep-dive documentation for specific packages, including installation steps, compatibility scores, and quick facts.
+- **Homepage** ([https://205055.xyz/](https://205055.xyz/)): The main discovery interface containing global search, filtering options, and popularity metrics for all registered resources.
+- **Compare Dashboard** ([https://205055.xyz/#/compare](https://205055.xyz/#/compare)): An interactive comparison view for evaluating technical specifications and developer adoption metrics side-by-side.
+- **Category Indexes** (`https://205055.xyz/category/[slug]`): Curated resource listings partitioned by technology patterns.
+  - [MCP Servers](https://205055.xyz/category/mcp-server): Servers implementing the Model Context Protocol.
+  - [Claude Skills](https://205055.xyz/category/claude-skill): Reusable capabilities custom-built for Claude-based agents.
+  - [Codex Skills](https://205055.xyz/category/codex-skill): Action routines designed for code generation agents.
+  - [Agent Tools](https://205055.xyz/category/agent-tool): Helper utilities and environment tools for agents.
+  - [Prompt Libraries](https://205055.xyz/category/prompt-library): Structured prompts for directing agent behaviors.
+  - [AI Coding Assistants](https://205055.xyz/category/ai-coding-assistant): Specialized coding plugins and IDE extensions.
+- **Skill Detail Pages** (`https://205055.xyz/skill/[owner]/[repo]`): Deep-dive documentation for specific packages, including installation steps, compatibility scores, and quick facts.
 
 ## Knowledge Domain
 Agent Skills Hub aggregates documentation, integration specifications, and quality metrics surrounding:
@@ -29,4 +29,4 @@ Agent Skills Hub aggregates documentation, integration specifications, and quali
 - Community adoption indicators (stars, forks, commit frequency).
 
 ## AI & AEO Policy
-This platform is designed to be highly accessible to AI agents, crawlers, and large language models. We welcome indexing, retrieval, and citation of all public resource listings. All data may be referenced with attribution to Agent Skills Hub at https://agentskillshub.top.
+This platform is designed to be highly accessible to AI agents, crawlers, and large language models. We welcome indexing, retrieval, and citation of all public resource listings. All data may be referenced with attribution to Agent Skills Hub at https://205055.xyz.

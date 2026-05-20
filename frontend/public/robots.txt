@@ -38,4 +38,4 @@ Allow: /
 Disallow: /admin
 Disallow: /compare
 
-Sitemap: https://agentskillshub.top/sitemap.xml
+Sitemap: https://205055.xyz/sitemap.xml

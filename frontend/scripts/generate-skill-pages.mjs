@@ -18,7 +18,7 @@ import { join } from "path";
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://vknzzecmzsfmohglpfgm.supabase.co";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrbnp6ZWNtenNmbW9oZ2xwZmdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MDQ3MzIsImV4cCI6MjA4ODM4MDczMn0.zFAGZH-lDcL-GwyMkR-9sSV8pJToVzomsJ_fuXZIoDo";
-const SITE = "https://agentskillshub.top";
+const SITE = "https://205055.xyz";
 
 const CATEGORY_LABELS = {
   "mcp-server": "MCP Server",
