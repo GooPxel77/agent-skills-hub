@@ -20,5 +20,9 @@ export default defineConfig({
     proxy: {
       '/api': 'http://localhost:8000',
     },
+    watch: {
+      // Exclude dist/ from file watching — prevents hang when dist/ has thousands of subdirs
+      ignored: ['**/dist/**', '**/node_modules/**'],
+    },
   },
 })

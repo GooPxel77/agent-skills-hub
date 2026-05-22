@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Hide the static SEO fallback — only crawlers (no JS) see it.
+   React's createRoot() replaces #root children on mount. */
+#root > .seo-fallback {
+  display: none;
+}
+
 /* ══════════════════════════════════════════════════════════════
    PostSoma Design Tokens
    ══════════════════════════════════════════════════════════════ */

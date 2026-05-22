@@ -137,6 +137,26 @@ async function fetchWithRetry(url, options = {}, retries = 5, delay = 1000) {
   }
 }
 
+async function fetchTotalSkillsCount() {
+  const url = `${SUPABASE_URL}/rest/v1/skills?select=id&limit=1`;
+  const res = await fetchWithRetry(url, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      Prefer: "count=exact",
+    },
+  });
+  const contentRange = res.headers.get("content-range");
+  if (contentRange) {
+    const parts = contentRange.split("/");
+    if (parts.length === 2) {
+      const total = parseInt(parts[1]);
+      if (!isNaN(total)) return total;
+    }
+  }
+  return 91000; // fallback
+}
+
 async function fetchAllSkills() {
   const skills = [];
   let lastId = null;
@@ -150,7 +170,7 @@ async function fetchAllSkills() {
   ].join(",");
 
   while (true) {
-    let url = `${SUPABASE_URL}/rest/v1/skills?select=${fields}&order=id.asc&limit=${limit}`;
+    let url = `${SUPABASE_URL}/rest/v1/skills?stars=gte.20&select=${fields}&order=id.asc&limit=${limit}`;
     if (lastId !== null) {
       url += `&id=gt.${lastId}`;
     }
@@ -647,10 +667,11 @@ async function main() {
   console.log(`Assets: ${assetTags.scriptTags.length} scripts, ${assetTags.linkTags.length} links`);
 
   console.log("Fetching skills from Supabase...");
+  const totalSkills = await fetchTotalSkillsCount();
   const skills = await fetchAllSkills();
   // Sort in-memory by stars desc
   skills.sort((a, b) => (b.stars || 0) - (a.stars || 0));
-  console.log(`Fetched ${skills.length} skills`);
+  console.log(`Fetched ${skills.length} skills (total database count: ${totalSkills})`);
 
   console.log("Fetching compositions...");
   const compositions = await fetchAllCompositions();
@@ -737,7 +758,7 @@ async function main() {
   const indexPath = join(distDir, "index.html");
   try {
     let indexHtml = readFileSync(indexPath, "utf-8");
-    const totalK = Math.floor(skills.length / 1000) * 1000;
+    const totalK = Math.floor(totalSkills / 1000) * 1000;
     const totalCountStr = totalK.toLocaleString() + "+";
 
     const curatedCount = skills.filter(shouldIndex).length;
