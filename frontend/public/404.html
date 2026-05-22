@@ -4,16 +4,12 @@
   <meta charset="utf-8">
   <title>Agent Skills Hub</title>
   <script>
-    // GitHub Pages SPA redirect: converts path to query param and redirects to index.html
-    var pathSegmentsToKeep = 0; // Custom domain: 205055.xyz (root)
-    var l = window.location;
-    l.replace(
-      l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-      l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-      l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-      (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-      l.hash
-    );
+    // GitHub Pages SPA redirect for HashRouter
+    // Any 404 path gets converted to /#/path and redirected to index.html
+    var path = window.location.pathname;
+    var search = window.location.search;
+    var hash = window.location.hash;
+    window.location.replace('/' + '#' + path + search + hash);
   </script>
 </head>
 <body></body>
