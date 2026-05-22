@@ -733,17 +733,25 @@ async function main() {
   const totalElapsed = ((Date.now() - t0) / 1000).toFixed(1);
   console.log(`Total: ${ok + catCount} pages in ${totalElapsed}s`);
 
-  // Update dist/index.html with actual skill count (for SEO meta tags)
+  // Update dist/index.html with actual skill counts (for SEO meta tags and fallback HTML)
   const indexPath = join(distDir, "index.html");
   try {
     let indexHtml = readFileSync(indexPath, "utf-8");
-    const countK = Math.floor(skills.length / 1000) * 1000;
-    const countStr = countK.toLocaleString() + "+";
-    // Replace any "X,000+" pattern in meta descriptions
-    const updated = indexHtml.replace(/\d{1,3},000\+/g, countStr);
+    const totalK = Math.floor(skills.length / 1000) * 1000;
+    const totalCountStr = totalK.toLocaleString() + "+";
+
+    const curatedCount = skills.filter(shouldIndex).length;
+    const curatedK = Math.floor(curatedCount / 100) * 100;
+    const curatedCountStr = curatedK.toLocaleString() + "+";
+
+    // Replace placeholders with dynamic count strings
+    let updated = indexHtml
+      .replace(/91,000\+/g, totalCountStr)
+      .replace(/8,700\+/g, curatedCountStr);
+
     if (updated !== indexHtml) {
       writeFileSync(indexPath, updated);
-      console.log(`Updated dist/index.html: skill count → ${countStr}`);
+      console.log(`Updated dist/index.html: total → ${totalCountStr}, curated → ${curatedCountStr}`);
     }
   } catch (e) {
     console.warn("Could not update index.html count:", e.message);
