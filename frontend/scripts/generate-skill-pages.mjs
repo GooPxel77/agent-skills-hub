@@ -116,7 +116,9 @@ function shouldIndex(skill) {
 
 /* ── fetch skills from Supabase ────────────────── */
 
-async function fetchWithRetry(url, options = {}, retries = 5, delay = 1000) {
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function fetchWithRetry(url, options = {}, retries = 5, delay = 3000) {
   for (let i = 0; i < retries; i++) {
     try {
       const res = await fetch(url, options);
@@ -131,7 +133,7 @@ async function fetchWithRetry(url, options = {}, retries = 5, delay = 1000) {
     } catch (err) {
       if (i === retries - 1) throw err;
       console.warn(`Fetch failed (${err.message}). Retrying in ${delay}ms... (Attempt ${i + 1}/${retries})`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      await sleep(delay);
       delay *= 2;
     }
   }
@@ -144,6 +146,7 @@ async function fetchTotalSkillsCount() {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       Prefer: "count=exact",
+      "x-statement-timeout": "25000",
     },
   });
   const contentRange = res.headers.get("content-range");
@@ -160,7 +163,7 @@ async function fetchTotalSkillsCount() {
 async function fetchAllSkills() {
   const skills = [];
   let lastId = null;
-  const limit = 1000;
+  const limit = 500; // reduced from 1000 to avoid statement timeout
   const fields = [
     "id", "repo_full_name", "repo_name", "author_name", "author_avatar_url",
     "stars", "forks", "description", "category", "language", "score", "license",
@@ -178,6 +181,7 @@ async function fetchAllSkills() {
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "x-statement-timeout": "25000",
       },
     });
     const data = await res.json();
@@ -190,7 +194,9 @@ async function fetchAllSkills() {
       skills.push(row);
     }
     lastId = data[data.length - 1].id;
+    console.log(`  ... fetched ${skills.length} skills so far (last id: ${lastId})`);
     if (data.length < limit) break;
+    await sleep(300); // brief pause between pages to avoid overwhelming Supabase
   }
   return skills;
 }
@@ -198,7 +204,7 @@ async function fetchAllSkills() {
 async function fetchAllCompositions() {
   const comps = new Map();
   let offset = 0;
-  const limit = 1000;
+  const limit = 500; // reduced from 1000 to avoid statement timeout
 
   while (true) {
     const url = `${SUPABASE_URL}/rest/v1/skill_compositions?select=skill_id,compatible_skill_id,compatibility_score,reason&order=skill_id.asc,compatibility_score.desc&offset=${offset}&limit=${limit}`;
@@ -206,6 +212,7 @@ async function fetchAllCompositions() {
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "x-statement-timeout": "25000",
       },
     });
     const data = await res.json();
@@ -216,6 +223,7 @@ async function fetchAllCompositions() {
     }
     offset += limit;
     if (data.length < limit) break;
+    await sleep(300); // brief pause between pages
   }
   return comps;
 }
