@@ -1,6 +1,19 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- GitHub Pages BrowserRouter path restore (pairs with 404.html redirect) -->
+    <script>
+      (function(l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&');
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location));
+    </script>
     <script>
       (function(){var t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme:dark)").matches)){document.documentElement.classList.add("dark")}})();
     </script>
@@ -35,9 +48,9 @@
     <meta property="og:title" content="Agent Skills Hub - Discover Agent Skills, Tools & MCP Servers" />
     <meta property="og:description" content="Discover, compare and explore 91,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills (indexing 8,700+ curated tools)." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://205055.xyz" />
+    <meta property="og:url" content="https://www.205055.xyz" />
     <meta property="og:site_name" content="Agent Skills Hub" />
-    <meta property="og:image" content="https://205055.xyz/icons/og-image.png" />
+    <meta property="og:image" content="https://www.205055.xyz/icons/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:type" content="image/png" />
@@ -47,11 +60,11 @@
     <meta name="twitter:title" content="Agent Skills Hub" />
     <meta name="twitter:description" content="Discover 91,000+ open-source Agent Skills, AI tools & MCP servers (indexing 8,700+ curated tools)." />
     <meta name="twitter:site" content="@postsoma-2050" />
-    <meta name="twitter:image" content="https://205055.xyz/icons/og-image.png" />
+    <meta name="twitter:image" content="https://www.205055.xyz/icons/og-image.png" />
     <meta name="twitter:image:alt" content="Agent Skills Hub - 91,000+ Agent Skills, Tools & MCP Servers (indexing 8,700+ curated tools)" />
 
     <!-- Canonical -->
-    <link rel="canonical" href="https://205055.xyz" />
+    <link rel="canonical" href="https://www.205055.xyz" />
 
     <!-- JSON-LD WebSite Structured Data -->
     <script type="application/ld+json">
@@ -59,12 +72,12 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Agent Skills Hub",
-      "url": "https://205055.xyz",
+      "url": "https://www.205055.xyz",
       "potentialAction": {
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": "https://205055.xyz/?tab=explore&search={search_term_string}"
+          "urlTemplate": "https://www.205055.xyz/?tab=explore&search={search_term_string}"
         },
         "query-input": "required name=search_term_string"
       }
@@ -77,9 +90,9 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "Agent Skills Hub",
-      "url": "https://205055.xyz",
+      "url": "https://www.205055.xyz",
       "description": "Discover, compare and explore 91,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills (indexing 8,700+ curated tools).",
-      "image": "https://205055.xyz/icons/og-image.png",
+      "image": "https://www.205055.xyz/icons/og-image.png",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Web",
       "offers": {
@@ -104,12 +117,12 @@
       <!-- Static SEO Fallback Content for Crawlers (Hydrated by React) -->
       <div class="seo-fallback" style="max-width: 1000px; margin: 0 auto; padding: 40px 20px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; color: #1f2937;">
         <header style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px;">
-          <a href="/#/" style="font-size: 24px; font-weight: bold; text-decoration: none; color: #4f46e5;">Agent Skills Hub</a>
+          <a href="/" style="font-size: 24px; font-weight: bold; text-decoration: none; color: #4f46e5;">Agent Skills Hub</a>
           <nav>
-            <a href="/#/category/mcp-server" style="margin-left: 20px; text-decoration: none; color: #4b5563; font-weight: 500;">MCP Servers</a>
-            <a href="/#/category/claude-skill" style="margin-left: 20px; text-decoration: none; color: #4b5563; font-weight: 500;">Claude Skills</a>
-            <a href="/#/category/codex-skill" style="margin-left: 20px; text-decoration: none; color: #4b5563; font-weight: 500;">Codex Skills</a>
-            <a href="/#/category/agent-tool" style="margin-left: 20px; text-decoration: none; color: #4b5563; font-weight: 500;">Agent Tools</a>
+            <a href="/category/mcp-server" style="margin-left: 20px; text-decoration: none; color: #4b5563; font-weight: 500;">MCP Servers</a>
+            <a href="/category/claude-skill" style="margin-left: 20px; text-decoration: none; color: #4b5563; font-weight: 500;">Claude Skills</a>
+            <a href="/category/codex-skill" style="margin-left: 20px; text-decoration: none; color: #4b5563; font-weight: 500;">Codex Skills</a>
+            <a href="/category/agent-tool" style="margin-left: 20px; text-decoration: none; color: #4b5563; font-weight: 500;">Agent Tools</a>
           </nav>
         </header>
 
@@ -120,8 +133,8 @@
               A curated, open-source library of AI Agent skills, MCP servers, Claude skills, and agent tools. Discover, compare, and reuse 91,000+ developer-contributed skills to supercharge your AI workflows.
             </p>
             <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px;">
-              <a href="/#/?tab=explore" style="display: inline-block; padding: 12px 24px; background: #4f46e5; color: #ffffff; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06);">Explore All Skills</a>
-              <a href="/#/category/mcp-server" style="display: inline-block; padding: 12px 24px; background: #f3f4f6; color: #1f2937; border-radius: 8px; text-decoration: none; font-weight: 600;">Browse MCP Servers</a>
+              <a href="/?tab=explore" style="display: inline-block; padding: 12px 24px; background: #4f46e5; color: #ffffff; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06);">Explore All Skills</a>
+              <a href="/category/mcp-server" style="display: inline-block; padding: 12px 24px; background: #f3f4f6; color: #1f2937; border-radius: 8px; text-decoration: none; font-weight: 600;">Browse MCP Servers</a>
             </div>
           </section>
 
@@ -130,22 +143,22 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
               
               <div style="padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb;">
-                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin-top: 0; margin-bottom: 10px;"><a href="/#/category/mcp-server" style="color: #4f46e5; text-decoration: none;">MCP Servers</a></h3>
+                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin-top: 0; margin-bottom: 10px;"><a href="/category/mcp-server" style="color: #4f46e5; text-decoration: none;">MCP Servers</a></h3>
                 <p style="font-size: 14px; color: #4b5563; line-height: 1.5; margin: 0;">Model Context Protocol (MCP) servers to extend Claude Code, Cursor, and other AI agents with secure, custom tools.</p>
               </div>
 
               <div style="padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb;">
-                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin-top: 0; margin-bottom: 10px;"><a href="/#/category/claude-skill" style="color: #4f46e5; text-decoration: none;">Claude Skills</a></h3>
+                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin-top: 0; margin-bottom: 10px;"><a href="/category/claude-skill" style="color: #4f46e5; text-decoration: none;">Claude Skills</a></h3>
                 <p style="font-size: 14px; color: #4b5563; line-height: 1.5; margin: 0;">Reusable Javascript/Typescript skills specifically designed for Claude's agentic environment.</p>
               </div>
 
               <div style="padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb;">
-                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin-top: 0; margin-bottom: 10px;"><a href="/#/category/codex-skill" style="color: #4f46e5; text-decoration: none;">Codex Skills</a></h3>
+                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin-top: 0; margin-bottom: 10px;"><a href="/category/codex-skill" style="color: #4f46e5; text-decoration: none;">Codex Skills</a></h3>
                 <p style="font-size: 14px; color: #4b5563; line-height: 1.5; margin: 0;">Open-source prompts, functions, and tools optimized for OpenAI Codex and software engineering agents.</p>
               </div>
 
               <div style="padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb;">
-                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin-top: 0; margin-bottom: 10px;"><a href="/#/category/agent-tool" style="color: #4f46e5; text-decoration: none;">Agent Tools</a></h3>
+                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin-top: 0; margin-bottom: 10px;"><a href="/category/agent-tool" style="color: #4f46e5; text-decoration: none;">Agent Tools</a></h3>
                 <p style="font-size: 14px; color: #4b5563; line-height: 1.5; margin: 0;">Generic developer tools, CLI utilities, and API wrappers for AI agent platforms.</p>
               </div>
 
@@ -160,25 +173,25 @@
               <!-- MCP servers featured -->
               <div style="padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px;">
                 <span style="font-size: 12px; text-transform: uppercase; font-weight: bold; color: #4f46e5; background: #f0f0ff; padding: 2px 8px; border-radius: 4px;">MCP Server</span>
-                <h3 style="font-size: 18px; font-weight: 600; margin-top: 10px; margin-bottom: 8px;"><a href="/#/skill/modelcontextprotocol/servers" style="color: #111827; text-decoration: none;">modelcontextprotocol/servers</a></h3>
+                <h3 style="font-size: 18px; font-weight: 600; margin-top: 10px; margin-bottom: 8px;"><a href="/skill/modelcontextprotocol/servers" style="color: #111827; text-decoration: none;">modelcontextprotocol/servers</a></h3>
                 <p style="font-size: 14px; color: #4b5563; margin-bottom: 15px;">Reference implementations for Model Context Protocol servers including filesystem, git, github, postgres, and sqlite.</p>
-                <a href="/#/skill/modelcontextprotocol/servers" style="font-size: 14px; color: #4f46e5; text-decoration: none; font-weight: 500;">View Details &rarr;</a>
+                <a href="/skill/modelcontextprotocol/servers" style="font-size: 14px; color: #4f46e5; text-decoration: none; font-weight: 500;">View Details &rarr;</a>
               </div>
 
               <!-- Claude skill featured -->
               <div style="padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px;">
                 <span style="font-size: 12px; text-transform: uppercase; font-weight: bold; color: #10b981; background: #ecfdf5; padding: 2px 8px; border-radius: 4px;">Claude Skill</span>
-                <h3 style="font-size: 18px; font-weight: 600; margin-top: 10px; margin-bottom: 8px;"><a href="/#/skill/anthropics/claude-code" style="color: #111827; text-decoration: none;">anthropics/claude-code</a></h3>
+                <h3 style="font-size: 18px; font-weight: 600; margin-top: 10px; margin-bottom: 8px;"><a href="/skill/anthropics/claude-code" style="color: #111827; text-decoration: none;">anthropics/claude-code</a></h3>
                 <p style="font-size: 14px; color: #4b5563; margin-bottom: 15px;">Official CLI tool and agentic coding assistant from Anthropic that can edit files, run tests, and search git repositories.</p>
-                <a href="/#/skill/anthropics/claude-code" style="font-size: 14px; color: #10b981; text-decoration: none; font-weight: 500;">View Details &rarr;</a>
+                <a href="/skill/anthropics/claude-code" style="font-size: 14px; color: #10b981; text-decoration: none; font-weight: 500;">View Details &rarr;</a>
               </div>
 
               <!-- Codex / Agent tool featured -->
               <div style="padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px;">
                 <span style="font-size: 12px; text-transform: uppercase; font-weight: bold; color: #f59e0b; background: #fffbeb; padding: 2px 8px; border-radius: 4px;">Agent Tool</span>
-                <h3 style="font-size: 18px; font-weight: 600; margin-top: 10px; margin-bottom: 8px;"><a href="/#/skill/browser-use/browser-use" style="color: #111827; text-decoration: none;">browser-use/browser-use</a></h3>
+                <h3 style="font-size: 18px; font-weight: 600; margin-top: 10px; margin-bottom: 8px;"><a href="/skill/browser-use/browser-use" style="color: #111827; text-decoration: none;">browser-use/browser-use</a></h3>
                 <p style="font-size: 14px; color: #4b5563; margin-bottom: 15px;">Make websites accessible for AI agents. Run agent workflows directly in chrome/playwright browsers with easy setup.</p>
-                <a href="/#/skill/browser-use/browser-use" style="font-size: 14px; color: #f59e0b; text-decoration: none; font-weight: 500;">View Details &rarr;</a>
+                <a href="/skill/browser-use/browser-use" style="font-size: 14px; color: #f59e0b; text-decoration: none; font-weight: 500;">View Details &rarr;</a>
               </div>
 
             </div>

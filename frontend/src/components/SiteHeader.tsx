@@ -47,7 +47,7 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
             <Link to="/" className="flex items-center gap-2 group">
               <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2" style={{ color: 'var(--ps-text-primary)' }}>
                 <CrayfishIcon className="w-6 h-6 sm:w-7 sm:h-7" style={{ color: 'var(--ps-neon-cyan)' }} />
-                <span className="truncate group-hover:opacity-80 transition-opacity ps-neon-text">My Skills Hub</span>
+                <span className="truncate group-hover:opacity-80 transition-opacity ps-neon-text">Agent Skills Hub</span>
               </h1>
             </Link>
             <p className="text-xs sm:text-sm mt-0.5 hidden sm:block" style={{ color: 'var(--ps-text-secondary)' }}>
@@ -106,7 +106,7 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
                 }}
               >
                 <Heart className="w-4 h-4 inline -mt-0.5 mr-1" />
-                {t("tab.favorites") || "My Favorites"}
+                {t("tab.favorites") || "Saved"}
               </button>
             </div>
             {/* Section quick navigation (overview tab only) */}

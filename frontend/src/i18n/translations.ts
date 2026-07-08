@@ -1,7 +1,7 @@
 export const translations = {
   zh: {
     // Header
-    "header.subtitle": "我的 Agent Skills 个人收藏库",
+    "header.subtitle": "GitHub AI 技能自动收录与评分平台 · 每 8 小时同步",
     "header.lastUpdated": "最后更新:",
     "header.wechat": "微信联系",
     "header.wechatScan": "微信扫码添加好友",
@@ -13,7 +13,7 @@ export const translations = {
     // Tabs
     "tab.overview": "概览",
     "tab.explore": "浏览全部",
-    "tab.favorites": "我的收藏",
+    "tab.favorites": "已收藏",
 
     // Sections
     "trending.title": "热门趋势",
@@ -273,12 +273,12 @@ export const translations = {
     "faq.a5": "Star 增速榜根据 stars/天 计算项目热度，每周快照一次。增速越高说明项目越受关注。",
 
     // Footer
-    "footer.source": "My Skills Hub · 数据来自 GitHub",
+    "footer.source": "Agent Skills Hub · 数据来自 GitHub",
     "footer.autoUpdated": "每8小时自动更新",
   },
   en: {
     "header.subtitle":
-      "My personal Agent Skills collection",
+      "Auto-indexed AI skill platform · GitHub-powered · Updated every 8h",
     "header.lastUpdated": "Last updated:",
     "header.wechat": "WeChat",
     "header.wechatScan": "Scan to add on WeChat",
@@ -288,7 +288,7 @@ export const translations = {
 
     "tab.overview": "Overview",
     "tab.explore": "Explore All",
-    "tab.favorites": "My Favorites",
+    "tab.favorites": "Saved",
 
     "trending.title": "Trending",
     "trending.subtitle": "Hottest projects recently, stay on top of trends",
@@ -545,7 +545,7 @@ export const translations = {
     "faq.q5": "What is the Star Velocity History?",
     "faq.a5": "Ranks projects by stars/day, snapshotted weekly. Higher velocity indicates more community interest.",
 
-    "footer.source": "My Skills Hub · Data sourced from GitHub",
+    "footer.source": "Agent Skills Hub · Data sourced from GitHub",
     "footer.autoUpdated": "Auto-updated every 8 hours",
   },
 } as const;

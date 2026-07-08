@@ -128,12 +128,21 @@ export function Home() {
   return (
     <div className="min-h-screen">
       <Helmet>
-        <title>My Skills Hub - Personal Agent Skills Collection</title>
-        <meta name="description" content="My personal collection of Agent Skills, MCP servers, and AI tools." />
-        <meta property="og:title" content="My Skills Hub - Personal Agent Skills Collection" />
-        <meta property="og:description" content="My personal collection of Agent Skills, MCP servers, and AI tools." />
+        <title>Agent Skills Hub - Discover Agent Skills, Tools &amp; MCP Servers</title>
+        <meta name="description" content="Discover, compare and explore 91,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills. Find the best skills for your AI agent workflow." />
+        {/* Open Graph */}
+        <meta property="og:title" content="Agent Skills Hub - Discover Agent Skills, Tools &amp; MCP Servers" />
+        <meta property="og:description" content="Discover, compare and explore 91,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills." />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.205055.xyz" />
+        <meta property="og:image" content="https://www.205055.xyz/icons/og-image.png" />
+        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Agent Skills Hub" />
+        <meta name="twitter:description" content="Discover 91,000+ open-source Agent Skills, AI tools &amp; MCP servers." />
+        <meta name="twitter:image" content="https://www.205055.xyz/icons/og-image.png" />
+        {/* Canonical */}
+        <link rel="canonical" href="https://www.205055.xyz" />
       </Helmet>
 
       <SiteHeader showTabs tab={tab} onTabChange={setTab} />
@@ -181,18 +190,25 @@ export function Home() {
               </LazySection>
             </div>
             
-            {/* About this Hub Section */}
             <div className="mt-16 mb-8 max-w-3xl mx-auto text-center border-t border-[var(--ps-border)] pt-12">
-              <h2 className="text-2xl font-bold text-[var(--ps-text-primary)] mb-4">About this Hub</h2>
+              <h2 className="text-2xl font-bold text-[var(--ps-text-primary)] mb-4">About Agent Skills Hub</h2>
               <div className="text-[var(--ps-text-secondary)] space-y-4 text-base">
                 <p>
-                  My Skills Hub is a personal AI Agent skills library maintained by postsoma-2050. 
-                  It automatically indexes AI skills, MCP servers, agent tools, and automation scripts 
-                  from GitHub and the open-source AI agent ecosystem.
+                  Agent Skills Hub is an automated indexing platform that continuously crawls GitHub
+                  to discover, classify, and score AI skills, MCP servers, agent tools, and automation scripts.
+                  The index currently covers 11,700+ repositories and is refreshed every 8 hours.
                 </p>
                 <p>
-                  The goal is not to collect more tools, but to make useful skills easier to find, 
-                  evaluate, bookmark, and reuse in real workflows.
+                  Built and maintained by{" "}
+                  <a
+                    href="https://github.com/postsoma-2050"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[var(--ps-neon-cyan)] hover:underline"
+                  >
+                    postsoma-2050
+                  </a>
+                  . Submit any public GitHub repository to add it to the index.
                 </p>
               </div>
             </div>

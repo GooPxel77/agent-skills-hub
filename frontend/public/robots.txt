@@ -1,41 +1,27 @@
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /compare
+Disallow: /admin/
 
+# AI/LLM Crawlers — allow full access for AI visibility
 User-agent: GPTBot
 Allow: /
-Disallow: /admin
-Disallow: /compare
 
 User-agent: ClaudeBot
 Allow: /
-Disallow: /admin
-Disallow: /compare
 
 User-agent: PerplexityBot
 Allow: /
-Disallow: /admin
-Disallow: /compare
 
 User-agent: anthropic-ai
 Allow: /
-Disallow: /admin
-Disallow: /compare
 
 User-agent: Applebot-Extended
 Allow: /
-Disallow: /admin
-Disallow: /compare
 
 User-agent: OAI-SearchBot
 Allow: /
-Disallow: /admin
-Disallow: /compare
 
 User-agent: Google-Extended
 Allow: /
-Disallow: /admin
-Disallow: /compare
 
-Sitemap: https://205055.xyz/sitemap.xml
+Sitemap: https://www.205055.xyz/sitemap.xml
