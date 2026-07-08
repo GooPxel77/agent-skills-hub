@@ -65,7 +65,19 @@ export function CategoryPage() {
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={description} />
-        <link rel="canonical" href={`https://205055.xyz/category/${slug}`} />
+        <link rel="canonical" href={`https://www.205055.xyz/category/${slug}`} />
+        {/* Open Graph */}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://www.205055.xyz/category/${slug}`} />
+        <meta property="og:image" content="https://www.205055.xyz/icons/og-image.png" />
+        <meta property="og:site_name" content="Agent Skills Hub" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://www.205055.xyz/icons/og-image.png" />
       </Helmet>
 
       <SiteHeader />

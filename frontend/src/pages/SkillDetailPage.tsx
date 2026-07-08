@@ -104,15 +104,16 @@ export function SkillDetailPage() {
         <meta property="og:title" content={`${detail.repo_name} | Agent Skills Hub`} />
         <meta property="og:description" content={ogDescription} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={`https://205055.xyz/skill/${detail.repo_full_name}`} />
-        <meta property="og:image" content={detail.author_avatar_url} />
+        <meta property="og:url" content={`https://www.205055.xyz/skill/${detail.repo_full_name}`} />
+        <meta property="og:image" content="https://www.205055.xyz/icons/og-image.png" />
+        <meta property="og:site_name" content="Agent Skills Hub" />
         {/* Twitter Card */}
-        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${detail.repo_name} | Agent Skills Hub`} />
         <meta name="twitter:description" content={ogDescription} />
-        <meta name="twitter:image" content={detail.author_avatar_url} />
+        <meta name="twitter:image" content="https://www.205055.xyz/icons/og-image.png" />
         {/* Canonical URL */}
-        <link rel="canonical" href={`https://205055.xyz/skill/${detail.repo_full_name}`} />
+        <link rel="canonical" href={`https://www.205055.xyz/skill/${detail.repo_full_name}`} />
       </Helmet>
 
       {/* Shared Navigation Bar */}

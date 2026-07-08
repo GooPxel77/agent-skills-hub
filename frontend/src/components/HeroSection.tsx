@@ -73,18 +73,17 @@ export function HeroSection({ onSearch }: Props) {
         {/* Byline pill */}
         <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-[var(--ps-border)] bg-[var(--ps-bg-elevated)] text-xs font-medium text-[var(--ps-text-secondary)]">
           <ShieldCheck className="w-3.5 h-3.5 text-[var(--ps-neon-cyan)]" />
-          <span>Curated by postsoma-2050 · Auto-synced every 8 hours</span>
+          <span>11,700+ skills indexed · Auto-synced every 8 hours from GitHub</span>
         </div>
 
         {/* Main headline */}
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-5 text-[var(--ps-text-primary)]">
-          My AI Agent Skills Hub
+          The AI Agent Skills Index
         </h2>
         
         <p className="text-base sm:text-lg mb-8 max-w-2xl mx-auto text-[var(--ps-text-secondary)] leading-relaxed">
-          A personal AI agent skills library curated by postsoma-2050.
-          Automatically collecting, classifying, and scoring AI skills, MCP servers,
-          agent tools, and automation scripts for fast discovery and reuse.
+          Automated discovery, classification and scoring of 11,700+ AI skills, MCP servers,
+          agent tools, and automation scripts — sourced from GitHub, refreshed every 8 hours.
         </p>
 
         {/* CTAs */}
@@ -181,10 +180,10 @@ export function HeroSection({ onSearch }: Props) {
             <div className="w-10 h-10 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center mb-4">
               <Zap className="w-5 h-5 text-[var(--ps-text-primary)]" />
             </div>
-            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Auto-collected</h3>
+            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">GitHub-Indexed</h3>
             <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
-              Automatically collects skills, MCP servers, agent tools, and automation scripts
-              from GitHub and the open-source AI agent ecosystem.
+              Continuously crawls GitHub for AI skills, MCP servers, and agent tools.
+              New entries appear within 8 hours of publication.
             </p>
           </div>
           
@@ -192,10 +191,10 @@ export function HeroSection({ onSearch }: Props) {
             <div className="w-10 h-10 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center mb-4">
               <Star className="w-5 h-5 text-[var(--ps-text-primary)]" />
             </div>
-            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Classified & Scored</h3>
+            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Auto-Classified & Scored</h3>
             <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
-              Organizes each item by type, platform, use case, freshness, popularity, and
-              reuse potential.
+              Every skill is automatically categorized by type, platform, language, and use case —
+              with a quality score based on stars, commits, and freshness.
             </p>
           </div>
 
@@ -203,10 +202,10 @@ export function HeroSection({ onSearch }: Props) {
             <div className="w-10 h-10 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center mb-4">
               <Server className="w-5 h-5 text-[var(--ps-text-primary)]" />
             </div>
-            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Reusable Workflows</h3>
+            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Composable Workflows</h3>
             <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
-              Turns individual skills into reusable workflows for content creation, research,
-              developer productivity, and automation.
+              Combine skills into reusable workflows for content creation, research,
+              developer productivity, and multi-agent automation.
             </p>
           </div>
         </div>

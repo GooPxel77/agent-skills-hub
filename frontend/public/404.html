@@ -4,12 +4,24 @@
   <meta charset="utf-8">
   <title>Agent Skills Hub</title>
   <script>
-    // GitHub Pages SPA redirect for HashRouter
-    // Any 404 path gets converted to /#/path and redirected to index.html
-    var path = window.location.pathname;
-    var search = window.location.search;
-    var hash = window.location.hash;
-    window.location.replace('/' + '#' + path + search + hash);
+    // GitHub Pages SPA fallback for BrowserRouter
+    // Encodes the path into a query param so index.html can decode & restore it.
+    // Static pre-rendered pages (/skill/*, /category/*) are served directly from
+    // dist/ — this 404.html should NOT redirect them to hash routes.
+    (function() {
+      var path = window.location.pathname;
+      var search = window.location.search;
+      var hash = window.location.hash;
+
+      // Encode path into ?/ query param for index.html to restore
+      var encoded = path.slice(1).replace(/&/g, '~and~');
+      var searchPart = search ? '&' + search.slice(1).replace(/&/g, '~and~') : '';
+
+      window.location.replace(
+        window.location.protocol + '//' + window.location.host +
+        '/?/' + encoded + searchPart + hash
+      );
+    })();
   </script>
 </head>
 <body></body>

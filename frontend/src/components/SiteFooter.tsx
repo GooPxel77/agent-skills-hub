@@ -45,10 +45,10 @@ export function SiteFooter() {
           <div className="col-span-2 sm:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-3">
               <CrayfishIcon className="w-6 h-6" style={{ color: 'var(--ps-neon-cyan)' }} />
-              <span className="font-bold text-sm ps-neon-text">My Skills Hub</span>
+              <span className="font-bold text-sm ps-neon-text">Agent Skills Hub</span>
             </Link>
             <p className="text-xs leading-relaxed" style={{ color: 'var(--ps-text-muted)' }}>
-              Built and maintained by postsoma-2050.<br />
+              Automated indexing platform · Maintained by postsoma-2050.<br />
               Data sourced from GitHub and the open-source AI agent ecosystem.
             </p>
           </div>
@@ -102,7 +102,7 @@ export function SiteFooter() {
                   onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-secondary)'}
                 >
                   <Heart className="w-3.5 h-3.5" />
-                  {t("tab.favorites") || "My Favorites"}
+                  {t("tab.favorites") || "Saved"}
                 </Link>
               </li>
             </ul>
@@ -114,7 +114,7 @@ export function SiteFooter() {
       <div className="ps-divider" />
       <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs" style={{ color: 'var(--ps-text-muted)' }}>
         <span>
-          &copy; {new Date().getFullYear()} My Skills Hub
+          © {new Date().getFullYear()} Agent Skills Hub · Maintained by postsoma-2050
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--ps-neon-green)' }} />
