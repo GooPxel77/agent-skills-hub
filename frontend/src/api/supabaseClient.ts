@@ -46,7 +46,7 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 1, delay = 1000): Pr
 
 export async function sbFetchSkills(params: SkillsQueryParams): Promise<PaginatedSkills> {
   const sb = ensureSupabase();
-  let query = sb.from("skills").select(SKILL_COLUMNS, { count: "exact" });
+  let query = sb.from("v_curated_skills").select(SKILL_COLUMNS, { count: "exact" });
 
   if (params.category) query = query.eq("category", params.category);
   if (params.size_category) query = query.eq("size_category", params.size_category);
@@ -167,7 +167,7 @@ export async function sbFetchTopRated(limit = 10): Promise<Skill[]> {
 
   // Fallback: query skills table directly using quality_score
   const { data: fallbackData, error: fallbackError } = await sb
-    .from("skills")
+    .from("v_curated_skills")
     .select(SKILL_COLUMNS)
     .gt("quality_score", 0)
     .order("quality_score", { ascending: false })
@@ -334,7 +334,7 @@ export async function sbFetchNewThisWeek(limit = 10): Promise<Skill[]> {
   const sb = ensureSupabase();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const { data, error } = await sb
-    .from("skills")
+    .from("v_curated_skills")
     .select(SKILL_COLUMNS)
     .gte("first_seen", sevenDaysAgo)
     .order("stars", { ascending: false })

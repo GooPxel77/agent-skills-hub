@@ -38,7 +38,18 @@ class ComposabilityEngine:
             db.query(SkillComposition).delete()
             db.flush()
 
-        skills = db.query(Skill).filter(Skill.stars >= 5).all()
+        from sqlalchemy import or_, and_
+        from datetime import datetime, timezone, timedelta
+        
+        since_30d = datetime.now(timezone.utc) - timedelta(days=30)
+        skills = db.query(Skill).filter(
+            or_(
+                Skill.stars >= 20,
+                and_(Skill.stars >= 5, Skill.last_commit_at >= since_30d),
+                Skill.category != "uncategorized"
+            )
+        ).all()
+        
         if not skills:
             db.commit()
             return 0

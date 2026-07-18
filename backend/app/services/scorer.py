@@ -87,8 +87,19 @@ class ScoringEngine:
         estimator = TokenEstimator()
         estimator.estimate_all(db, changed_ids)
 
-        # Now compute overall scores
-        skills: List[Skill] = db.query(Skill).all()
+        from sqlalchemy import or_, and_
+        from datetime import timedelta
+        
+        # Only score skills that are curated candidates (stars >= 20 or active stars >= 5 or categorized)
+        since_30d = datetime.now(timezone.utc) - timedelta(days=30)
+        skills = db.query(Skill).filter(
+            or_(
+                Skill.stars >= 20,
+                and_(Skill.stars >= 5, Skill.last_commit_at >= since_30d),
+                Skill.category != "uncategorized"
+            )
+        ).all()
+        
         if not skills:
             return 0
 
