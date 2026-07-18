@@ -6,6 +6,9 @@ Should be triggered once a day by a GitHub Action.
 import logging
 import os
 import sys
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Override DATABASE_URL to use Supabase if available
 supabase_url = os.environ.get("SUPABASE_DB_URL", "").strip()
