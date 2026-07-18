@@ -145,8 +145,8 @@ export function SearchBar({ value, onChange }: Props) {
         onFocus={handleFocus}
         placeholder={t("explore.search")}
         aria-label="Search skills"
-        className="ps-input"
-        style={{ paddingLeft: '40px', paddingRight: '36px' }}
+        className="w-full bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.04)] text-[var(--ps-text-primary)] border border-[rgba(255,255,255,0.08)] focus:border-[var(--ps-neon-cyan)]/40 focus:bg-[rgba(255,255,255,0.03)] focus:ring-1 focus:ring-[var(--ps-neon-cyan)]/10 transition-all duration-300 outline-none rounded-xl text-sm"
+        style={{ paddingLeft: '40px', paddingRight: '36px', height: '40px' }}
       />
       {local && (
         <button
@@ -164,10 +164,10 @@ export function SearchBar({ value, onChange }: Props) {
       {/* Dropdown */}
       {showDropdown && (
         <div
-          className="absolute top-full left-0 right-0 mt-2 ps-card overflow-hidden z-[100]"
+          className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-[rgba(255,255,255,0.08)] overflow-hidden z-[100]"
           style={{
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 240, 255, 0.08)',
-            background: 'var(--ps-bg)',
+            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.03)',
+            background: 'rgba(10, 10, 12, 0.95)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)'
           }}
@@ -176,7 +176,7 @@ export function SearchBar({ value, onChange }: Props) {
           {!local.trim() && recentSearches.length > 0 && (
             <div className="px-3 py-2" style={{ borderBottom: '1px solid var(--ps-border)' }}>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] uppercase tracking-wide" style={{ color: 'var(--ps-text-muted)' }}>{t("search.recent")}</span>
+                <span className="text-[10px] uppercase tracking-wide font-semibold" style={{ color: 'var(--ps-text-muted)' }}>{t("search.recent")}</span>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -195,7 +195,7 @@ export function SearchBar({ value, onChange }: Props) {
                   <button
                     key={query}
                     onClick={() => handleHotKeyword(query)}
-                    className="ps-badge cursor-pointer flex items-center gap-1"
+                    className="px-2 py-0.5 rounded text-[10px] border border-[rgba(255,255,255,0.08)] text-[var(--ps-text-secondary)] hover:text-[var(--ps-text-primary)] hover:border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.02)] cursor-pointer flex items-center gap-1 transition-colors"
                   >
                     <Clock className="w-2.5 h-2.5" />
                     {query}
@@ -208,15 +208,13 @@ export function SearchBar({ value, onChange }: Props) {
           {/* Hot keywords when empty */}
           {!local.trim() && (
             <div className="px-3 py-2.5" style={{ borderBottom: '1px solid var(--ps-border)' }}>
-              <span className="text-[10px] uppercase tracking-wide" style={{ color: 'var(--ps-text-muted)' }}>{t("search.hotKeywords")}</span>
+              <span className="text-[10px] uppercase tracking-wide font-semibold" style={{ color: 'var(--ps-text-muted)' }}>{t("search.hotKeywords")}</span>
               <div className="flex flex-wrap gap-1.5 mt-1.5">
                 {HOT_KEYWORDS.map((kw) => (
                   <button
                     key={kw}
                     onClick={() => handleHotKeyword(kw)}
-                    className="ps-badge cursor-pointer transition-all"
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--ps-neon-cyan)'; e.currentTarget.style.boxShadow = '0 0 8px rgba(0,240,255,0.15)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(0, 240, 255, 0.2)'; e.currentTarget.style.boxShadow = 'none'; }}
+                    className="px-2 py-0.5 rounded text-[10px] border border-[rgba(0,240,255,0.15)] text-[var(--ps-neon-cyan)] hover:bg-[rgba(0,240,255,0.03)] cursor-pointer transition-all duration-200"
                   >
                     {kw}
                   </button>
@@ -235,46 +233,53 @@ export function SearchBar({ value, onChange }: Props) {
           {/* Results */}
           {!searching && results.length > 0 && (
             <div className="max-h-72 overflow-y-auto">
-              {results.map((skill, i) => (
-                <div
-                  key={skill.id}
-                  onClick={() => {
-                    navigate(`/skill/${skill.repo_full_name}`);
-                    setShowDropdown(false);
-                    addSearch(skill.repo_name);
-                  }}
-                  onMouseEnter={() => setActiveIdx(i)}
-                  className="flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors"
-                  style={{
-                    background: i === activeIdx ? 'rgba(0, 240, 255, 0.06)' : 'transparent',
-                  }}
-                >
-                  <img src={skill.author_avatar_url} alt="" width={28} height={28} className="w-7 h-7 rounded-full shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium truncate" style={{ color: 'var(--ps-text-primary)' }}>
-                        {skill.repo_name}
-                      </span>
-                      <span className="text-[10px] shrink-0" style={{ color: 'var(--ps-text-muted)' }}>
-                        {skill.author_name}
-                      </span>
+              {results.map((skill, i) => {
+                const isHighValue = skill.stars >= 200 || skill.score >= 80;
+                const isVerified = skill.quality_score >= 70;
+                return (
+                  <div
+                    key={skill.id}
+                    onClick={() => {
+                      navigate(`/skill/${skill.repo_full_name}`);
+                      setShowDropdown(false);
+                      addSearch(skill.repo_name);
+                    }}
+                    onMouseEnter={() => setActiveIdx(i)}
+                    className="flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors"
+                    style={{
+                      background: i === activeIdx ? 'rgba(0, 240, 255, 0.04)' : 'transparent',
+                    }}
+                  >
+                    <img src={skill.author_avatar_url} alt="" width={28} height={28} className="w-7 h-7 rounded-full shrink-0 border border-[rgba(255,255,255,0.1)]" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium truncate" style={{ color: 'var(--ps-text-primary)' }}>
+                          {skill.repo_name}
+                        </span>
+                        <span className="text-[10px] shrink-0" style={{ color: 'var(--ps-text-muted)' }}>
+                          {skill.author_name}
+                        </span>
+                      </div>
+                      <p className="text-xs truncate" style={{ color: 'var(--ps-text-secondary)' }}>{skill.description}</p>
                     </div>
-                    <p className="text-xs truncate" style={{ color: 'var(--ps-text-secondary)' }}>{skill.description}</p>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs flex items-center gap-0.5" style={{ color: 'var(--ps-text-secondary)' }}>
+                        <Star className="w-3 h-3" style={{ color: 'var(--ps-neon-amber)', fill: 'var(--ps-neon-amber)' }} />
+                        {skill.stars.toLocaleString()}
+                      </span>
+                      {isHighValue ? (
+                        <span className="text-[9px] px-1 py-0.2 rounded border border-[var(--ps-neon-amber)]/20 text-[var(--ps-neon-amber)] bg-[var(--ps-neon-amber)]/5 shrink-0 font-medium">
+                          High Value
+                        </span>
+                      ) : isVerified ? (
+                        <span className="text-[9px] px-1 py-0.2 rounded border border-[var(--ps-neon-green)]/20 text-[var(--ps-neon-green)] bg-[var(--ps-neon-green)]/5 shrink-0 font-medium">
+                          Verified
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs flex items-center gap-0.5" style={{ color: 'var(--ps-text-secondary)' }}>
-                      <Star className="w-3 h-3" style={{ color: 'var(--ps-neon-amber)', fill: 'var(--ps-neon-amber)' }} />
-                      {skill.stars.toLocaleString()}
-                    </span>
-                    <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${skill.score >= 70 ? "ps-badge-new" :
-                      skill.score >= 40 ? "ps-badge" :
-                        "ps-badge-purple"
-                      }`}>
-                      {skill.score.toFixed(0)}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

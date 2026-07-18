@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, Search, ChevronRight, Heart } from "lucide-react";
+import { BarChart3, Search, ChevronRight, Bookmark } from "lucide-react";
 import { CrayfishIcon } from "./icons/CrayfishIcon";
 import { LanguageToggle } from "./LanguageToggle";
 import { ThemeToggle } from "./ThemeToggle";
@@ -105,7 +105,7 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
                   color: tab === "favorites" ? 'var(--ps-neon-cyan)' : 'var(--ps-text-secondary)',
                 }}
               >
-                <Heart className="w-4 h-4 inline -mt-0.5 mr-1" />
+                <Bookmark className="w-4 h-4 inline -mt-0.5 mr-1" />
                 {t("tab.favorites") || "Saved"}
               </button>
             </div>
