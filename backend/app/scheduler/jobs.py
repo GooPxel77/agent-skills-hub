@@ -535,11 +535,20 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
                 db.rollback()
             except Exception:
                 pass
+            from sqlalchemy import or_, and_
+            since_30d = datetime.now(timezone.utc) - timedelta(days=30)
             null_readme_skills = (
                 db.query(Skill.repo_full_name)
                 .filter(Skill.readme_content.is_(None))
-                .order_by(Skill.score.desc().nullslast())
-                .limit(300)
+                .filter(
+                    or_(
+                        Skill.stars >= 20,
+                        and_(Skill.stars >= 5, Skill.last_commit_at >= since_30d),
+                        Skill.category != "uncategorized"
+                    )
+                )
+                .order_by(Skill.stars.desc().nullslast())
+                .limit(1000)
                 .all()
             )
             readme_targets = {r.repo_full_name for r in null_readme_skills} & set(all_repos.keys())

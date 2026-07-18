@@ -30,9 +30,21 @@ def run_heavy():
     try:
         limit = int(os.environ.get("DAILY_HEAVY_LIMIT", 100))
         
+        from sqlalchemy import and_
+        from datetime import datetime, timezone, timedelta
+        since_30d = datetime.now(timezone.utc) - timedelta(days=30)
+        
+        # Candidate filter to identify skills that qualify for scoring
+        candidate_filter = or_(
+            Skill.stars >= 20,
+            and_(Skill.stars >= 5, Skill.last_commit_at >= since_30d),
+            Skill.category != "uncategorized"
+        )
+        
         # 1. Scoring Missing ones
         skills_to_score = db.query(Skill).filter(
-            or_(Skill.score == 0, Skill.quality_score == 0)
+            or_(Skill.score == 0, Skill.quality_score == 0),
+            candidate_filter
         ).order_by(Skill.first_seen.desc().nullslast(), Skill.id.desc()).limit(limit).all()
         
         score_ids = {s.id for s in skills_to_score}
@@ -46,7 +58,10 @@ def run_heavy():
         # Outerjoin to find skills with no child compositions
         skills_without_comp = db.query(Skill).outerjoin(
             SkillComposition, Skill.id == SkillComposition.skill_id
-        ).filter(SkillComposition.id == None, Skill.stars >= 5).order_by(
+        ).filter(
+            SkillComposition.id == None,
+            candidate_filter
+        ).order_by(
             Skill.first_seen.desc().nullslast(), Skill.id.desc()
         ).limit(limit).all()
         
