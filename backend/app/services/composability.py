@@ -86,6 +86,18 @@ class ComposabilityEngine:
         else:
             process_indices = list(range(len(skills)))
 
+        # Convert skills to plain list of dicts for hyper-fast iteration
+        skills_data = []
+        for s in skills:
+            skills_data.append({
+                "id": s.id,
+                "author_name": s.author_name,
+                "category": s.category,
+                "language": s.language,
+                "stars": s.stars,
+                "quality_score": s.quality_score or 0
+            })
+
         count = 0
         start_time = time.monotonic()
         for idx_pos, i in enumerate(process_indices):
@@ -100,14 +112,15 @@ class ComposabilityEngine:
                 break
 
             skill = skills[i]
+            skill_data = skills_data[i]
             sim_row = cosine_similarity(tfidf_matrix[i : i + 1], tfidf_matrix).flatten()
 
             candidates = []
             for j in range(len(skills)):
                 if j == i:
                     continue
-                candidate = skills[j]
-                if candidate.author_name == skill.author_name:
+                candidate = skills_data[j]
+                if candidate["author_name"] == skill_data["author_name"]:
                     continue
 
                 score = 0.0
@@ -120,33 +133,33 @@ class ComposabilityEngine:
                     reasons.append(f"semantic({tfidf_sim:.2f})")
 
                 # 2. Complementary vs alternative
-                if candidate.category != skill.category and tfidf_sim > 0.15:
+                if candidate["category"] != skill_data["category"] and tfidf_sim > 0.15:
                     score += 0.2
                     reasons.append("complementary")
-                elif candidate.category == skill.category:
+                elif candidate["category"] == skill_data["category"]:
                     score += 0.05
 
                 # 3. Shared framework (max 0.2)
-                fw_score = ecosystem.shared_framework_score(skill.id, candidate.id)
+                fw_score = ecosystem.shared_framework_score(skill.id, candidate["id"])
                 if fw_score > 0:
                     score += min(fw_score * 0.2, 0.2)
-                    shared_fw = ecosystem.get_frameworks(skill.id) & ecosystem.get_frameworks(candidate.id)
+                    shared_fw = ecosystem.get_frameworks(skill.id) & ecosystem.get_frameworks(candidate["id"])
                     reasons.append(f"shared_fw({','.join(sorted(shared_fw))})")
 
                 # 4. Shared rare topics (max 0.15)
-                rare_score = ecosystem.shared_rare_topics_score(skill.id, candidate.id)
+                rare_score = ecosystem.shared_rare_topics_score(skill.id, candidate["id"])
                 if rare_score > 0:
                     score += min(rare_score * 0.15, 0.15)
                     reasons.append("rare_topics")
 
                 # 5. Same language (max 0.1)
-                if skill.language and skill.language == candidate.language:
+                if skill_data["language"] and skill_data["language"] == candidate["language"]:
                     score += 0.1
                     reasons.append("same_lang")
 
                 # 6. Similar popularity (max 0.1)
-                if skill.stars > 0 and candidate.stars > 0:
-                    ratio = max(skill.stars, candidate.stars) / max(min(skill.stars, candidate.stars), 1)
+                if skill_data["stars"] > 0 and candidate["stars"] > 0:
+                    ratio = max(skill_data["stars"], candidate["stars"]) / max(min(skill_data["stars"], candidate["stars"]), 1)
                     if ratio <= 10:
                         score += 0.1
                         reasons.append("similar_pop")
@@ -158,7 +171,7 @@ class ComposabilityEngine:
                     reasons.append("shared_platform")
 
                 # 8. Quality bonus (max 0.05)
-                if (candidate.quality_score or 0) >= 50:
+                if candidate["quality_score"] >= 50:
                     score += 0.05
 
                 if score >= self.MIN_THRESHOLD:
@@ -170,7 +183,7 @@ class ComposabilityEngine:
                 batch_items.append(
                     SkillComposition(
                         skill_id=skill.id,
-                        compatible_skill_id=comp_skill.id,
+                        compatible_skill_id=comp_skill["id"],
                         compatibility_score=round(cscore, 2),
                         reason=reason,
                     )

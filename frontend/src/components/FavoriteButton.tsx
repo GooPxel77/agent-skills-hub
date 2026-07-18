@@ -1,4 +1,4 @@
-import { Heart } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { useFavorites } from "../hooks/useFavorites";
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 export function FavoriteButton({ skillId, size = "md" }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const active = isFavorite(skillId);
-  const sz = size === "sm" ? "w-7 h-7" : "w-9 h-9";
+  const sz = size === "sm" ? "w-7 h-7 rounded" : "w-9 h-9 rounded-lg";
   const iconSz = size === "sm" ? "w-4 h-4" : "w-5 h-5";
 
   return (
@@ -19,16 +19,18 @@ export function FavoriteButton({ skillId, size = "md" }: Props) {
         e.preventDefault();
         toggleFavorite(skillId);
       }}
-      className={`${sz} flex items-center justify-center rounded-lg transition-all cursor-pointer`}
-      style={{
-        background: active ? 'rgba(236, 72, 153, 0.1)' : 'var(--ps-bg-elevated)',
-        color: active ? 'var(--ps-neon-pink)' : 'var(--ps-text-secondary)',
-        border: active ? '1px solid rgba(236, 72, 153, 0.3)' : '1px solid var(--ps-border)',
-      }}
+      className={`
+        ${sz} flex items-center justify-center border transition-all duration-200 ease-out cursor-pointer
+        hover:scale-105 active:scale-95
+        ${active 
+          ? "bg-[rgba(0,240,255,0.06)] text-[var(--ps-neon-cyan)] border-[var(--ps-neon-cyan)]/40 shadow-[0_0_12px_rgba(0,240,255,0.1)]" 
+          : "bg-[var(--ps-bg-elevated)] text-[var(--ps-text-secondary)] border-[var(--ps-border)] hover:border-[var(--ps-border-glow)] hover:text-[var(--ps-text-primary)]"
+        }
+      `}
       aria-label={active ? "Remove from favorites" : "Add to favorites"}
       title={active ? "Remove from favorites" : "Add to favorites"}
     >
-      <Heart className={iconSz} fill={active ? "currentColor" : "none"} strokeWidth={active ? 0 : 2} />
+      <Bookmark className={`${iconSz} transition-transform`} fill={active ? "currentColor" : "none"} strokeWidth={1.5} />
     </button>
   );
 }

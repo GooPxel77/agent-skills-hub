@@ -118,7 +118,8 @@ export function HeroSection({ onSearch }: Props) {
             onFocus={() => { if (query.trim() || results.length > 0) setShowDropdown(true); }}
             placeholder="Search MCP servers, Claude skills, Codex skills, agent tools..."
             aria-label="Search skills"
-            className="ps-input pl-12 pr-12 py-4 text-base rounded-2xl shadow-sm"
+            className="w-full bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.03)] text-[var(--ps-text-primary)] border border-[rgba(255,255,255,0.08)] focus:border-[var(--ps-neon-cyan)]/40 focus:bg-[rgba(255,255,255,0.03)] focus:ring-1 focus:ring-[var(--ps-neon-cyan)]/10 transition-all duration-300 outline-none rounded-2xl text-base shadow-sm"
+            style={{ paddingLeft: '48px', paddingRight: '48px', height: '56px' }}
           />
           {query && (
             <button
@@ -133,7 +134,13 @@ export function HeroSection({ onSearch }: Props) {
           {/* Dropdown */}
           {showDropdown && (query.trim() || results.length > 0) && (
             <div
-              className="absolute top-full left-0 right-0 mt-2 ps-card overflow-hidden z-[100] text-left shadow-lg"
+              className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-[rgba(255,255,255,0.08)] overflow-hidden z-[100] text-left shadow-2xl"
+              style={{
+                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.03)',
+                background: 'rgba(10, 10, 12, 0.95)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)'
+              }}
             >
               {searching && (
                 <div className="px-4 py-4 text-center">
@@ -142,27 +149,45 @@ export function HeroSection({ onSearch }: Props) {
               )}
               {!searching && results.length > 0 && (
                 <div className="max-h-72 overflow-y-auto">
-                  {results.map((skill, i) => (
-                    <div
-                      key={skill.id}
-                      onClick={() => { navigate(`/skill/${skill.repo_full_name}`); setShowDropdown(false); }}
-                      onMouseEnter={() => setActiveIdx(i)}
-                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${i === activeIdx ? 'bg-[rgba(255,255,255,0.05)]' : ''}`}
-                    >
-                      <img src={skill.author_avatar_url} alt="" width={32} height={32} className="w-8 h-8 rounded-full shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold truncate text-[var(--ps-text-primary)]">{skill.repo_name}</span>
-                          <span className="text-xs shrink-0 text-[var(--ps-text-muted)]">{skill.author_name}</span>
+                  {results.map((skill, i) => {
+                    const isHighValue = skill.stars >= 200 || skill.score >= 80;
+                    const isVerified = skill.quality_score >= 70;
+                    return (
+                      <div
+                        key={skill.id}
+                        onClick={() => { navigate(`/skill/${skill.repo_full_name}`); setShowDropdown(false); }}
+                        onMouseEnter={() => setActiveIdx(i)}
+                        className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-[rgba(255,255,255,0.02)] last:border-0"
+                        style={{
+                          background: i === activeIdx ? 'rgba(0, 240, 255, 0.04)' : 'transparent',
+                        }}
+                      >
+                        <img src={skill.author_avatar_url} alt="" width={32} height={32} className="w-8 h-8 rounded-full shrink-0 border border-[rgba(255,255,255,0.1)]" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold truncate text-[var(--ps-text-primary)]">{skill.repo_name}</span>
+                            <span className="text-xs shrink-0 text-[var(--ps-text-muted)]">{skill.author_name}</span>
+                          </div>
+                          <p className="text-xs truncate text-[var(--ps-text-secondary)]">{skill.description}</p>
                         </div>
-                        <p className="text-xs truncate text-[var(--ps-text-secondary)]">{skill.description}</p>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-xs flex items-center gap-0.5 text-[var(--ps-text-secondary)]">
+                            <Star className="w-3.5 h-3.5 text-[var(--ps-neon-amber)]/80" />
+                            {skill.stars >= 1000 ? `${(skill.stars / 1000).toFixed(1)}k` : skill.stars.toLocaleString()}
+                          </span>
+                          {isHighValue ? (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded border border-[var(--ps-neon-amber)]/20 text-[var(--ps-neon-amber)] bg-[var(--ps-neon-amber)]/5 shrink-0 font-medium">
+                              High Value
+                            </span>
+                          ) : isVerified ? (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded border border-[var(--ps-neon-green)]/20 text-[var(--ps-neon-green)] bg-[var(--ps-neon-green)]/5 shrink-0 font-medium">
+                              Verified
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
-                      <span className="text-xs flex items-center gap-0.5 shrink-0 text-[var(--ps-text-secondary)]">
-                        <Star className="w-3.5 h-3.5 text-[var(--ps-neon-amber)] fill-[var(--ps-neon-amber)]" />
-                        {skill.stars >= 1000 ? `${(skill.stars / 1000).toFixed(1)}k` : skill.stars.toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
               {!searching && query.trim() && results.length === 0 && (
@@ -176,9 +201,9 @@ export function HeroSection({ onSearch }: Props) {
 
         {/* Value Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-4xl mx-auto">
-          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] transition-colors">
-            <div className="w-10 h-10 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center mb-4">
-              <Zap className="w-5 h-5 text-[var(--ps-text-primary)]" />
+          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] hover:shadow-[0_0_15px_rgba(0,240,255,0.02)] transition-all duration-300">
+            <div className="w-10 h-10 rounded-lg bg-[rgba(0,240,255,0.03)] border border-[rgba(0,240,255,0.1)] text-[var(--ps-neon-cyan)] flex items-center justify-center mb-4">
+              <Zap className="w-5 h-5" />
             </div>
             <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">GitHub-Indexed</h3>
             <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
@@ -187,9 +212,9 @@ export function HeroSection({ onSearch }: Props) {
             </p>
           </div>
           
-          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] transition-colors">
-            <div className="w-10 h-10 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center mb-4">
-              <Star className="w-5 h-5 text-[var(--ps-text-primary)]" />
+          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] hover:shadow-[0_0_15px_rgba(0,240,255,0.02)] transition-all duration-300">
+            <div className="w-10 h-10 rounded-lg bg-[rgba(0,240,255,0.03)] border border-[rgba(0,240,255,0.1)] text-[var(--ps-neon-cyan)] flex items-center justify-center mb-4">
+              <Star className="w-5 h-5" />
             </div>
             <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Auto-Classified & Scored</h3>
             <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
@@ -198,9 +223,9 @@ export function HeroSection({ onSearch }: Props) {
             </p>
           </div>
 
-          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] transition-colors">
-            <div className="w-10 h-10 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center mb-4">
-              <Server className="w-5 h-5 text-[var(--ps-text-primary)]" />
+          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] hover:shadow-[0_0_15px_rgba(0,240,255,0.02)] transition-all duration-300">
+            <div className="w-10 h-10 rounded-lg bg-[rgba(0,240,255,0.03)] border border-[rgba(0,240,255,0.1)] text-[var(--ps-neon-cyan)] flex items-center justify-center mb-4">
+              <Server className="w-5 h-5" />
             </div>
             <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Composable Workflows</h3>
             <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
