@@ -95,8 +95,13 @@ class ScoringEngine:
         skills = db.query(Skill).filter(
             or_(
                 Skill.stars >= 20,
-                and_(Skill.stars >= 5, Skill.last_commit_at >= since_30d),
-                Skill.category != "uncategorized"
+                and_(
+                    Skill.stars >= 5,
+                    or_(
+                        Skill.last_commit_at >= since_30d,
+                        Skill.category != "uncategorized"
+                    )
+                )
             )
         ).all()
         
