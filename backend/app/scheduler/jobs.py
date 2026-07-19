@@ -543,8 +543,13 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
                 .filter(
                     or_(
                         Skill.stars >= 20,
-                        and_(Skill.stars >= 5, Skill.last_commit_at >= since_30d),
-                        Skill.category != "uncategorized"
+                        and_(
+                            Skill.stars >= 5,
+                            or_(
+                                Skill.last_commit_at >= since_30d,
+                                Skill.category != "uncategorized"
+                            )
+                        )
                     )
                 )
                 .order_by(Skill.stars.desc().nullslast())
