@@ -17,7 +17,7 @@ interface Props {
 }
 
 export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { stats } = useStats();
   const subNavRef = useRef<HTMLDivElement>(null);
   const [navScroll, setNavScroll] = useState({ left: false, right: false });
@@ -63,6 +63,15 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
                 </>
               )}
             </span>
+            <Link
+              to="/about"
+              className="text-xs sm:text-sm font-medium transition-colors px-2 py-1 rounded cursor-pointer"
+              style={{ color: 'var(--ps-text-secondary)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-secondary)'}
+            >
+              {lang === "zh" ? "关于 / E-E-A-T" : "About / E-E-A-T"}
+            </Link>
             <ThemeToggle />
             <LanguageToggle />
           </div>

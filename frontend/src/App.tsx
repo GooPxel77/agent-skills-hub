@@ -9,6 +9,7 @@ import { ComparePage } from "./pages/ComparePage";
 import { CompareBar } from "./components/CompareBar";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { CategoryPage } from "./pages/CategoryPage";
+import { AboutPage } from "./pages/AboutPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/about" element={<AboutPage />} />
                 <Route path="/skill/:id" element={<SkillDetailPage />} />
                 <Route path="/skill/:owner/:repo" element={<SkillDetailPage />} />
                 <Route path="/category/:slug" element={<CategoryPage />} />

@@ -2,8 +2,11 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-# AI/LLM Crawlers — allow full access for AI visibility
+# Mainstream AI / LLM Crawlers & Search Engines — Full Access Enabled for GEO
 User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: ClaudeBot
@@ -18,10 +21,23 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-User-agent: OAI-SearchBot
-Allow: /
-
 User-agent: Google-Extended
 Allow: /
 
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+# Sitemap Index
 Sitemap: https://www.205055.xyz/sitemap.xml

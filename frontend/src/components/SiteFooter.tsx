@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Search, Heart } from "lucide-react";
+import { Search, Heart, ShieldCheck, FileText, Bot } from "lucide-react";
 import { CrayfishIcon } from "./icons/CrayfishIcon";
 import { useI18n } from "../i18n/I18nContext";
 
@@ -40,16 +40,16 @@ export function SiteFooter() {
 
       {/* Main footer content */}
       <div className="max-w-7xl mx-auto px-4 py-10">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand column */}
-          <div className="col-span-2 sm:col-span-1">
+          <div>
             <Link to="/" className="flex items-center gap-2 mb-3">
               <CrayfishIcon className="w-6 h-6" style={{ color: 'var(--ps-neon-cyan)' }} />
               <span className="font-bold text-sm ps-neon-text">Agent Skills Hub</span>
             </Link>
             <p className="text-xs leading-relaxed" style={{ color: 'var(--ps-text-muted)' }}>
               Automated indexing platform · Maintained by postsoma-2050.<br />
-              Data sourced from GitHub and the open-source AI agent ecosystem.
+              Data sourced from GitHub and open-source AI agent ecosystem.
             </p>
           </div>
 
@@ -79,12 +79,22 @@ export function SiteFooter() {
             </ul>
           </div>
 
-          {/* Links column */}
+          {/* Quick Links column */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--ps-neon-cyan)' }}>
-              {lang === "zh" ? "快捷" : "Quick Links"}
+              {lang === "zh" ? "快捷链接" : "Quick Links"}
             </h4>
             <ul className="space-y-2">
+              <li>
+                <Link to="/about" className="text-sm transition-colors flex items-center gap-1.5"
+                  style={{ color: 'var(--ps-text-secondary)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-secondary)'}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  {lang === "zh" ? "关于与 E-E-A-T 规范" : "About & E-E-A-T"}
+                </Link>
+              </li>
               <li>
                 <Link to="/?tab=explore" className="text-sm transition-colors flex items-center gap-1.5"
                   style={{ color: 'var(--ps-text-secondary)' }}
@@ -104,6 +114,48 @@ export function SiteFooter() {
                   <Heart className="w-3.5 h-3.5" />
                   {t("tab.favorites") || "Saved"}
                 </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* GEO & AI Machine Feeds column */}
+          <div>
+            <h4 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--ps-neon-cyan)' }}>
+              {lang === "zh" ? "GEO & 机器知识喂料" : "GEO & Machine Feeds"}
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="/llms.txt" target="_blank" rel="noopener noreferrer" 
+                  className="text-sm transition-colors flex items-center gap-1.5"
+                  style={{ color: 'var(--ps-text-secondary)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-secondary)'}
+                >
+                  <Bot className="w-3.5 h-3.5" />
+                  llms.txt (Index Feed)
+                </a>
+              </li>
+              <li>
+                <a href="/llms-full.txt" target="_blank" rel="noopener noreferrer" 
+                  className="text-sm transition-colors flex items-center gap-1.5"
+                  style={{ color: 'var(--ps-text-secondary)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-secondary)'}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  llms-full.txt (Manifest)
+                </a>
+              </li>
+              <li>
+                <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" 
+                  className="text-sm transition-colors flex items-center gap-1.5"
+                  style={{ color: 'var(--ps-text-secondary)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-secondary)'}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  sitemap.xml (Sitemap)
+                </a>
               </li>
             </ul>
           </div>

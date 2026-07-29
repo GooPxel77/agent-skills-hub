@@ -155,9 +155,15 @@ async function main() {
     <priority>1.0</priority>
     <lastmod>${today}</lastmod>
   </url>`,
+    `  <url>
+    <loc>${SITE}/about</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>${today}</lastmod>
+  </url>`,
   ];
   writeFileSync("dist/sitemap-static.xml", wrapUrlset(staticEntries));
-  console.log(`sitemap-static.xml: 1 URL`);
+  console.log(`sitemap-static.xml: ${staticEntries.length} URLs`);
 
   // 2. sitemap-categories.xml — only include categories that have skills
   const catsWithSkills = CATEGORIES.filter((cat) =>

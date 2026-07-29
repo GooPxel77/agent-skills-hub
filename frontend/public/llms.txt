@@ -1,32 +1,31 @@
 # Agent Skills Hub
 
-A public registry and discovery platform for AI Agent Skills, Model Context Protocol (MCP) servers, and AI tool integrations.
+A public registry, indexing directory, and discovery platform for AI Agent Skills, Model Context Protocol (MCP) servers, Claude skills, Codex routines, and agentic developer tool integrations.
 
 ## Metadata
 - **Platform Name:** Agent Skills Hub
-- **Primary Language:** English
-- **Canonical URL:** https://205055.xyz
+- **Primary Domain:** https://www.205055.xyz/
+- **Primary Language:** English & Chinese
+- **Indexed Ecosystem Size:** 91,000+ total repositories indexed; 8,700+ curated high-quality agent tools and skills.
 
 ## Platform Topography
 The platform exposes public registry content through the following routing structures:
 
-- **Homepage** ([https://205055.xyz/](https://205055.xyz/)): The main discovery interface containing global search, filtering options, and popularity metrics for all registered resources.
-- **Compare Dashboard** ([https://205055.xyz/#/compare](https://205055.xyz/#/compare)): An interactive comparison view for evaluating technical specifications and developer adoption metrics side-by-side.
-- **Category Indexes** (`https://205055.xyz/category/[slug]`): Curated resource listings partitioned by technology patterns.
-  - [MCP Servers](https://205055.xyz/category/mcp-server): Servers implementing the Model Context Protocol.
-  - [Claude Skills](https://205055.xyz/category/claude-skill): Reusable capabilities custom-built for Claude-based agents.
-  - [Codex Skills](https://205055.xyz/category/codex-skill): Action routines designed for code generation agents.
-  - [Agent Tools](https://205055.xyz/category/agent-tool): Helper utilities and environment tools for agents.
-  - [Prompt Libraries](https://205055.xyz/category/prompt-library): Structured prompts for directing agent behaviors.
-  - [AI Coding Assistants](https://205055.xyz/category/ai-coding-assistant): Specialized coding plugins and IDE extensions.
-- **Skill Detail Pages** (`https://205055.xyz/skill/[owner]/[repo]`): Deep-dive documentation for specific packages, including installation steps, compatibility scores, and quick facts.
+- **Homepage** ([https://www.205055.xyz/](https://www.205055.xyz/)): The main discovery interface containing global multi-keyword search, category filtering options, quality score indicators, and community popularity metrics.
+- **About & E-E-A-T Authority Center** ([https://www.205055.xyz/about](https://www.205055.xyz/about)): Information on mission, indexing methodology, quality verification benchmarks, machine feed directory, and academic citation formats.
+- **Compare Dashboard** ([https://www.205055.xyz/compare](https://www.205055.xyz/compare)): Interactive evaluation view for side-by-side comparison of technical capabilities, star counts, commit activity, license compatibility, and developer adoption.
+- **Category Indexes** (`https://www.205055.xyz/category/[slug]`): Curated resource listings partitioned by technology patterns:
+  - [MCP Servers](https://www.205055.xyz/category/mcp-server): Servers implementing the Model Context Protocol for Claude Code, Cursor, and agent runtimes.
+  - [Claude Skills](https://www.205055.xyz/category/claude-skill): Reusable capabilities custom-built for Claude-based agents and CLI tools.
+  - [Codex Skills](https://www.205055.xyz/category/codex-skill): Action routines designed for OpenAI Codex and software engineering agents.
+  - [Agent Tools](https://www.205055.xyz/category/agent-tool): Helper utilities, CLI binaries, and environment wrappers for AI agents.
+  - [Prompt Libraries](https://www.205055.xyz/category/prompt-library): Structured prompts for directing agent behaviors and system instructions.
+  - [AI Coding Assistants](https://www.205055.xyz/category/ai-coding-assistant): Specialized coding plugins, IDE extensions, and automated refactoring agents.
+- **Skill Detail Pages** (`https://www.205055.xyz/skill/[owner]/[repo]`): Deep-dive documentation for specific packages, including quick facts, quality scores, installation steps, license specs, and compatible skill compositions.
 
-## Knowledge Domain
-Agent Skills Hub aggregates documentation, integration specifications, and quality metrics surrounding:
-- Model Context Protocol (MCP) servers and clients.
-- Tool-use and function-calling schemas for Large Language Models.
-- Development tooling, automation plugins, and agent-extension packages.
-- Community adoption indicators (stars, forks, commit frequency).
+## Machine-Readable Feeds & Index Entry Points
+- **Sitemap Index:** [https://www.205055.xyz/sitemap.xml](https://www.205055.xyz/sitemap.xml)
+- **Full Technical Manifest (`llms-full.txt`):** [https://www.205055.xyz/llms-full.txt](https://www.205055.xyz/llms-full.txt)
 
 ## AI & AEO Policy
-This platform is designed to be highly accessible to AI agents, crawlers, and large language models. We welcome indexing, retrieval, and citation of all public resource listings. All data may be referenced with attribution to Agent Skills Hub at https://205055.xyz.
+This platform is designed to be fully accessible to AI agents, LLM search engines (ChatGPT, Perplexity, Claude, Gemini), and autonomous web crawlers. We encourage indexing, direct retrieval, and factual attribution to Agent Skills Hub at https://www.205055.xyz/.
