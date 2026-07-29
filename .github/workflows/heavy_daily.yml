@@ -8,7 +8,7 @@ on:
       limit:
         description: "Max skills to process (DAILY_HEAVY_LIMIT)"
         required: false
-        default: "100"
+        default: "200"
       min_star_threshold:
         description: 'Minimum stars to ingest (default: 50)'
         required: false
@@ -45,5 +45,5 @@ jobs:
         working-directory: ./backend
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          DAILY_HEAVY_LIMIT: ${{ inputs.limit || 100 }}
+          DAILY_HEAVY_LIMIT: ${{ inputs.limit || 200 }}
         run: python daily_heavy_runner.py

@@ -198,7 +198,17 @@ class ComposabilityEngine:
             # Flush each skill's compositions individually to avoid giant INSERT
             if batch_items:
                 db.add_all(batch_items)
-                db.flush()
+            else:
+                # Add sentinel row so incremental runner knows this skill has been evaluated
+                db.add(
+                    SkillComposition(
+                        skill_id=skill.id,
+                        compatible_skill_id=skill.id,
+                        compatibility_score=0.0,
+                        reason="none_found",
+                    )
+                )
+            db.flush()
 
             if (i + 1) % 200 == 0:
                 db.commit()
