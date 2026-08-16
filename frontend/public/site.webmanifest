@@ -1,11 +1,11 @@
 {
-  "name": "My Skills Hub",
+  "name": "Agent Skills Hub",
   "short_name": "SkillsHub",
-  "description": "Personal AI Agent Skills Collection",
+  "description": "Autonomous AI Agent Skills, MCP Servers & Production Toolchains Hub",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#090a0b",
-  "theme_color": "#4f46e5",
+  "theme_color": "#00f0ff",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
