@@ -1,201 +1,342 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  RiCodeBoxLine,
+  RiSearchEyeLine,
+  RiShareForwardBoxLine,
+  RiDatabase2Line,
+  RiCommandLine,
+  RiArrowRightLine,
+  RiFileCopyLine,
+  RiCheckLine,
+  RiSparklingLine,
+  RiStackLine,
+  RiExternalLinkLine,
+  RiLightbulbLine,
+} from "@remixicon/react";
 import { useI18n } from "../i18n/I18nContext";
 
-interface WorkflowStep {
+interface RecipeTool {
   name: string;
   slug: string;
-  description_zh: string;
-  description_en: string;
+  role_zh: string;
+  role_en: string;
 }
 
-interface Scenario {
+interface Recipe {
   id: string;
-  icon: string;
+  iconType: "code" | "search" | "share" | "database";
   title_zh: string;
   title_en: string;
-  description_zh: string;
-  description_en: string;
-  steps: WorkflowStep[];
+  tag_zh: string;
+  tag_en: string;
+  environment: string;
+  summary_zh: string;
+  summary_en: string;
+  tools: RecipeTool[];
+  guide_zh: string;
+  guide_en: string;
+  snippet: string;
 }
 
-const scenarios: Scenario[] = [
+const RECIPES: Recipe[] = [
   {
-    id: "social-media",
-    icon: "share",
-    title_zh: "自媒体内容创作",
-    title_en: "Social Media Content",
-    description_zh: "从内容创作到多平台发布的完整工作流",
-    description_en: "End-to-end workflow from content creation to multi-platform publishing",
-    steps: [
+    id: "recipe-code-refactor",
+    iconType: "code",
+    title_zh: "全自动代码重构与架构审查套件",
+    title_en: "Autonomous Code Refactoring & Architecture Review",
+    tag_zh: "工程效率",
+    tag_en: "Engineering",
+    environment: "Cursor / Windsurf / Claude Code",
+    summary_zh: "具备本地上下文感知、自动 Git 差异提取与架构规范审查的自主编程闭环。",
+    summary_en: "Context-aware autonomous coding loop with Git diff analysis & rule verification.",
+    tools: [
+      {
+        name: "cline",
+        slug: "cline/cline",
+        role_zh: "Coding Agent 执行器",
+        role_en: "Coding Agent Core",
+      },
+      {
+        name: "mcp-server-git",
+        slug: "modelcontextprotocol/servers",
+        role_zh: "Git 版本控制 MCP",
+        role_en: "Git Version Control MCP",
+      },
+      {
+        name: "qiaomu-advisor",
+        slug: "joeseesun/qiaomu-design-advisor",
+        role_zh: "架构规则与上下文校验",
+        role_en: "Architecture Rules Guard",
+      },
+    ],
+    guide_zh: "在 .cursor/mcp.json 挂载 Git MCP 并注入 .cursorrules，驱动 Agent 自动执行 diff 提取、架构审查、自动重构与单元测试闭环。",
+    guide_en: "Mount Git MCP in .cursor/mcp.json and set .cursorrules for autonomous diff -> review -> refactor -> test loops.",
+    snippet: `// .cursor/mcp.json
+{
+  "mcpServers": {
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git"]
+    }
+  }
+}`,
+  },
+  {
+    id: "recipe-deep-research",
+    iconType: "search",
+    title_zh: "深度研究与知识库自动化管道",
+    title_en: "Deep Research & Knowledge Ingestion Pipeline",
+    tag_zh: "知识工程",
+    tag_en: "Knowledge Base",
+    environment: "Claude Desktop / CLI",
+    summary_zh: "自动化抓取深层动态网页、清洗杂质文档为纯净 Markdown，批量同步至知识库。",
+    summary_en: "Automates deep web scraping, transforms multi-format documents into clean Markdown, and syncs to NotebookLM.",
+    tools: [
+      {
+        name: "browser-use",
+        slug: "browser-use/browser-use",
+        role_zh: "网页智能交互与深层抓取",
+        role_en: "Browser Agent Scraper",
+      },
+      {
+        name: "markitdown",
+        slug: "microsoft/markitdown",
+        role_zh: "文档转纯净 Markdown",
+        role_en: "Doc to Markdown Converter",
+      },
+      {
+        name: "notebooklm-sync",
+        slug: "joeseesun/anything-to-notebooklm",
+        role_zh: "NotebookLM 批量同步",
+        role_en: "NotebookLM Importer",
+      },
+    ],
+    guide_zh: "browser-use 交互抓取深层网页，经 markitdown 提取纯净 Markdown 并批量同步至 NotebookLM 生成结构化研报与播客。",
+    guide_en: "Scrape deep web via browser-use, convert to Markdown via markitdown, and sync to NotebookLM for auto-reports.",
+    snippet: `# 深度抓取与清洗管道
+python -m browser_use.agent --query "AI Agent trend"
+markitdown research.pdf > clean_notes.md
+python -m anything_to_notebooklm --file clean_notes.md`,
+  },
+  {
+    id: "recipe-social-publisher",
+    iconType: "share",
+    title_zh: "自动化自媒体与多平台内容分发流",
+    title_en: "Autonomous Media Publisher & Syndication Flow",
+    tag_zh: "内容出海",
+    tag_en: "Content Pipeline",
+    environment: "GitHub Actions / Python",
+    summary_zh: "从海外前沿热点抓取、多版本文案裂变、高美感封面图渲染到一键自动分发。",
+    summary_en: "Trend extraction, multi-platform copy generation, SVG cover rendering, and automated publishing.",
+    tools: [
       {
         name: "Agent-Reach",
         slug: "Panniantong/Agent-Reach",
-        description_zh: "阅读 X (Twitter) 内容",
-        description_en: "Read X (Twitter) content",
+        role_zh: "X 行业热点抓取",
+        role_en: "X Trend Extractor",
       },
       {
         name: "baoyu-skills",
         slug: "JimLiu/baoyu-skills",
-        description_zh: "封面图 + 微信公众号 + 小红书图文",
-        description_en: "Cover images + WeChat + Xiaohongshu posts",
+        role_zh: "SVG 封面与长图排版",
+        role_en: "SVG Graphic Generator",
       },
       {
-        name: "qiaomu-x-article-publisher",
+        name: "x-article-publisher",
         slug: "joeseesun/qiaomu-x-article-publisher",
-        description_zh: "Markdown 发布 X 长文",
-        description_en: "Publish long-form articles to X",
+        role_zh: "Markdown 长文自动分发",
+        role_en: "Longform Publisher",
       },
     ],
+    guide_zh: "定时 Actions 抓取海外热点，驱动 LLM 结合 baoyu 模板生成 SVG 封面与长文，Webhook 自动同步至 X 与微信公众号草稿箱。",
+    guide_en: "Scheduled Actions extract trends, generate SVG covers with baoyu prompts, and publish via webhooks to X & WeChat.",
+    snippet: `# GitHub Actions 定时发帖工作流
+name: Auto Media Pipeline
+on:
+  schedule:
+    - cron: '0 1 * * *' # 每日定时自动执行`,
   },
   {
-    id: "learning",
-    icon: "book",
-    title_zh: "学习研究",
-    title_en: "Learning & Research",
-    description_zh: "高效获取和整理知识的学习工作流",
-    description_en: "Efficient knowledge acquisition and organization workflow",
-    steps: [
+    id: "recipe-db-ops",
+    iconType: "database",
+    title_zh: "数据库智能运维与安全查询沙箱",
+    title_en: "Database Ops & Safe Query Sandbox",
+    tag_zh: "系统运维",
+    tag_en: "Database Ops",
+    environment: "Claude Desktop / Cursor",
+    summary_zh: "为数据库赋予自然语言查询、只读权限前置拦截与慢 SQL 自动优化建议。",
+    summary_en: "Natural language database querying with read-only guardrails and slow-query optimization.",
+    tools: [
       {
-        name: "yt-search-download",
-        slug: "joeseesun/yt-search-download",
-        description_zh: "YouTube 内容搜索与下载",
-        description_en: "YouTube content search & download",
+        name: "mcp-postgres",
+        slug: "modelcontextprotocol/servers",
+        role_zh: "PostgreSQL 直连协议",
+        role_en: "Postgres Protocol MCP",
       },
       {
-        name: "anything-to-notebooklm",
-        slug: "joeseesun/anything-to-notebooklm",
-        description_zh: "任意内容转换到 NotebookLM",
-        description_en: "Convert any content to NotebookLM",
+        name: "pydantic-ai-guard",
+        slug: "vstorm-co/pydantic-ai-todo",
+        role_zh: "结构化数据校验与安全拦截",
+        role_en: "Safe Schema Validator",
       },
       {
         name: "defuddle-skill",
         slug: "joeseesun/defuddle-skill",
-        description_zh: "网页内容智能提取",
-        description_en: "Smart web content extraction",
+        role_zh: "复杂 SQL 语义解析",
+        role_en: "SQL Query Explainer",
       },
     ],
-  },
-  {
-    id: "dev-tools",
-    icon: "wrench",
-    title_zh: "开发效率",
-    title_en: "Developer Productivity",
-    description_zh: "提升开发效率的实用工具组合",
-    description_en: "Practical tool combinations to boost development efficiency",
-    steps: [
-      {
-        name: "knowledge-site-creator",
-        slug: "joeseesun/knowledge-site-creator",
-        description_zh: "知识站点一键生成",
-        description_en: "One-click knowledge site generator",
-      },
-      {
-        name: "qiaomu-design-advisor",
-        slug: "joeseesun/qiaomu-design-advisor",
-        description_zh: "UI/UX 设计顾问",
-        description_en: "UI/UX design advisor",
-      },
-      {
-        name: "skill-publisher",
-        slug: "joeseesun/skill-publisher",
-        description_zh: "Skill 发布与管理工具",
-        description_en: "Skill publishing & management tool",
-      },
-    ],
+    guide_zh: "Claude Desktop 挂载 Postgres MCP，结合 Pydantic 只读校验守卫拦截写操作，自然语言智能诊断慢查询与生成索引优化方案。",
+    guide_en: "Mount Postgres MCP in Claude Desktop with Pydantic read-only guards for safe natural-language SQL queries and index diagnosis.",
+    snippet: `// claude_desktop_config.json
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://ro_user:pass@localhost:5432/main"]
+    }
+  }
+}`,
   },
 ];
 
-const iconPaths: Record<string, string> = {
-  share:
-    "M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z",
-  book: "M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25",
-  wrench:
-    "M11.42 15.17l-5.384 5.384a1.522 1.522 0 01-2.153-2.153l5.384-5.384m2.153 2.153l5.384-5.384a1.522 1.522 0 00-2.153-2.153L9.267 12.95m2.153 2.22a3.015 3.015 0 004.276 0 3.015 3.015 0 000-4.276",
-};
+function getRecipeIcon(iconType: string) {
+  switch (iconType) {
+    case "code":
+      return RiCodeBoxLine;
+    case "search":
+      return RiSearchEyeLine;
+    case "share":
+      return RiShareForwardBoxLine;
+    case "database":
+      return RiDatabase2Line;
+    default:
+      return RiSparklingLine;
+  }
+}
 
 export function ScenarioWorkflows() {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = (id: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   return (
     <section className="mb-10">
-      <div className="mb-6">
-        <h2 className="text-lg font-bold text-[var(--ps-text-primary)]">
-          {t("scenarios.title")}
-        </h2>
-        <p className="text-sm text-[var(--ps-text-secondary)] mt-1">
-          {t("scenarios.subtitle")}
-        </p>
+      {/* Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-[var(--ps-neon-purple)]/10 text-[var(--ps-neon-purple)] flex items-center justify-center border border-[var(--ps-neon-purple)]/20">
+              <RiStackLine className="w-3.5 h-3.5" />
+            </div>
+            <h2 className="text-lg font-bold text-[var(--ps-text-primary)]">
+              {t("recipes.title")}
+            </h2>
+          </div>
+          <p className="text-xs text-[var(--ps-text-secondary)] mt-0.5 ml-8">
+            {t("recipes.subtitle")}
+          </p>
+        </div>
+
+        <span className="text-xs text-[var(--ps-text-muted)] font-mono self-start sm:self-auto">
+          {RECIPES.length} Production Recipes
+        </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {scenarios.map((sc) => (
-          <div
-            key={sc.id}
-            className="ps-card rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] p-5 hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                <svg
-                  className="w-5 h-5 text-[var(--ps-neon-cyan)]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.5"
-                    d={iconPaths[sc.icon] || iconPaths.wrench}
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-semibold text-[var(--ps-text-primary)] text-sm">
-                  {lang === "zh" ? sc.title_zh : sc.title_en}
-                </h3>
-                <p className="text-xs text-[var(--ps-text-muted)] leading-tight">
-                  {lang === "zh" ? sc.description_zh : sc.description_en}
-                </p>
-              </div>
-            </div>
+      {/* Flattened Recipe Cards Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {RECIPES.map((recipe) => {
+          const Icon = getRecipeIcon(recipe.iconType);
+          const isCopied = copiedId === recipe.id;
 
-            <div className="space-y-1.5">
-              {sc.steps.map((step, idx) => (
-                <button
-                  key={step.name}
-                  onClick={() => navigate(`/skill/${step.slug}`)}
-                  className="w-full flex items-center gap-2.5 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors group text-left"
-                >
-                  <span className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-[var(--ps-neon-cyan)] flex items-center justify-center text-[10px] font-bold shrink-0">
-                    {idx + 1}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-sm font-medium text-[var(--ps-text-primary)] group-hover:text-[var(--ps-neon-cyan)] transition-colors block truncate">
-                      {step.name}
-                    </span>
-                    <span className="text-xs text-[var(--ps-text-muted)] block truncate">
-                      {lang === "zh" ? step.description_zh : step.description_en}
-                    </span>
+          return (
+            <div
+              key={recipe.id}
+              className="p-4 sm:p-5 rounded-2xl border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-neon-cyan)]/40 hover:bg-[var(--ps-bg-card-hover)] transition-all duration-200 flex flex-col justify-between shadow-xs group"
+            >
+              <div>
+                {/* Header Row: Icon + Title + Environment Badge */}
+                <div className="flex items-start justify-between gap-3 mb-2.5">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--ps-neon-cyan)]/10 text-[var(--ps-neon-cyan)] border border-[var(--ps-neon-cyan)]/25 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-bold text-[var(--ps-text-primary)] truncate">
+                        {lang === "zh" ? recipe.title_zh : recipe.title_en}
+                      </h3>
+                      <p className="text-xs text-[var(--ps-text-secondary)] line-clamp-1">
+                        {lang === "zh" ? recipe.summary_zh : recipe.summary_en}
+                      </p>
+                    </div>
                   </div>
-                  <svg
-                    className="w-3.5 h-3.5 text-[var(--ps-text-muted)] group-hover:text-blue-400 transition-colors shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
+
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--ps-bg-elevated)] border border-[var(--ps-border)] text-[10px] font-mono text-[var(--ps-neon-cyan)] shrink-0">
+                    <RiCommandLine className="w-2.5 h-2.5" />
+                    {recipe.environment.split("/")[0].trim()}
+                  </span>
+                </div>
+
+                {/* Compact Single-Line Toolchain Flow */}
+                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1.5 my-1">
+                  <span className="text-[10px] font-semibold text-[var(--ps-text-muted)] uppercase tracking-wider shrink-0 mr-0.5">
+                    Flow:
+                  </span>
+                  {recipe.tools.map((tool, idx) => (
+                    <div key={tool.slug} className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => navigate(`/skill/${tool.slug}`)}
+                        className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--ps-bg-elevated)] border border-[var(--ps-border)] hover:border-[var(--ps-neon-cyan)]/50 hover:text-[var(--ps-neon-cyan)] text-[11px] font-medium text-[var(--ps-text-primary)] transition-colors cursor-pointer"
+                        title={`${tool.name} — ${lang === "zh" ? tool.role_zh : tool.role_en}`}
+                      >
+                        <span>{tool.name}</span>
+                        <RiExternalLinkLine className="w-2.5 h-2.5 opacity-40" />
+                      </button>
+                      {idx < recipe.tools.length - 1 && (
+                        <RiArrowRightLine className="w-3 h-3 text-[var(--ps-text-muted)] shrink-0" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Flattened Action & Integration Line (No Heavy Embedded Dark Card) */}
+              <div className="pt-2.5 mt-2.5 border-t border-[var(--ps-border)]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <p className="text-xs text-[var(--ps-text-secondary)] leading-relaxed flex-1 min-w-0 pr-2">
+                  <span className="text-[var(--ps-neon-amber)] font-medium mr-1 inline-flex items-center gap-1">
+                    <RiLightbulbLine className="w-3.5 h-3.5" />
+                    <span>{t("recipes.guideLabel")}:</span>
+                  </span>
+                  <span>{lang === "zh" ? recipe.guide_zh : recipe.guide_en}</span>
+                </p>
+
+                <button
+                  onClick={() => handleCopy(recipe.id, recipe.snippet)}
+                  className="flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[var(--ps-neon-cyan)]/10 text-[var(--ps-neon-cyan)] hover:bg-[var(--ps-neon-cyan)] hover:text-black border border-[var(--ps-neon-cyan)]/25 transition-all cursor-pointer shrink-0 self-end sm:self-auto"
+                >
+                  {isCopied ? (
+                    <>
+                      <RiCheckLine className="w-3 h-3 text-emerald-400" />
+                      <span className="text-emerald-400">{t("recipes.copied")}</span>
+                    </>
+                  ) : (
+                    <>
+                      <RiFileCopyLine className="w-3 h-3" />
+                      <span>{t("recipes.copyConfig")}</span>
+                    </>
+                  )}
                 </button>
-              ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

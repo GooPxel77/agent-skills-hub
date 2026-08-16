@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, Clock, Star } from "lucide-react";
+import {
+  RiSearch2Line,
+  RiCloseLine,
+  RiTimeLine,
+  RiStarFill,
+} from "@remixicon/react";
 import { fetchQuickSearch } from "../api/client";
 import { useI18n } from "../i18n/I18nContext";
 import { useRecentSearches } from "../hooks/useRecentSearches";
@@ -11,12 +16,23 @@ interface Props {
   onChange: (value: string) => void;
 }
 
-const HOT_KEYWORDS = ["mcp-server", "claude", "agent", "codex", "python", "typescript"];
+const HOT_KEYWORDS = [
+  "mcp-server",
+  "claude",
+  "agent",
+  "codex",
+  "python",
+  "typescript",
+];
 
 export function SearchBar({ value, onChange }: Props) {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const { searches: recentSearches, addSearch, clearSearches } = useRecentSearches();
+  const {
+    searches: recentSearches,
+    addSearch,
+    clearSearches,
+  } = useRecentSearches();
   const [local, setLocal] = useState(value);
   const [results, setResults] = useState<Skill[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -31,14 +47,20 @@ export function SearchBar({ value, onChange }: Props) {
     setLocal(value);
   }, [value]);
 
-  useEffect(() => () => {
-    clearTimeout(timer.current);
-    clearTimeout(searchTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      clearTimeout(timer.current);
+      clearTimeout(searchTimer.current);
+    },
+    []
+  );
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -132,9 +154,9 @@ export function SearchBar({ value, onChange }: Props) {
 
   return (
     <div className="relative" ref={containerRef}>
-      <Search
+      <RiSearch2Line
         className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 z-10"
-        style={{ color: 'var(--ps-text-muted)' }}
+        style={{ color: "var(--ps-text-muted)" }}
       />
       <input
         ref={inputRef}
@@ -146,18 +168,22 @@ export function SearchBar({ value, onChange }: Props) {
         placeholder={t("explore.search")}
         aria-label="Search skills"
         className="w-full bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.04)] text-[var(--ps-text-primary)] border border-[rgba(255,255,255,0.08)] focus:border-[var(--ps-neon-cyan)]/40 focus:bg-[rgba(255,255,255,0.03)] focus:ring-1 focus:ring-[var(--ps-neon-cyan)]/10 transition-all duration-300 outline-none rounded-xl text-sm"
-        style={{ paddingLeft: '40px', paddingRight: '36px', height: '40px' }}
+        style={{ paddingLeft: "40px", paddingRight: "36px", height: "40px" }}
       />
       {local && (
         <button
           onClick={handleClear}
           className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 cursor-pointer z-10 transition-colors"
-          style={{ color: 'var(--ps-text-muted)' }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-muted)'}
+          style={{ color: "var(--ps-text-muted)" }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.color = "var(--ps-neon-cyan)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.color = "var(--ps-text-muted)")
+          }
           aria-label="Clear search"
         >
-          <X className="w-4 h-4" />
+          <RiCloseLine className="w-4 h-4" />
         </button>
       )}
 
@@ -166,26 +192,39 @@ export function SearchBar({ value, onChange }: Props) {
         <div
           className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-[rgba(255,255,255,0.08)] overflow-hidden z-[100]"
           style={{
-            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.03)',
-            background: 'rgba(10, 10, 12, 0.95)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)'
+            boxShadow:
+              "0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.03)",
+            background: "rgba(10, 10, 12, 0.95)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
           }}
         >
           {/* Recent searches when empty */}
           {!local.trim() && recentSearches.length > 0 && (
-            <div className="px-3 py-2" style={{ borderBottom: '1px solid var(--ps-border)' }}>
+            <div
+              className="px-3 py-2"
+              style={{ borderBottom: "1px solid var(--ps-border)" }}
+            >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] uppercase tracking-wide font-semibold" style={{ color: 'var(--ps-text-muted)' }}>{t("search.recent")}</span>
+                <span
+                  className="text-[10px] uppercase tracking-wide font-semibold"
+                  style={{ color: "var(--ps-text-muted)" }}
+                >
+                  {t("search.recent")}
+                </span>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     clearSearches();
                   }}
                   className="text-[10px] transition-colors cursor-pointer"
-                  style={{ color: 'var(--ps-text-muted)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-pink)'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-muted)'}
+                  style={{ color: "var(--ps-text-muted)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "var(--ps-neon-pink)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "var(--ps-text-muted)")
+                  }
                 >
                   {t("search.clearRecent")}
                 </button>
@@ -197,7 +236,7 @@ export function SearchBar({ value, onChange }: Props) {
                     onClick={() => handleHotKeyword(query)}
                     className="px-2 py-0.5 rounded text-[10px] border border-[rgba(255,255,255,0.08)] text-[var(--ps-text-secondary)] hover:text-[var(--ps-text-primary)] hover:border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.02)] cursor-pointer flex items-center gap-1 transition-colors"
                   >
-                    <Clock className="w-2.5 h-2.5" />
+                    <RiTimeLine className="w-2.5 h-2.5" />
                     {query}
                   </button>
                 ))}
@@ -207,8 +246,16 @@ export function SearchBar({ value, onChange }: Props) {
 
           {/* Hot keywords when empty */}
           {!local.trim() && (
-            <div className="px-3 py-2.5" style={{ borderBottom: '1px solid var(--ps-border)' }}>
-              <span className="text-[10px] uppercase tracking-wide font-semibold" style={{ color: 'var(--ps-text-muted)' }}>{t("search.hotKeywords")}</span>
+            <div
+              className="px-3 py-2.5"
+              style={{ borderBottom: "1px solid var(--ps-border)" }}
+            >
+              <span
+                className="text-[10px] uppercase tracking-wide font-semibold"
+                style={{ color: "var(--ps-text-muted)" }}
+              >
+                {t("search.hotKeywords")}
+              </span>
               <div className="flex flex-wrap gap-1.5 mt-1.5">
                 {HOT_KEYWORDS.map((kw) => (
                   <button
@@ -226,7 +273,13 @@ export function SearchBar({ value, onChange }: Props) {
           {/* Loading */}
           {searching && local.trim() && (
             <div className="px-3 py-4 text-center">
-              <div className="w-4 h-4 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: 'var(--ps-neon-cyan)', borderTopColor: 'transparent' }} />
+              <div
+                className="w-4 h-4 border-2 rounded-full animate-spin mx-auto"
+                style={{
+                  borderColor: "var(--ps-neon-cyan)",
+                  borderTopColor: "transparent",
+                }}
+              />
             </div>
           )}
 
@@ -247,24 +300,49 @@ export function SearchBar({ value, onChange }: Props) {
                     onMouseEnter={() => setActiveIdx(i)}
                     className="flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors"
                     style={{
-                      background: i === activeIdx ? 'rgba(0, 240, 255, 0.04)' : 'transparent',
+                      background:
+                        i === activeIdx
+                          ? "rgba(0, 240, 255, 0.04)"
+                          : "transparent",
                     }}
                   >
-                    <img src={skill.author_avatar_url} alt="" width={28} height={28} className="w-7 h-7 rounded-full shrink-0 border border-[rgba(255,255,255,0.1)]" />
+                    <img
+                      src={skill.author_avatar_url}
+                      alt=""
+                      width={28}
+                      height={28}
+                      className="w-7 h-7 rounded-full shrink-0 border border-[rgba(255,255,255,0.1)]"
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium truncate" style={{ color: 'var(--ps-text-primary)' }}>
+                        <span
+                          className="text-sm font-medium truncate"
+                          style={{ color: "var(--ps-text-primary)" }}
+                        >
                           {skill.repo_name}
                         </span>
-                        <span className="text-[10px] shrink-0" style={{ color: 'var(--ps-text-muted)' }}>
+                        <span
+                          className="text-[10px] shrink-0"
+                          style={{ color: "var(--ps-text-muted)" }}
+                        >
                           {skill.author_name}
                         </span>
                       </div>
-                      <p className="text-xs truncate" style={{ color: 'var(--ps-text-secondary)' }}>{skill.description}</p>
+                      <p
+                        className="text-xs truncate"
+                        style={{ color: "var(--ps-text-secondary)" }}
+                      >
+                        {skill.description}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-xs flex items-center gap-0.5" style={{ color: 'var(--ps-text-secondary)' }}>
-                        <Star className="w-3 h-3" style={{ color: 'var(--ps-neon-amber)', fill: 'var(--ps-neon-amber)' }} />
+                      <span
+                        className="text-xs flex items-center gap-0.5"
+                        style={{ color: "var(--ps-text-secondary)" }}
+                      >
+                        <RiStarFill
+                          className="w-3 h-3 text-[var(--ps-neon-amber)]"
+                        />
                         {skill.stars.toLocaleString()}
                       </span>
                       {isHighValue ? (
@@ -285,24 +363,58 @@ export function SearchBar({ value, onChange }: Props) {
 
           {/* No results */}
           {!searching && local.trim() && results.length === 0 && (
-            <div className="px-3 py-4 text-center text-sm" style={{ color: 'var(--ps-text-muted)' }}>
+            <div
+              className="px-3 py-4 text-center text-sm"
+              style={{ color: "var(--ps-text-muted)" }}
+            >
               {t("explore.noResults")}
             </div>
           )}
 
           {/* Keyboard hint */}
           {results.length > 0 && (
-            <div className="px-3 py-1.5 flex items-center gap-3 text-[10px]" style={{ borderTop: '1px solid var(--ps-border)', background: 'var(--ps-bg-elevated)', color: 'var(--ps-text-muted)' }}>
+            <div
+              className="px-3 py-1.5 flex items-center gap-3 text-[10px]"
+              style={{
+                borderTop: "1px solid var(--ps-border)",
+                background: "var(--ps-bg-elevated)",
+                color: "var(--ps-text-muted)",
+              }}
+            >
               <span className="flex items-center gap-1">
-                <kbd className="px-1 py-0.5 rounded text-[9px]" style={{ background: 'var(--ps-bg-card)', border: '1px solid var(--ps-border)' }}>↑↓</kbd>
+                <kbd
+                  className="px-1 py-0.5 rounded text-[9px]"
+                  style={{
+                    background: "var(--ps-bg-card)",
+                    border: "1px solid var(--ps-border)",
+                  }}
+                >
+                  ↑↓
+                </kbd>
                 {t("search.navigate")}
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1 py-0.5 rounded text-[9px]" style={{ background: 'var(--ps-bg-card)', border: '1px solid var(--ps-border)' }}>Enter</kbd>
+                <kbd
+                  className="px-1 py-0.5 rounded text-[9px]"
+                  style={{
+                    background: "var(--ps-bg-card)",
+                    border: "1px solid var(--ps-border)",
+                  }}
+                >
+                  Enter
+                </kbd>
                 {t("search.select")}
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1 py-0.5 rounded text-[9px]" style={{ background: 'var(--ps-bg-card)', border: '1px solid var(--ps-border)' }}>Esc</kbd>
+                <kbd
+                  className="px-1 py-0.5 rounded text-[9px]"
+                  style={{
+                    background: "var(--ps-bg-card)",
+                    border: "1px solid var(--ps-border)",
+                  }}
+                >
+                  Esc
+                </kbd>
                 {t("search.close")}
               </span>
             </div>

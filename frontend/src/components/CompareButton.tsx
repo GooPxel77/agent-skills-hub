@@ -1,4 +1,4 @@
-import { Scale } from "lucide-react";
+import { RiScales3Line } from "@remixicon/react";
 import { useCompare } from "../hooks/useCompare";
 import type { Skill } from "../types/skill";
 
@@ -24,16 +24,30 @@ export function CompareButton({ skill, size = "md" }: Props) {
       disabled={disabled}
       className={`${sz} flex items-center justify-center rounded-lg transition-all cursor-pointer`}
       style={{
-        background: active ? 'rgba(0, 240, 255, 0.1)' : 'var(--ps-bg-elevated)',
-        color: active ? 'var(--ps-neon-cyan)' : disabled ? 'var(--ps-text-muted)' : 'var(--ps-text-secondary)',
-        border: active ? '1px solid var(--ps-border-glow)' : '1px solid var(--ps-border)',
-        cursor: disabled ? 'not-allowed' : 'pointer',
+        background: active
+          ? "rgba(0, 240, 255, 0.1)"
+          : "var(--ps-bg-elevated)",
+        color: active
+          ? "var(--ps-neon-cyan)"
+          : disabled
+          ? "var(--ps-text-muted)"
+          : "var(--ps-text-secondary)",
+        border: active
+          ? "1px solid var(--ps-border-glow)"
+          : "1px solid var(--ps-border)",
+        cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.4 : 1,
       }}
       aria-label={active ? "Remove from compare" : "Add to compare"}
-      title={active ? "Remove from compare" : disabled ? "Max 3 skills" : "Add to compare"}
+      title={
+        active
+          ? "Remove from compare"
+          : disabled
+          ? "Max 3 skills"
+          : "Add to compare"
+      }
     >
-      <Scale className={iconSz} strokeWidth={active ? 2.5 : 2} />
+      <RiScales3Line className={iconSz} />
     </button>
   );
 }

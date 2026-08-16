@@ -1,4 +1,4 @@
-import { Bookmark } from "lucide-react";
+import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
 import { useFavorites } from "../hooks/useFavorites";
 
 interface Props {
@@ -22,15 +22,20 @@ export function FavoriteButton({ skillId, size = "md" }: Props) {
       className={`
         ${sz} flex items-center justify-center border transition-all duration-200 ease-out cursor-pointer
         hover:scale-105 active:scale-95
-        ${active 
-          ? "bg-[rgba(0,240,255,0.06)] text-[var(--ps-neon-cyan)] border-[var(--ps-neon-cyan)]/40 shadow-[0_0_12px_rgba(0,240,255,0.1)]" 
-          : "bg-[var(--ps-bg-elevated)] text-[var(--ps-text-secondary)] border-[var(--ps-border)] hover:border-[var(--ps-border-glow)] hover:text-[var(--ps-text-primary)]"
+        ${
+          active
+            ? "bg-[rgba(0,240,255,0.06)] text-[var(--ps-neon-cyan)] border-[var(--ps-neon-cyan)]/40 shadow-[0_0_12px_rgba(0,240,255,0.1)]"
+            : "bg-[var(--ps-bg-elevated)] text-[var(--ps-text-secondary)] border-[var(--ps-border)] hover:border-[var(--ps-border-glow)] hover:text-[var(--ps-text-primary)]"
         }
       `}
       aria-label={active ? "Remove from favorites" : "Add to favorites"}
       title={active ? "Remove from favorites" : "Add to favorites"}
     >
-      <Bookmark className={`${iconSz} transition-transform`} fill={active ? "currentColor" : "none"} strokeWidth={1.5} />
+      {active ? (
+        <RiBookmarkFill className={`${iconSz} transition-transform`} />
+      ) : (
+        <RiBookmarkLine className={`${iconSz} transition-transform`} />
+      )}
     </button>
   );
 }

@@ -149,18 +149,40 @@ export const translations = {
     "nav.discover": "发现更多",
     "nav.newsletter": "订阅",
 
-    // Scenarios
-    "scenarios.title": "场景推荐组合",
-    "scenarios.subtitle": "精选场景化工作流，多技能协同完成任务",
+    // Scenarios & Recipes
+    "scenarios.title": "实战搭配指南与落地配方",
+    "scenarios.subtitle": "精选高质量 Agent 工具组合，附带 Cursor / Claude 接入指引，直接上手实战",
+    "recipes.title": "实战搭配指南与落地配方",
+    "recipes.subtitle": "精选高质量 Agent 工具组合，附带 Cursor / Claude 接入指引，直接上手实战",
+    "recipes.environment": "推荐运行环境",
+    "recipes.toolChain": "实战工具搭配",
+    "recipes.setupGuide": "落地接入与实战说明",
+    "recipes.guideLabel": "落地",
+    "recipes.copyConfig": "复制接入说明",
+    "recipes.copied": "已复制到剪贴板",
 
-    // Workflows
+    // Workflows & Categories
     "workflows.title": "分类精选",
     "workflows.subtitle": "按类别浏览高评分技能，发现更多可能",
     "workflows.viewAll": "查看全部 {count} 个",
+    "categoryGuide.title": "协议分类与选型指引",
+    "categoryGuide.subtitle": "按底层协议与落地场景精准选型，快速接入 Cursor 与 Claude",
+    "categoryGuide.bestFor": "适用场景",
+    "categoryGuide.targetAudience": "适用对象",
+    "categoryGuide.browseAll": "浏览该分类全部 {count} 个技能 →",
+    "categoryGuide.topSamples": "代表性高分项目",
+
+    // Picks
+    "picks.title": "postsoma-2050's Picks",
+    "picks.subtitle": "聚焦三大核心自主 Agent：全能个人助理、深度推理研究型与极简轻量流式交互",
+    "picks.whyThisPick": "选型理由",
+    "picks.architecture": "架构定位",
+    "picks.reuseScore": "Reuse Score",
 
     // Platforms
-    "platforms.title": "平台推荐",
-    "platforms.subtitle": "发现更多 Agent Skills 的好去处",
+    "platforms.title": "外部生态与平台推荐",
+    "platforms.subtitle": "发现更多开源 Agent Harness、技能市场与权威索引",
+    "platforms.visit": "前往探索",
 
     // Sort
     "sort.qualityScore": "质量评分",
@@ -241,10 +263,20 @@ export const translations = {
     "auth.favorites": "我的收藏",
 
     // Hero
-    "hero.title": "我的 {count} Agent Skills 收藏",
+    "hero.title": "The AI Agent Skills Index",
     "hero.subtitle": "快速查找我收集的 Agent 工具、MCP Server 和 AI Skills",
+    "hero.subtitleSingle": "收录全球高质量 MCP Server、Claude Skills 与 Agent 工具，自动化多维评分与相容性分析。",
+    "hero.badgeDefault": "AI Agent 技能与工具索引库",
+    "hero.badgeSkills": "个高质量技能已收录",
+    "hero.autoSync": "每 8 小时自动同步",
     "hero.trending": "热门",
-    "hero.searchPlaceholder": "搜索 MCP 服务器、Claude 技能、Agent 工具...",
+    "hero.searchPlaceholder": "搜索 MCP 服务器、Claude 技能、Codex 工具、Agent 插件...",
+    "hero.step1Title": "找工具",
+    "hero.step1Desc": "按 MCP / Claude / Agent 协议精准选型",
+    "hero.step2Title": "看评分",
+    "hero.step2Desc": "评估 Reuse Score、活跃度与相容性",
+    "hero.step3Title": "直连用",
+    "hero.step3Desc": "复制配置一键接入 Cursor / Claude",
 
     // Charts
     "chart.categoryDist": "分类分布",
@@ -252,7 +284,15 @@ export const translations = {
     "chart.starTrend": "Star 趋势 Top 10",
     "chart.skills": "技能数",
 
-    // New This Week
+    // Live Data Stream & New This Week
+    "dataStream.title": "流动资产数据流",
+    "dataStream.subtitle": "每 8 小时动态抓取与评分，掌握 Agent 资产全网最新风向",
+    "dataStream.tabNew": "本周最新",
+    "dataStream.tabTrending": "热门飙升",
+    "dataStream.tabMostStars": "Stars 排行",
+    "dataStream.liveSync": "滚动数据流 · 每 8h 自动更新",
+    "dataStream.viewAllInExplore": "进入 Explorer 查看全部流动资产 →",
+    "dataStream.starVelocity": "增速",
     "newThisWeek.title": "本周新增",
     "newThisWeek.subtitle": "最近 7 天首次收录的项目",
 
@@ -422,18 +462,40 @@ export const translations = {
     "nav.discover": "Discover More",
     "nav.newsletter": "Newsletter",
 
-    // Scenarios
-    "scenarios.title": "Scenario Workflows",
-    "scenarios.subtitle": "Curated multi-skill workflows for common tasks",
+    // Scenarios & Recipes
+    "scenarios.title": "Practical Stacks & Recipes",
+    "scenarios.subtitle": "Curated multi-tool combos with Cursor & Claude deployment guides for instant use",
+    "recipes.title": "Practical Stacks & Recipes",
+    "recipes.subtitle": "Curated multi-tool combos with Cursor & Claude deployment guides for instant use",
+    "recipes.environment": "Target Environment",
+    "recipes.toolChain": "Toolchain Combo",
+    "recipes.setupGuide": "Deployment & Integration Guide",
+    "recipes.guideLabel": "Setup",
+    "recipes.copyConfig": "Copy Setup Guide",
+    "recipes.copied": "Copied to clipboard!",
 
-    // Workflows
+    // Workflows & Categories
     "workflows.title": "Browse by Category",
     "workflows.subtitle": "Top-rated skills organized by category",
     "workflows.viewAll": "View all {count}",
+    "categoryGuide.title": "Protocols & Category Guide",
+    "categoryGuide.subtitle": "Select by protocol & practical use case for seamless Cursor & Claude integration",
+    "categoryGuide.bestFor": "Best For",
+    "categoryGuide.targetAudience": "Target Audience",
+    "categoryGuide.browseAll": "Browse all {count} skills in this category →",
+    "categoryGuide.topSamples": "Top Ranked Examples",
+
+    // Picks
+    "picks.title": "postsoma-2050's Picks",
+    "picks.subtitle": "Curated focus on the Top 3 Autonomous Agents: All-in-One, Deep Reasoning & Lightweight Streaming",
+    "picks.whyThisPick": "Why this pick",
+    "picks.architecture": "Architecture",
+    "picks.reuseScore": "Reuse Score",
 
     // Platforms
-    "platforms.title": "Discover More",
-    "platforms.subtitle": "Platforms to find more Agent Skills",
+    "platforms.title": "Ecosystem & External Platforms",
+    "platforms.subtitle": "Discover open-source agent harnesses, skill marketplaces & authoritative registries",
+    "platforms.visit": "Explore",
 
     // Sort
     "sort.qualityScore": "Quality",
@@ -520,12 +582,30 @@ export const translations = {
     "chart.skills": "Skills",
 
     // Hero
-    "hero.title": "My {count} Agent Skills",
+    "hero.title": "The AI Agent Skills Index",
     "hero.subtitle": "Quickly find the tools, MCP servers, and AI skills I've collected",
+    "hero.subtitleSingle": "Automated discovery, multi-dimensional scoring, and compatibility analysis for MCP servers, Claude skills & agent tools.",
+    "hero.badgeDefault": "AI Agent Skills & MCP Server Index",
+    "hero.badgeSkills": "Skills Indexed",
+    "hero.autoSync": "Auto-synced every 8h",
     "hero.trending": "Trending",
-    "hero.searchPlaceholder": "Search MCP servers, Claude skills, agent tools...",
+    "hero.searchPlaceholder": "Search MCP servers, Claude skills, Codex tools, agent plugins...",
+    "hero.step1Title": "Find Tools",
+    "hero.step1Desc": "Filter by MCP, Claude & Agent protocols",
+    "hero.step2Title": "Check Score",
+    "hero.step2Desc": "Evaluate Reuse Score, activity & compatibility",
+    "hero.step3Title": "Connect & Use",
+    "hero.step3Desc": "Copy config to integrate with Cursor / Claude",
 
-    // New This Week
+    // Live Data Stream & New This Week
+    "dataStream.title": "Live Skill Stream",
+    "dataStream.subtitle": "Auto-crawled & scored every 8h, tracking real-time trends in the AI agent ecosystem",
+    "dataStream.tabNew": "New This Week",
+    "dataStream.tabTrending": "Trending",
+    "dataStream.tabMostStars": "Most Stars",
+    "dataStream.liveSync": "Live Stream · Auto-synced every 8h",
+    "dataStream.viewAllInExplore": "View full dynamic stream in Explorer →",
+    "dataStream.starVelocity": "Velocity",
     "newThisWeek.title": "New This Week",
     "newThisWeek.subtitle": "Skills first indexed in the last 7 days",
 

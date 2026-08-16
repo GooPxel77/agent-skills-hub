@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, Search, ChevronRight, Bookmark } from "lucide-react";
+import {
+  RiDashboardLine,
+  RiSearch2Line,
+  RiArrowRightSLine,
+  RiBookmarkLine,
+} from "@remixicon/react";
 import { CrayfishIcon } from "./icons/CrayfishIcon";
 import { LanguageToggle } from "./LanguageToggle";
 import { ThemeToggle } from "./ThemeToggle";
@@ -92,7 +97,7 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
                   color: tab === "overview" ? 'var(--ps-neon-cyan)' : 'var(--ps-text-secondary)',
                 }}
               >
-                <BarChart3 className="w-4 h-4 inline -mt-0.5 mr-1" />
+                <RiDashboardLine className="w-4 h-4 inline -mt-0.5 mr-1" />
                 {t("tab.overview")}
               </button>
               <button
@@ -103,7 +108,7 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
                   color: tab === "explore" ? 'var(--ps-neon-cyan)' : 'var(--ps-text-secondary)',
                 }}
               >
-                <Search className="w-4 h-4 inline -mt-0.5 mr-1" />
+                <RiSearch2Line className="w-4 h-4 inline -mt-0.5 mr-1" />
                 {t("tab.explore")}
               </button>
               <button
@@ -114,7 +119,7 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
                   color: tab === "favorites" ? 'var(--ps-neon-cyan)' : 'var(--ps-text-secondary)',
                 }}
               >
-                <Bookmark className="w-4 h-4 inline -mt-0.5 mr-1" />
+                <RiBookmarkLine className="w-4 h-4 inline -mt-0.5 mr-1" />
                 {t("tab.favorites") || "Saved"}
               </button>
             </div>
@@ -166,7 +171,7 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
             </Link>
             {breadcrumb.map((item, i) => (
               <span key={i} className="flex items-center gap-2">
-                <ChevronRight className="w-3 h-3 shrink-0" style={{ color: 'var(--ps-text-muted)' }} />
+                <RiArrowRightSLine className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--ps-text-muted)' }} />
                 <span className="font-medium truncate" style={{ color: 'var(--ps-text-primary)' }}>{item.label}</span>
               </span>
             ))}

@@ -1,15 +1,25 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, Star, Zap, Server, ShieldCheck } from "lucide-react";
+import {
+  RiSearch2Line,
+  RiCloseLine,
+  RiStarFill,
+  RiSparklingLine,
+  RiCompass3Line,
+  RiShieldCheckLine,
+  RiTerminalBoxLine,
+} from "@remixicon/react";
 import { fetchQuickSearch } from "../api/client";
-import type { Skill } from "../types/skill";
+import { useI18n } from "../i18n/I18nContext";
+import type { Skill, Stats } from "../types/skill";
 
 interface Props {
-  stats: any; // Kept for compatibility but unused
+  stats?: Stats | null;
   onSearch: (query: string) => void;
 }
 
-export function HeroSection({ onSearch }: Props) {
+export function HeroSection({ stats, onSearch }: Props) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Skill[]>([]);
@@ -19,6 +29,17 @@ export function HeroSection({ onSearch }: Props) {
   const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const doSearch = useCallback((q: string) => {
     clearTimeout(searchTimer.current);
@@ -30,7 +51,10 @@ export function HeroSection({ onSearch }: Props) {
     setSearching(true);
     searchTimer.current = setTimeout(() => {
       fetchQuickSearch(q, 6)
-        .then((items) => { setResults(items); setSearching(false); })
+        .then((items) => {
+          setResults(items);
+          setSearching(false);
+        })
         .catch(() => setSearching(false));
     }, 200);
   }, []);
@@ -63,83 +87,87 @@ export function HeroSection({ onSearch }: Props) {
     }
   };
 
+  const quickTags = [
+    { label: "MCP Server", query: "mcp" },
+    { label: "Claude Skill", query: "claude-skill" },
+    { label: "Cursor Rules", query: "cursor" },
+    { label: "Browser Agent", query: "browser" },
+    { label: "Code Gen", query: "code" },
+  ];
+
   return (
-    <section className="hero-gradient -mx-4 px-4 pt-10 pb-12 sm:pt-16 sm:pb-16 mb-8 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse 60% 40% at 50% 20%, rgba(255,255,255,0.02), transparent)',
-      }} />
+    <section className="hero-gradient -mx-4 px-4 pt-6 pb-8 sm:pt-10 sm:pb-10 mb-6 relative overflow-hidden">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 40% at 50% 20%, rgba(56,189,248,0.03), transparent)",
+        }}
+      />
 
       <div className="max-w-4xl mx-auto text-center relative z-[1]">
-        {/* Byline pill */}
-        <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-[var(--ps-border)] bg-[var(--ps-bg-elevated)] text-xs font-medium text-[var(--ps-text-secondary)]">
-          <ShieldCheck className="w-3.5 h-3.5 text-[var(--ps-neon-cyan)]" />
-          <span>11,700+ skills indexed · Auto-synced every 8 hours from GitHub</span>
+        {/* Byline pill: minimal and dynamic */}
+        <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 mb-4 rounded-full border border-[var(--ps-border)] bg-[var(--ps-bg-elevated)] text-xs font-medium text-[var(--ps-text-secondary)] shadow-sm">
+          <RiSparklingLine className="w-3.5 h-3.5 text-[var(--ps-neon-cyan)] animate-pulse" />
+          <span>
+            {stats?.total_skills
+              ? `${stats.total_skills.toLocaleString()} ${t("hero.badgeSkills")}`
+              : t("hero.badgeDefault")}
+            {" · "}
+            {t("hero.autoSync")}
+          </span>
         </div>
 
         {/* Main headline */}
-        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-5 text-[var(--ps-text-primary)]">
-          The AI Agent Skills Index
-        </h2>
-        
-        <p className="text-base sm:text-lg mb-8 max-w-2xl mx-auto text-[var(--ps-text-secondary)] leading-relaxed">
-          Automated discovery, classification and scoring of 11,700+ AI skills, MCP servers,
-          agent tools, and automation scripts — sourced from GitHub, refreshed every 8 hours.
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-3 text-[var(--ps-text-primary)]">
+          {t("hero.title")}
+        </h1>
+
+        {/* Single-sentence subtitle */}
+        <p className="text-sm sm:text-base mb-6 max-w-2xl mx-auto text-[var(--ps-text-secondary)] leading-relaxed">
+          {t("hero.subtitleSingle")}
         </p>
 
-        {/* CTAs */}
-        <div className="flex items-center justify-center gap-4 mb-10">
-          <button
-            onClick={() => onSearch("")}
-            className="px-6 py-3 rounded-full font-semibold transition-opacity hover:opacity-90"
-            style={{ background: 'var(--cta-bg)', color: 'var(--cta-text)' }}
-          >
-            Explore Skills
-          </button>
-          <a
-            href="#scenarios"
-            className="px-6 py-3 rounded-full border font-medium transition-colors"
-            style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-primary)', background: 'var(--bg-elevated)' }}
-          >
-            View Workflows
-          </a>
-        </div>
-
-        {/* Search bar */}
-        <div className="relative max-w-2xl mx-auto mb-16" ref={containerRef}>
-          <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 z-10 text-[var(--ps-text-muted)]"
-          />
+        {/* Search Bar - Positioned right below subtitle */}
+        <div className="relative max-w-2xl mx-auto mb-4" ref={containerRef}>
+          <RiSearch2Line className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 z-10 text-[var(--ps-text-muted)]" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => handleChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={() => { if (query.trim() || results.length > 0) setShowDropdown(true); }}
-            placeholder="Search MCP servers, Claude skills, Codex skills, agent tools..."
+            onFocus={() => {
+              if (query.trim() || results.length > 0) setShowDropdown(true);
+            }}
+            placeholder={t("hero.searchPlaceholder")}
             aria-label="Search skills"
-            className="w-full bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.03)] text-[var(--ps-text-primary)] border border-[rgba(255,255,255,0.08)] focus:border-[var(--ps-neon-cyan)]/40 focus:bg-[rgba(255,255,255,0.03)] focus:ring-1 focus:ring-[var(--ps-neon-cyan)]/10 transition-all duration-300 outline-none rounded-2xl text-base shadow-sm"
-            style={{ paddingLeft: '48px', paddingRight: '48px', height: '56px' }}
+            className="w-full bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.05)] text-[var(--ps-text-primary)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--ps-neon-cyan)]/50 focus:bg-[rgba(255,255,255,0.05)] focus:ring-2 focus:ring-[var(--ps-neon-cyan)]/15 transition-all duration-300 outline-none rounded-2xl text-sm sm:text-base shadow-sm"
+            style={{ paddingLeft: "48px", paddingRight: "48px", height: "52px" }}
           />
           {query && (
             <button
-              onClick={() => { setQuery(""); setResults([]); setShowDropdown(false); }}
+              onClick={() => {
+                setQuery("");
+                setResults([]);
+                setShowDropdown(false);
+              }}
               className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 cursor-pointer z-10 text-[var(--ps-text-muted)] hover:text-[var(--ps-neon-cyan)] transition-colors"
               aria-label="Clear"
             >
-              <X className="w-5 h-5" />
+              <RiCloseLine className="w-5 h-5" />
             </button>
           )}
 
-          {/* Dropdown */}
+          {/* Quick Search Dropdown */}
           {showDropdown && (query.trim() || results.length > 0) && (
             <div
-              className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-[rgba(255,255,255,0.08)] overflow-hidden z-[100] text-left shadow-2xl"
+              className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-[rgba(255,255,255,0.1)] overflow-hidden z-[100] text-left shadow-2xl"
               style={{
-                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.03)',
-                background: 'rgba(10, 10, 12, 0.95)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)'
+                boxShadow: "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.05)",
+                background: "rgba(15, 17, 21, 0.96)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
               }}
             >
               {searching && (
@@ -155,32 +183,49 @@ export function HeroSection({ onSearch }: Props) {
                     return (
                       <div
                         key={skill.id}
-                        onClick={() => { navigate(`/skill/${skill.repo_full_name}`); setShowDropdown(false); }}
+                        onClick={() => {
+                          navigate(`/skill/${skill.repo_full_name}`);
+                          setShowDropdown(false);
+                        }}
                         onMouseEnter={() => setActiveIdx(i)}
-                        className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-[rgba(255,255,255,0.02)] last:border-0"
+                        className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors border-b border-[rgba(255,255,255,0.03)] last:border-0 hover:bg-[rgba(56,189,248,0.06)]"
                         style={{
-                          background: i === activeIdx ? 'rgba(0, 240, 255, 0.04)' : 'transparent',
+                          background: i === activeIdx ? "rgba(56, 189, 248, 0.06)" : "transparent",
                         }}
                       >
-                        <img src={skill.author_avatar_url} alt="" width={32} height={32} className="w-8 h-8 rounded-full shrink-0 border border-[rgba(255,255,255,0.1)]" />
+                        <img
+                          src={skill.author_avatar_url}
+                          alt=""
+                          width={32}
+                          height={32}
+                          className="w-8 h-8 rounded-full shrink-0 border border-[rgba(255,255,255,0.1)]"
+                        />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold truncate text-[var(--ps-text-primary)]">{skill.repo_name}</span>
-                            <span className="text-xs shrink-0 text-[var(--ps-text-muted)]">{skill.author_name}</span>
+                            <span className="text-sm font-semibold truncate text-[var(--ps-text-primary)]">
+                              {skill.repo_name}
+                            </span>
+                            <span className="text-xs shrink-0 text-[var(--ps-text-muted)]">
+                              {skill.author_name}
+                            </span>
                           </div>
-                          <p className="text-xs truncate text-[var(--ps-text-secondary)]">{skill.description}</p>
+                          <p className="text-xs truncate text-[var(--ps-text-secondary)]">
+                            {skill.description}
+                          </p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="text-xs flex items-center gap-0.5 text-[var(--ps-text-secondary)]">
-                            <Star className="w-3.5 h-3.5 text-[var(--ps-neon-amber)]/80" />
-                            {skill.stars >= 1000 ? `${(skill.stars / 1000).toFixed(1)}k` : skill.stars.toLocaleString()}
+                            <RiStarFill className="w-3.5 h-3.5 text-[var(--ps-neon-amber)]" />
+                            {skill.stars >= 1000
+                              ? `${(skill.stars / 1000).toFixed(1)}k`
+                              : skill.stars.toLocaleString()}
                           </span>
                           {isHighValue ? (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded border border-[var(--ps-neon-amber)]/20 text-[var(--ps-neon-amber)] bg-[var(--ps-neon-amber)]/5 shrink-0 font-medium">
+                            <span className="text-[9px] px-1.5 py-0.5 rounded border border-[var(--ps-neon-amber)]/30 text-[var(--ps-neon-amber)] bg-[var(--ps-neon-amber)]/10 shrink-0 font-medium">
                               High Value
                             </span>
                           ) : isVerified ? (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded border border-[var(--ps-neon-green)]/20 text-[var(--ps-neon-green)] bg-[var(--ps-neon-green)]/5 shrink-0 font-medium">
+                            <span className="text-[9px] px-1.5 py-0.5 rounded border border-[var(--ps-neon-green)]/30 text-[var(--ps-neon-green)] bg-[var(--ps-neon-green)]/10 shrink-0 font-medium">
                               Verified
                             </span>
                           ) : null}
@@ -192,46 +237,89 @@ export function HeroSection({ onSearch }: Props) {
               )}
               {!searching && query.trim() && results.length === 0 && (
                 <div className="px-4 py-4 text-center text-sm text-[var(--ps-text-muted)]">
-                  No skills found.
+                  No skills found. Press Enter to search explore tab.
                 </div>
               )}
             </div>
           )}
         </div>
 
-        {/* Value Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-4xl mx-auto">
-          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] hover:shadow-[0_0_15px_rgba(0,240,255,0.02)] transition-all duration-300">
-            <div className="w-10 h-10 rounded-lg bg-[rgba(0,240,255,0.03)] border border-[rgba(0,240,255,0.1)] text-[var(--ps-neon-cyan)] flex items-center justify-center mb-4">
-              <Zap className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">GitHub-Indexed</h3>
-            <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
-              Continuously crawls GitHub for AI skills, MCP servers, and agent tools.
-              New entries appear within 8 hours of publication.
-            </p>
-          </div>
-          
-          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] hover:shadow-[0_0_15px_rgba(0,240,255,0.02)] transition-all duration-300">
-            <div className="w-10 h-10 rounded-lg bg-[rgba(0,240,255,0.03)] border border-[rgba(0,240,255,0.1)] text-[var(--ps-neon-cyan)] flex items-center justify-center mb-4">
-              <Star className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Auto-Classified & Scored</h3>
-            <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
-              Every skill is automatically categorized by type, platform, language, and use case —
-              with a quality score based on stars, commits, and freshness.
-            </p>
-          </div>
+        {/* Quick search suggestion tags */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-6 text-xs">
+          <span className="text-[var(--ps-text-muted)] font-medium">{t("hero.trending")}:</span>
+          {quickTags.map((tag) => (
+            <button
+              key={tag.query}
+              onClick={() => onSearch(tag.query)}
+              className="px-2.5 py-1 rounded-full border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-neon-cyan)]/40 hover:text-[var(--ps-neon-cyan)] text-[var(--ps-text-secondary)] transition-colors cursor-pointer"
+            >
+              {tag.label}
+            </button>
+          ))}
+        </div>
 
-          <div className="p-5 rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] hover:shadow-[0_0_15px_rgba(0,240,255,0.02)] transition-all duration-300">
-            <div className="w-10 h-10 rounded-lg bg-[rgba(0,240,255,0.03)] border border-[rgba(0,240,255,0.1)] text-[var(--ps-neon-cyan)] flex items-center justify-center mb-4">
-              <Server className="w-5 h-5" />
+        {/* 3-Step Quick Guide */}
+        <div className="pt-5 border-t border-[var(--ps-border)]/60 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+            {/* Step 1 */}
+            <div className="group p-3.5 rounded-xl border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-neon-cyan)]/50 hover:bg-[var(--ps-bg-card-hover)] transition-all duration-300 flex items-start gap-3 shadow-xs">
+              <div className="w-8 h-8 rounded-lg bg-[var(--ps-neon-cyan)]/10 text-[var(--ps-neon-cyan)] border border-[var(--ps-neon-cyan)]/25 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                <RiCompass3Line className="w-4 h-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-mono font-bold text-[var(--ps-neon-cyan)] px-1 rounded bg-[var(--ps-neon-cyan)]/10">
+                    01
+                  </span>
+                  <h3 className="text-xs sm:text-sm font-semibold text-[var(--ps-text-primary)]">
+                    {t("hero.step1Title")}
+                  </h3>
+                </div>
+                <p className="text-xs text-[var(--ps-text-secondary)] mt-0.5 leading-snug">
+                  {t("hero.step1Desc")}
+                </p>
+              </div>
             </div>
-            <h3 className="text-base font-semibold text-[var(--ps-text-primary)] mb-2">Composable Workflows</h3>
-            <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed">
-              Combine skills into reusable workflows for content creation, research,
-              developer productivity, and multi-agent automation.
-            </p>
+
+            {/* Step 2 */}
+            <div className="group p-3.5 rounded-xl border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-neon-purple)]/50 hover:bg-[var(--ps-bg-card-hover)] transition-all duration-300 flex items-start gap-3 shadow-xs">
+              <div className="w-8 h-8 rounded-lg bg-[var(--ps-neon-purple)]/10 text-[var(--ps-neon-purple)] border border-[var(--ps-neon-purple)]/25 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                <RiShieldCheckLine className="w-4 h-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-mono font-bold text-[var(--ps-neon-purple)] px-1 rounded bg-[var(--ps-neon-purple)]/10">
+                    02
+                  </span>
+                  <h3 className="text-xs sm:text-sm font-semibold text-[var(--ps-text-primary)]">
+                    {t("hero.step2Title")}
+                  </h3>
+                </div>
+                <p className="text-xs text-[var(--ps-text-secondary)] mt-0.5 leading-snug">
+                  {t("hero.step2Desc")}
+                </p>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="group p-3.5 rounded-xl border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-neon-green)]/50 hover:bg-[var(--ps-bg-card-hover)] transition-all duration-300 flex items-start gap-3 shadow-xs">
+              <div className="w-8 h-8 rounded-lg bg-[var(--ps-neon-green)]/10 text-[var(--ps-neon-green)] border border-[var(--ps-neon-green)]/25 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                <RiTerminalBoxLine className="w-4 h-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-mono font-bold text-[var(--ps-neon-green)] px-1 rounded bg-[var(--ps-neon-green)]/10">
+                    03
+                  </span>
+                  <h3 className="text-xs sm:text-sm font-semibold text-[var(--ps-text-primary)]">
+                    {t("hero.step3Title")}
+                  </h3>
+                </div>
+                <p className="text-xs text-[var(--ps-text-secondary)] mt-0.5 leading-snug">
+                  {t("hero.step3Desc")}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
