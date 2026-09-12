@@ -18,23 +18,6 @@ export function timeAgo(dateStr: string | null): string {
   return `${Math.floor(days / 365)}y ago`;
 }
 
-export function formatDate(dateStr: string | null): string {
-  if (!dateStr) return "N/A";
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-export function parseTags(topics: string): string[] {
-  try {
-    return JSON.parse(topics);
-  } catch {
-    return [];
-  }
-}
-
 export function formatStars(stars: number): string {
   if (stars >= 1000) return `${(stars / 1000).toFixed(1)}k`;
   return stars.toLocaleString();
@@ -44,10 +27,4 @@ export function formatStars(stars: number): string {
 export function isNew(firstSeen: string | null, days = 7): boolean {
   if (!firstSeen) return false;
   return Date.now() - new Date(firstSeen).getTime() < days * 24 * 60 * 60 * 1000;
-}
-
-/** Check if a date is within `days` days from now */
-export function isRecentlyUpdated(dateStr: string | null, days = 3): boolean {
-  if (!dateStr) return false;
-  return Date.now() - new Date(dateStr).getTime() < days * 24 * 60 * 60 * 1000;
 }

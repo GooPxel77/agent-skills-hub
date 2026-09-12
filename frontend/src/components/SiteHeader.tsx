@@ -10,8 +10,7 @@ import { CrayfishIcon } from "./icons/CrayfishIcon";
 import { LanguageToggle } from "./LanguageToggle";
 import { ThemeToggle } from "./ThemeToggle";
 import { useI18n } from "../i18n/I18nContext";
-import { useStats } from "../hooks/useStats";
-import { timeAgo } from "../utils/time";
+
 interface Props {
   /** Show tab navigation (only on Home page) */
   showTabs?: boolean;
@@ -23,7 +22,6 @@ interface Props {
 
 export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
   const { t, lang } = useI18n();
-  const { stats } = useStats();
   const subNavRef = useRef<HTMLDivElement>(null);
   const [navScroll, setNavScroll] = useState({ left: false, right: false });
 
@@ -60,14 +58,6 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
             </p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <span className="text-sm items-center gap-1.5 hidden lg:flex" style={{ color: 'var(--ps-text-muted)' }}>
-              {stats?.last_sync_at && (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  {t("header.lastUpdated")} {timeAgo(stats.last_sync_at)}
-                </>
-              )}
-            </span>
             <Link
               to="/about"
               className="text-xs sm:text-sm font-medium transition-colors px-2 py-1 rounded cursor-pointer"

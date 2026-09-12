@@ -13,11 +13,18 @@ interface CacheEntry<T> {
   cachedAt: number;
 }
 
-export function cacheGet<T>(key: string): CacheEntry<T> | null {
+const DEFAULT_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
+
+export function cacheGet<T>(key: string, ttlMs: number = DEFAULT_TTL_MS): CacheEntry<T> | null {
   try {
     const raw = localStorage.getItem(PREFIX + key);
     if (!raw) return null;
-    return JSON.parse(raw) as CacheEntry<T>;
+    const entry = JSON.parse(raw) as CacheEntry<T>;
+    if (entry.cachedAt && Date.now() - entry.cachedAt > ttlMs) {
+      localStorage.removeItem(PREFIX + key);
+      return null;
+    }
+    return entry;
   } catch {
     return null;
   }
@@ -32,11 +39,3 @@ export function cacheSet<T>(key: string, data: T, lastSyncAt: string | null): vo
   }
 }
 
-export function cacheClear(): void {
-  const keysToRemove: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key?.startsWith(PREFIX)) keysToRemove.push(key);
-  }
-  keysToRemove.forEach((k) => localStorage.removeItem(k));
-}
