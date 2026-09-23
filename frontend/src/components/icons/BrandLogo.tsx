@@ -12,132 +12,133 @@ export function BrandLogo({ className = "w-6 h-6", ...props }: React.SVGProps<SV
       {...props}
     >
       <defs>
-        {/* Background Subtle Tech Base */}
-        <radialGradient id="headerLogoBg" cx="50%" cy="50%" r="65%">
-          <stop offset="0%" stop-color="#140f2d" />
-          <stop offset="100%" stop-color="#05040a" />
+        {/* Light Theme Gradients */}
+        <linearGradient id="brandLogoGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#8b5cf6" />
+          <stop offset="40%" stopColor="#7c3aed" />
+          <stop offset="75%" stopColor="#6d28d9" />
+          <stop offset="100%" stopColor="#4f46e5" />
+        </linearGradient>
+
+        <linearGradient id="brandLogoWarmLight" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#7c3aed" />
+          <stop offset="35%" stopColor="#e11d48" />
+          <stop offset="75%" stopColor="#f59e0b" />
+        </linearGradient>
+
+        <radialGradient id="brandLogoAmberCoreLight" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="30%" stopColor="#fef08a" />
+          <stop offset="70%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#d97706" />
         </radialGradient>
 
-        {/* Purple Neon Circuit Gradient */}
-        <linearGradient id="headerLogoSGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        {/* Dark Theme Gradients */}
+        <linearGradient id="brandLogoGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#c084fc" />
-          <stop offset="35%" stopColor="#a855f7" />
-          <stop offset="70%" stopColor="#8b5cf6" />
+          <stop offset="40%" stopColor="#a855f7" />
+          <stop offset="75%" stopColor="#8b5cf6" />
           <stop offset="100%" stopColor="#6366f1" />
         </linearGradient>
 
-        {/* Center Connector Warm Gradient */}
-        <linearGradient id="headerLogoWarmGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <linearGradient id="brandLogoWarmDark" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#c084fc" />
-          <stop offset="35%" stopColor="#f43f5e" />
-          <stop offset="80%" stopColor="#fbbf24" />
+          <stop offset="35%" stopColor="#fb7185" />
+          <stop offset="75%" stopColor="#fbbf24" />
         </linearGradient>
 
-        {/* Glowing Amber Concentric Core */}
-        <radialGradient id="headerLogoAmberCore" cx="50%" cy="50%" r="50%">
+        <radialGradient id="brandLogoAmberCoreDark" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#ffffff" />
           <stop offset="30%" stopColor="#fef08a" />
           <stop offset="70%" stopColor="#f59e0b" />
           <stop offset="100%" stopColor="#ea580c" />
         </radialGradient>
-
-        {/* Soft Glow */}
-        <filter id="headerLogoGlow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-
-        <filter id="headerLogoAmberGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
       </defs>
 
-      {/* Dark Base Plate */}
-      <rect width="128" height="128" rx="26" fill="url(#headerLogoBg)" />
+      <style>{`
+        .ash-s-path {
+          stroke: url(#brandLogoGradLight);
+          stroke-width: 8;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          transition: stroke 0.2s ease;
+        }
+        .ash-branch-path {
+          stroke: #7c3aed;
+          stroke-width: 6;
+          stroke-linecap: round;
+          fill: none;
+        }
+        .ash-connector-line {
+          stroke: url(#brandLogoWarmLight);
+          stroke-width: 6.5;
+          stroke-linecap: round;
+        }
+        .ash-node-box {
+          fill: #ede9fe;
+          stroke: #7c3aed;
+          stroke-width: 2.2;
+        }
+        .ash-amber-ring {
+          stroke: #d97706;
+          stroke-width: 3.5;
+          fill: #fffbeb;
+        }
+        .ash-amber-core {
+          fill: url(#brandLogoAmberCoreLight);
+        }
 
-      {/* Outer Ambient Glow Trace */}
-      <g opacity="0.6" filter="url(#headerLogoGlow)">
-        <path
-          d="M 42 26 L 68 26 L 82 46 L 70 58 L 44 58 L 32 70 L 44 88 L 70 88 L 82 72"
-          stroke="url(#headerLogoSGrad)"
-          strokeWidth="11"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </g>
+        :root.dark .ash-s-path, html.dark .ash-s-path, .dark .ash-s-path {
+          stroke: url(#brandLogoGradDark);
+          filter: drop-shadow(0 0 3px rgba(192, 132, 252, 0.65));
+        }
+        :root.dark .ash-branch-path, html.dark .ash-branch-path, .dark .ash-branch-path {
+          stroke: #c084fc;
+        }
+        :root.dark .ash-connector-line, html.dark .ash-connector-line, .dark .ash-connector-line {
+          stroke: url(#brandLogoWarmDark);
+        }
+        :root.dark .ash-node-box, html.dark .ash-node-box, .dark .ash-node-box {
+          fill: #2e1065;
+          stroke: #c084fc;
+          stroke-width: 2;
+        }
+        :root.dark .ash-amber-ring, html.dark .ash-amber-ring, .dark .ash-amber-ring {
+          stroke: #fbbf24;
+          fill: #1c1917;
+          filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.85));
+        }
+        :root.dark .ash-amber-core, html.dark .ash-amber-core, .dark .ash-amber-core {
+          fill: url(#brandLogoAmberCoreDark);
+        }
+      `}</style>
 
-      {/* Main S Circuit */}
-      <g filter="url(#headerLogoGlow)">
-        <path
-          d="M 42 26 L 68 26 L 82 46 L 70 58 L 44 58 L 32 70 L 44 88 L 70 88 L 82 72"
-          stroke="url(#headerLogoSGrad)"
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+      {/* Main S Circuit Tube (100% Transparent background) */}
+      <path
+        className="ash-s-path"
+        d="M 24 82 L 38 102 L 61 102 L 74 82 L 61 64 L 38 64 L 24 46 L 38 26 L 61 26"
+      />
 
-        {/* Top Branch to Purple Rounded Node */}
-        <path
-          d="M 80 43 Q 88 43 93 38 Q 98 34 104 34"
-          stroke="#a855f7"
-          strokeWidth="6"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <rect
-          x="98"
-          y="28"
-          width="13"
-          height="13"
-          rx="3.5"
-          fill="#2e1065"
-          stroke="#c084fc"
-          strokeWidth="2.5"
-        />
+      {/* Top Branch to Node */}
+      <path
+        className="ash-branch-path"
+        d="M 61 26 L 74 46 C 79 51, 84 42, 93 42"
+      />
+      <rect className="ash-node-box" x="93" y="35" width="14" height="14" rx="3.5" />
 
-        {/* Bottom Branch to Purple Rounded Node */}
-        <path
-          d="M 80 74 Q 88 74 93 79 Q 98 84 104 84"
-          stroke="#a855f7"
-          strokeWidth="6"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <rect
-          x="98"
-          y="78"
-          width="13"
-          height="13"
-          rx="3.5"
-          fill="#2e1065"
-          stroke="#c084fc"
-          strokeWidth="2.5"
-        />
+      {/* Bottom Branch to Node */}
+      <path
+        className="ash-branch-path"
+        d="M 74 82 C 79 82, 84 88, 93 88"
+      />
+      <rect className="ash-node-box" x="93" y="81" width="14" height="14" rx="3.5" />
 
-        {/* Center Connector */}
-        <line
-          x1="64"
-          y1="58"
-          x2="92"
-          y2="58"
-          stroke="url(#headerLogoWarmGrad)"
-          strokeWidth="6.5"
-          strokeLinecap="round"
-        />
-      </g>
+      {/* Center Warm Connector */}
+      <line className="ash-connector-line" x1="61" y1="64" x2="89" y2="64" />
 
-      {/* Concentric Amber Node with Radiant Bloom */}
-      <g filter="url(#headerLogoAmberGlow)">
-        <circle cx="100" cy="58" r="11" stroke="#fbbf24" strokeWidth="3.5" fill="none" />
-        <circle cx="100" cy="58" r="5.5" fill="url(#headerLogoAmberCore)" />
-      </g>
+      {/* Amber Concentric Node */}
+      <circle className="ash-amber-ring" cx="100" cy="64" r="10" />
+      <circle className="ash-amber-core" cx="100" cy="64" r="5" />
     </svg>
   );
 }

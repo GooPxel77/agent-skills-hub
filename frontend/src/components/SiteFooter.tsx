@@ -57,8 +57,8 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand column */}
           <div>
-            <Link to="/" className="flex items-center gap-2 mb-3 group">
-              <BrandLogo className="w-6 h-6 rounded-md shrink-0 shadow-xs" />
+            <Link to="/" className="inline-flex items-center gap-2.5 mb-3 group">
+              <BrandLogo className="w-6 h-6 shrink-0 transition-transform duration-200 group-hover:scale-105" />
               <span className="font-bold text-sm ps-neon-text">
                 Agent Skills Hub
               </span>

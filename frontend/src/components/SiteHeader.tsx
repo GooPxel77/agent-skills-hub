@@ -47,13 +47,13 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
       <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between mb-3">
           <div className="min-w-0">
-            <Link to="/" className="flex items-center gap-2 group">
-              <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2" style={{ color: 'var(--ps-text-primary)' }}>
-                <BrandLogo className="w-6 h-6 sm:w-7 sm:h-7 rounded-md shadow-xs shrink-0" />
+            <Link to="/" className="inline-flex items-center gap-2.5 sm:gap-3 group">
+              <BrandLogo className="w-6 h-6 sm:w-7 sm:h-7 shrink-0 transition-transform duration-200 group-hover:scale-105" />
+              <h1 className="text-lg sm:text-xl font-bold leading-none tracking-tight flex items-center" style={{ color: 'var(--ps-text-primary)' }}>
                 <span className="truncate group-hover:opacity-80 transition-opacity ps-neon-text">Agent Skills Hub</span>
               </h1>
             </Link>
-            <p className="text-xs sm:text-sm mt-0.5 hidden sm:block" style={{ color: 'var(--ps-text-secondary)' }}>
+            <p className="text-xs sm:text-sm mt-1 hidden sm:block" style={{ color: 'var(--ps-text-secondary)' }}>
               {t("header.subtitle")}
             </p>
           </div>
