@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
-import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -91,8 +90,45 @@ const SVG_DARK = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" 
   <circle cx="100" cy="64" r="5" fill="url(#amberCoreDark)" />
 </svg>`;
 
+/**
+ * Pure JavaScript ICO Encoder for PNG frames.
+ * No Python, No PIL, and no external native dependencies required!
+ */
+function createIcoFromPngs(pngFrames) {
+  const count = pngFrames.length;
+  const headerSize = 6;
+  const dirEntrySize = 16;
+  let offset = headerSize + count * dirEntrySize;
+
+  const header = Buffer.alloc(headerSize);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // 1 = ICO
+  header.writeUInt16LE(count, 4); // number of icons
+
+  const entries = [];
+  const datas = [];
+
+  for (const { width, height, buffer } of pngFrames) {
+    const entry = Buffer.alloc(dirEntrySize);
+    entry.writeUInt8(width >= 256 ? 0 : width, 0);
+    entry.writeUInt8(height >= 256 ? 0 : height, 1);
+    entry.writeUInt8(0, 2); // color palette (0 for truecolor)
+    entry.writeUInt8(0, 3); // reserved
+    entry.writeUInt16LE(1, 4); // color planes
+    entry.writeUInt16LE(32, 6); // bits per pixel
+    entry.writeUInt32LE(buffer.length, 8); // image size in bytes
+    entry.writeUInt32LE(offset, 12); // offset in file
+
+    entries.push(entry);
+    datas.push(buffer);
+    offset += buffer.length;
+  }
+
+  return Buffer.concat([header, ...entries, ...datas]);
+}
+
 async function run() {
-  console.log('🚀 Generating transparent & sharp brand icons matrix...');
+  console.log('🚀 Generating transparent & sharp brand icons matrix (Pure Node.js)...');
 
   const lightBuf = Buffer.from(SVG_LIGHT);
   const darkBuf = Buffer.from(SVG_DARK);
@@ -106,9 +142,13 @@ async function run() {
     fs.mkdirSync(dir, { recursive: true });
 
     // 1. Transparent PNG Favicons (Light mode: default)
-    await sharp(lightBuf).resize(16, 16).png().toFile(path.join(dir, 'favicon-16x16.png'));
-    await sharp(lightBuf).resize(32, 32).png().toFile(path.join(dir, 'favicon-32x32.png'));
-    await sharp(lightBuf).resize(48, 48).png().toFile(path.join(dir, 'favicon-48x48.png'));
+    const p16 = await sharp(lightBuf).resize(16, 16).png().toBuffer();
+    const p32 = await sharp(lightBuf).resize(32, 32).png().toBuffer();
+    const p48 = await sharp(lightBuf).resize(48, 48).png().toBuffer();
+
+    await sharp(p16).toFile(path.join(dir, 'favicon-16x16.png'));
+    await sharp(p32).toFile(path.join(dir, 'favicon-32x32.png'));
+    await sharp(p48).toFile(path.join(dir, 'favicon-48x48.png'));
 
     // 2. Transparent PNG Favicons (Dark mode variant)
     await sharp(darkBuf).resize(16, 16).png().toFile(path.join(dir, 'favicon-dark-16x16.png'));
@@ -138,15 +178,14 @@ async function run() {
       .png()
       .toFile(path.join(dir, 'apple-touch-icon.png'));
 
-    // 5. Generate Multi-resolution Transparent favicon.ico using python PIL
-    const pyScript = `
-from PIL import Image
-p16 = Image.open(r"${path.join(dir, 'favicon-16x16.png')}")
-p32 = Image.open(r"${path.join(dir, 'favicon-32x32.png')}")
-p48 = Image.open(r"${path.join(dir, 'favicon-48x48.png')}")
-p48.save(r"${path.join(dir, 'favicon.ico')}", format="ICO", sizes=[(16, 16), (32, 32), (48, 48)])
-`;
-    execSync('python3', { input: pyScript });
+    // 5. Generate Multi-resolution Transparent favicon.ico using pure JS
+    const icoBuffer = createIcoFromPngs([
+      { width: 16, height: 16, buffer: p16 },
+      { width: 32, height: 32, buffer: p32 },
+      { width: 48, height: 48, buffer: p48 }
+    ]);
+    fs.writeFileSync(path.join(dir, 'favicon.ico'), icoBuffer);
+
     console.log(`✅ Icons successfully generated in ${dir}`);
   }
 
