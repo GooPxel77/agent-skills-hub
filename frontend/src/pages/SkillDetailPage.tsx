@@ -105,13 +105,20 @@ export function SkillDetailPage() {
         <meta property="og:description" content={ogDescription} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://www.205055.xyz/skill/${detail.repo_full_name}`} />
-        <meta property="og:image" content="https://www.205055.xyz/icons/og-image.png" />
         <meta property="og:site_name" content="Agent Skills Hub" />
+        <meta property="og:image" content="https://www.205055.xyz/og-image.png" />
+        <meta property="og:image:secure_url" content="https://www.205055.xyz/og-image.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={`${detail.repo_name} | Agent Skills Hub`} />
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@postsoma-2050" />
         <meta name="twitter:title" content={`${detail.repo_name} | Agent Skills Hub`} />
         <meta name="twitter:description" content={ogDescription} />
-        <meta name="twitter:image" content="https://www.205055.xyz/icons/og-image.png" />
+        <meta name="twitter:image" content="https://www.205055.xyz/og-image.png" />
+        <meta name="twitter:image:alt" content={`${detail.repo_name} | Agent Skills Hub`} />
         {/* Canonical URL */}
         <link rel="canonical" href={`https://www.205055.xyz/skill/${detail.repo_full_name}`} />
       </Helmet>

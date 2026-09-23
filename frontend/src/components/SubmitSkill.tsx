@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, ShieldCheck, Zap, Check } from "lucide-react";
-import { CrayfishIcon } from "./icons/CrayfishIcon";
+import { BrandLogo } from "./icons/BrandLogo";
 import { submitSkill, submitMasterApplication, submitWorkflow } from "../api/client";
 import { useI18n } from "../i18n/I18nContext";
 import type { TransKey } from "../i18n/translations";
@@ -164,7 +164,7 @@ export function MasterForm({ t }: { t: (key: TransKey) => string }) {
           {submitting ? (
             <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin mr-1.5" />
           ) : (
-            <CrayfishIcon className="w-4 h-4 mr-1.5" />
+            <BrandLogo className="w-4 h-4 mr-1.5 inline-block" />
           )}
           {t("submit.masterButton")}
         </button>

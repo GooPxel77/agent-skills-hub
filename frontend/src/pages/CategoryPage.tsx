@@ -71,13 +71,20 @@ export function CategoryPage() {
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`https://www.205055.xyz/category/${slug}`} />
-        <meta property="og:image" content="https://www.205055.xyz/icons/og-image.png" />
         <meta property="og:site_name" content="Agent Skills Hub" />
+        <meta property="og:image" content="https://www.205055.xyz/og-image.png" />
+        <meta property="og:image:secure_url" content="https://www.205055.xyz/og-image.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={title} />
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@postsoma-2050" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://www.205055.xyz/icons/og-image.png" />
+        <meta name="twitter:image" content="https://www.205055.xyz/og-image.png" />
+        <meta name="twitter:image:alt" content={title} />
       </Helmet>
 
       <SiteHeader />

@@ -7,10 +7,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const SVG_PATH = path.join(__dirname, '../public/favicon.svg');
-const OUT_DIR = path.join(__dirname, '../public/icons');
+const OUT_DIR = path.join(__dirname, '../public');
 
-const BG_COLOR = '#090a0b';
-const ACCENT_COLOR = '#4f46e5';
+const BG_COLOR = '#050608';
+const ACCENT_COLOR = '#8b5cf6';
 
 if (!fs.existsSync(OUT_DIR)) {
   fs.mkdirSync(OUT_DIR, { recursive: true });

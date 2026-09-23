@@ -69,10 +69,23 @@ export function AboutPage() {
         <title>About & E-E-A-T Authority Center - Agent Skills Hub</title>
         <meta name="description" content="Discover Agent Skills Hub's mission, data quality benchmarks, AI crawler indexing feeds (llms.txt), and academic citation guidelines for AI agent tool research." />
         <link rel="canonical" href="https://www.205055.xyz/about" />
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="Agent Skills Hub" />
         <meta property="og:title" content="About Agent Skills Hub — E-E-A-T & Technical Overview" />
         <meta property="og:description" content="Discover Agent Skills Hub's mission, data quality benchmarks, AI crawler indexing feeds (llms.txt), and academic citation guidelines." />
         <meta property="og:url" content="https://www.205055.xyz/about" />
-        <meta property="og:type" content="article" />
+        <meta property="og:image" content="https://www.205055.xyz/og-image.png" />
+        <meta property="og:image:secure_url" content="https://www.205055.xyz/og-image.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="About Agent Skills Hub — E-E-A-T & Technical Overview" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@postsoma-2050" />
+        <meta name="twitter:title" content="About Agent Skills Hub — E-E-A-T & Technical Overview" />
+        <meta name="twitter:description" content="Discover Agent Skills Hub's mission, data quality benchmarks, AI crawler indexing feeds (llms.txt), and academic citation guidelines." />
+        <meta name="twitter:image" content="https://www.205055.xyz/og-image.png" />
+        <meta name="twitter:image:alt" content="About Agent Skills Hub — E-E-A-T & Technical Overview" />
       </Helmet>
 
       <JsonLd data={aboutSchema} />

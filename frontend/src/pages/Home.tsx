@@ -131,18 +131,26 @@ export function Home() {
         <title>Agent Skills Hub - Discover Agent Skills, Tools &amp; MCP Servers</title>
         <meta name="description" content="Discover, compare and explore 91,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills. Find the best skills for your AI agent workflow." />
         {/* Open Graph */}
-        <meta property="og:title" content="Agent Skills Hub - Discover Agent Skills, Tools &amp; MCP Servers" />
-        <meta property="og:description" content="Discover, compare and explore 91,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.205055.xyz" />
-        <meta property="og:image" content="https://www.205055.xyz/icons/og-image.png" />
+        <meta property="og:site_name" content="Agent Skills Hub" />
+        <meta property="og:title" content="Agent Skills Hub - The AI Agent Skills Index" />
+        <meta property="og:description" content="Automated discovery, scoring, and compatibility for MCP servers, Claude skills &amp; agent tools." />
+        <meta property="og:url" content="https://www.205055.xyz/" />
+        <meta property="og:image" content="https://www.205055.xyz/og-image.png" />
+        <meta property="og:image:secure_url" content="https://www.205055.xyz/og-image.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Agent Skills Hub - The AI Agent Skills Index" />
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Agent Skills Hub" />
-        <meta name="twitter:description" content="Discover 91,000+ open-source Agent Skills, AI tools &amp; MCP servers." />
-        <meta name="twitter:image" content="https://www.205055.xyz/icons/og-image.png" />
+        <meta name="twitter:site" content="@postsoma-2050" />
+        <meta name="twitter:title" content="Agent Skills Hub - The AI Agent Skills Index" />
+        <meta name="twitter:description" content="Automated discovery, scoring, and compatibility for MCP servers, Claude skills &amp; agent tools." />
+        <meta name="twitter:image" content="https://www.205055.xyz/og-image.png" />
+        <meta name="twitter:image:alt" content="Agent Skills Hub - The AI Agent Skills Index" />
         {/* Canonical */}
-        <link rel="canonical" href="https://www.205055.xyz" />
+        <link rel="canonical" href="https://www.205055.xyz/" />
       </Helmet>
 
       <SiteHeader showTabs tab={tab} onTabChange={setTab} />

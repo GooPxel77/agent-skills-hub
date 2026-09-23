@@ -422,28 +422,35 @@ function buildSkillHtml(skill, assetTags, compositions, skillById, categoryIndex
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />${robotsMeta}
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(metaDesc)}" />
   <meta name="keywords" content="${esc(keywords)}" />
 
   <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Agent Skills Hub" />
   <meta property="og:title" content="${esc(title)}" />
   <meta property="og:description" content="${esc(metaDesc)}" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="${esc(pageUrl)}" />
-  <meta property="og:site_name" content="Agent Skills Hub" />
   <meta property="og:image" content="${esc(ogImage)}" />
+  <meta property="og:image:secure_url" content="${esc(ogImage)}" />
+  <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="${esc(title)}" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@postsoma-2050" />
   <meta name="twitter:title" content="${esc(title)}" />
   <meta name="twitter:description" content="${esc(metaDesc)}" />
-  <meta name="twitter:site" content="@postsoma-2050" />
   <meta name="twitter:image" content="${esc(ogImage)}" />
+  <meta name="twitter:image:alt" content="${esc(title)}" />
 
   <!-- Canonical -->
   <link rel="canonical" href="${esc(pageUrl)}" />
@@ -586,22 +593,33 @@ function buildCategoryHtml(catSlug, catSkills, assetTags, allCategories) {
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(metaDesc)}" />
   <meta name="keywords" content="${esc(catLabel)}, Agent Skills, open source, AI tools, ${catSlug}" />
 
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Agent Skills Hub" />
   <meta property="og:title" content="${esc(title)}" />
   <meta property="og:description" content="${esc(metaDesc)}" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="${esc(pageUrl)}" />
-  <meta property="og:site_name" content="Agent Skills Hub" />
+  <meta property="og:image" content="${SITE}/og-image.png" />
+  <meta property="og:image:secure_url" content="${SITE}/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="${esc(title)}" />
 
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@postsoma-2050" />
   <meta name="twitter:title" content="${esc(title)}" />
   <meta name="twitter:description" content="${esc(metaDesc)}" />
-  <meta name="twitter:site" content="@postsoma-2050" />
+  <meta name="twitter:image" content="${SITE}/og-image.png" />
+  <meta name="twitter:image:alt" content="${esc(title)}" />
 
   <link rel="canonical" href="${esc(pageUrl)}" />
 
@@ -663,6 +681,28 @@ ${breadcrumbLd}
   </noscript>
 </body>
 </html>`;
+}
+
+function buildStaticRouteHtml(baseHtml, { title, description, canonicalUrl, ogType = "website" }) {
+  let html = baseHtml;
+  if (title) {
+    html = html.replace(/<title>.*?<\/title>/i, `<title>${esc(title)}</title>`);
+    html = html.replace(/<meta property="og:title" content=".*?" \/>/i, `<meta property="og:title" content="${esc(title)}" />`);
+    html = html.replace(/<meta name="twitter:title" content=".*?" \/>/i, `<meta name="twitter:title" content="${esc(title)}" />`);
+  }
+  if (description) {
+    html = html.replace(/<meta name="description" content=".*?" \/>/i, `<meta name="description" content="${esc(description)}" />`);
+    html = html.replace(/<meta property="og:description" content=".*?" \/>/i, `<meta property="og:description" content="${esc(description)}" />`);
+    html = html.replace(/<meta name="twitter:description" content=".*?" \/>/i, `<meta name="twitter:description" content="${esc(description)}" />`);
+  }
+  if (canonicalUrl) {
+    html = html.replace(/<link rel="canonical" href=".*?" \/>/i, `<link rel="canonical" href="${esc(canonicalUrl)}" />`);
+    html = html.replace(/<meta property="og:url" content=".*?" \/>/i, `<meta property="og:url" content="${esc(canonicalUrl)}" />`);
+  }
+  if (ogType) {
+    html = html.replace(/<meta property="og:type" content=".*?" \/>/i, `<meta property="og:type" content="${ogType}" />`);
+  }
+  return html;
 }
 
 /* ── main ──────────────────────────────────────── */
@@ -784,6 +824,37 @@ async function main() {
     }
   } catch (e) {
     console.warn("Could not update index.html count:", e.message);
+  }
+
+  // Generate static sub-pages (/about and /compare) for 100% social crawler & SEO compatibility
+  try {
+    const finalIndexHtml = readFileSync(indexPath, "utf-8");
+    const aboutDir = join(distDir, "about");
+    mkdirSync(aboutDir, { recursive: true });
+    writeFileSync(
+      join(aboutDir, "index.html"),
+      buildStaticRouteHtml(finalIndexHtml, {
+        title: "About & E-E-A-T Authority Center - Agent Skills Hub",
+        description: "Discover Agent Skills Hub's mission, data quality benchmarks, AI crawler indexing feeds (llms.txt), and academic citation guidelines.",
+        canonicalUrl: `${SITE}/about`,
+        ogType: "article"
+      })
+    );
+
+    const compareDir = join(distDir, "compare");
+    mkdirSync(compareDir, { recursive: true });
+    writeFileSync(
+      join(compareDir, "index.html"),
+      buildStaticRouteHtml(finalIndexHtml, {
+        title: "Compare AI Agent Skills & MCP Servers - Agent Skills Hub",
+        description: "Side-by-side comparison of AI Agent skills, tools, and MCP servers on Agent Skills Hub.",
+        canonicalUrl: `${SITE}/compare`,
+        ogType: "website"
+      })
+    );
+    console.log("✅ Static sub-pages (/about, /compare) generated successfully with full OG metadata");
+  } catch (e) {
+    console.warn("Could not generate static sub-pages:", e.message);
   }
 }
 
