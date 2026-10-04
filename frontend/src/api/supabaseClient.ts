@@ -44,9 +44,11 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 1, delay = 1000): Pr
   }
 }
 
-export async function sbFetchSkills(params: SkillsQueryParams): Promise<PaginatedSkills> {
+export async function sbFetchSkills(params: SkillsQueryParams, source: "v_curated_skills" | "skills" = "v_curated_skills"): Promise<PaginatedSkills> {
   const sb = ensureSupabase();
-  let query = sb.from("v_curated_skills").select(SKILL_COLUMNS, { count: "exact" });
+  let query = sb.from(source).select(SKILL_COLUMNS, { count: "exact" });
+  // Match the existing static-page inclusion rule when the curated view is unavailable.
+  if (source === "skills") query = query.gte("stars", 20);
 
   if (params.category) query = query.eq("category", params.category);
   if (params.size_category) query = query.eq("size_category", params.size_category);
@@ -93,7 +95,12 @@ export async function sbFetchSkills(params: SkillsQueryParams): Promise<Paginate
   query = query.range(from, to);
 
   const { data, count, error } = await query;
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (source === "v_curated_skills" && (error.code === "PGRST205" || error.code === "42P01")) {
+      return sbFetchSkills(params, "skills");
+    }
+    throw new Error(error.message);
+  }
 
   const total = count ?? 0;
   return {
@@ -167,8 +174,9 @@ export async function sbFetchTopRated(limit = 10): Promise<Skill[]> {
 
   // Fallback: query skills table directly using quality_score
   const { data: fallbackData, error: fallbackError } = await sb
-    .from("v_curated_skills")
+    .from("skills")
     .select(SKILL_COLUMNS)
+    .gte("stars", 20)
     .gt("quality_score", 0)
     .order("quality_score", { ascending: false })
     .limit(limit);
@@ -334,8 +342,9 @@ export async function sbFetchNewThisWeek(limit = 10): Promise<Skill[]> {
   const sb = ensureSupabase();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const { data, error } = await sb
-    .from("v_curated_skills")
+    .from("skills")
     .select(SKILL_COLUMNS)
+    .gte("stars", 20)
     .gte("first_seen", sevenDaysAgo)
     .order("stars", { ascending: false })
     .limit(limit);

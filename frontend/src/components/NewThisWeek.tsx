@@ -292,8 +292,8 @@ export function NewThisWeek({ onShowDetail }: Props) {
         <div className="p-3 border-t border-[var(--ps-border)]/60 bg-[var(--ps-bg-card)]/50 flex items-center justify-between">
           <span className="text-xs text-[var(--ps-text-muted)] ml-2">
             {lang === "zh"
-              ? "共抓取收录 11,700+ 个项目，每 8 小时增量清洗入库"
-              : "11,700+ skills crawled & verified, continuously refreshed"}
+              ? "共抓取收录 10,000+ 个项目，每 8 小时增量清洗入库"
+              : "10,000+ skills crawled & verified, continuously refreshed"}
           </span>
           <button
             onClick={handleExploreMore}

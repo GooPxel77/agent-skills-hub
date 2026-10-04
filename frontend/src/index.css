@@ -559,3 +559,7 @@ body::before {
 .hero-gradient {
   background: var(--bg-page);
 }
+/* Native select popups must use the active theme, including OS-rendered options. */
+html[data-theme="dark"] { color-scheme: dark; }
+html[data-theme="light"] { color-scheme: light; }
+select option { background: var(--ps-bg-base); color: var(--ps-text-primary); }

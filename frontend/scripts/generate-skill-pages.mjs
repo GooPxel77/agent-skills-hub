@@ -821,7 +821,7 @@ async function main() {
 
     // Replace placeholders with dynamic count strings
     let updated = indexHtml
-      .replace(/91,000\+/g, totalCountStr)
+      .replace(/91,000\+/g, "10,000+")
       .replace(/8,700\+/g, curatedCountStr);
 
     if (updated !== indexHtml) {

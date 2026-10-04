@@ -18,7 +18,7 @@ interface Props {
   onSearch: (query: string) => void;
 }
 
-export function HeroSection({ stats, onSearch }: Props) {
+export function HeroSection({ onSearch }: Props) {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -110,9 +110,7 @@ export function HeroSection({ stats, onSearch }: Props) {
         <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 mb-4 rounded-full border border-[var(--ps-border)] bg-[var(--ps-bg-elevated)] text-xs font-medium text-[var(--ps-text-secondary)] shadow-sm">
           <RiSparklingLine className="w-3.5 h-3.5 text-[var(--ps-neon-cyan)] animate-pulse" />
           <span>
-            {stats?.total_skills
-              ? `${stats.total_skills.toLocaleString()} ${t("hero.badgeSkills")}`
-              : t("hero.badgeDefault")}
+            {t("hero.badgeCollection")}
             {" · "}
             {t("hero.autoSync")}
           </span>

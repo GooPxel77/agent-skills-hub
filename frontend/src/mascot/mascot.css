@@ -1,0 +1,110 @@
+.skill-mascot-boundary { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 35; }
+.skill-mascot-dock {
+  --skill-rest-offset: var(--skill-mobile-rest, 68px);
+  --skill-peek-offset: var(--skill-mobile-peek, 55px);
+  --skill-hidden-offset: var(--skill-mobile-hidden, 160px);
+  position: absolute;
+  z-index: 40;
+  width: var(--skill-mobile-width, 118px);
+  height: var(--skill-mobile-height, 129px);
+  pointer-events: none;
+  user-select: none;
+  transform: translate3d(calc(-50% + var(--skill-x, 0vw)), var(--skill-rest-offset), 0);
+  transition: transform var(--skill-transition-ms, 700ms) cubic-bezier(.22,.72,.22,1);
+  will-change: transform;
+}
+.skill-mascot-dock[data-mode="peek"],
+.skill-mascot-dock[data-mode="alert"] {
+  transform: translate3d(calc(-50% + var(--skill-x, 0vw)), var(--skill-peek-offset), 0);
+}
+.skill-mascot-dock[data-mode="companion"],
+.skill-mascot-dock[data-mode="shock"],
+.skill-mascot-dock[data-mode="shy"] {
+  transform: translate3d(calc(-50% + var(--skill-x, 0vw)), calc(-1 * var(--skill-lift, 16px)), 0);
+}
+.skill-mascot-dock[data-mode="shy_hide"],
+.skill-mascot-dock[data-mode="shy_wait"],
+.skill-mascot-dock[data-mode="guarded"] {
+  transform: translate3d(calc(-50% + var(--skill-x, 0vw)), var(--skill-hidden-offset), 0);
+}
+.skill-mascot-button {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.skill-mascot-button:focus-visible { outline: 2px solid #8edbc2; outline-offset: 2px; border-radius: 50%; }
+.skill-mascot-dock[data-mode="shy_hide"] .skill-mascot-button,
+.skill-mascot-dock[data-mode="shy_wait"] .skill-mascot-button,
+.skill-mascot-dock[data-mode="guarded"] .skill-mascot-button { pointer-events: none; }
+.skill-mascot-stage,
+.skill-mascot-core { position: absolute; inset: 0; display: block; }
+.skill-mascot-stage { filter: drop-shadow(0 10px 18px rgba(0,0,0,.22)); }
+.skill-mascot-core { transform-origin: 50% 88%; animation: skill-mascot-breathe var(--skill-breath-ms, 3400ms) ease-in-out infinite; }
+.skill-mascot-plate { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
+.skill-mascot-sprout { position: absolute; z-index: 2; display: block; animation: skill-mascot-sprout var(--skill-breath-ms, 3400ms) ease-in-out infinite; }
+.skill-mascot-sprout img { display: block; width: 100%; height: auto; opacity: 1; }
+.skill-mascot-slot { position: absolute; pointer-events: none; }
+.skill-mascot-slot img { display: block; width: 100%; height: auto; transform-origin: 50% 80%; }
+.skill-mascot-star img { opacity: .75; }
+.skill-mascot-eyes { position: absolute; inset: 0; z-index: 6; width: 100%; height: 100%; overflow: visible; }
+.skill-mascot-eye { animation: skill-mascot-blink var(--skill-blink-ms, 5200ms) ease-in-out infinite; }
+.skill-mascot-eye:nth-child(2) { animation-delay: 120ms; }
+.skill-mascot-eye-halo { fill: #f9f8f5; stroke: #242423; stroke-width: 13; }
+.skill-mascot-eye-moon { fill: #111110; }
+.skill-mascot-cheek { position: absolute; z-index: 7; top: 52%; width: 13%; height: 5%; border-radius: 50%; background: #db8b83; filter: blur(2px); opacity: 0; }
+.skill-mascot-cheek-left { left: 23%; }
+.skill-mascot-cheek-right { right: 23%; }
+.skill-mascot-dock[data-theme="light"] .skill-mascot-eye-halo { fill: #242320; stroke: #fbfaf7; }
+.skill-mascot-dock[data-theme="light"] .skill-mascot-eye-moon { fill: #fffdf9; }
+.skill-mascot-dock[data-mode="shy"] .skill-mascot-cheek { animation: skill-mascot-blush var(--skill-action-ms, 980ms) ease-in-out both; }
+.skill-mascot-dock[data-behavior="hover_wiggle"] .skill-mascot-stage { animation: skill-mascot-wiggle var(--skill-hover-ms, 560ms) ease-in-out both; }
+.skill-mascot-dock[data-behavior="click_react"] .skill-mascot-stage { animation: skill-mascot-hop var(--skill-click-ms, 760ms) cubic-bezier(.2,.8,.22,1) both; }
+.skill-mascot-dock[data-behavior="flinch"] .skill-mascot-stage { animation: skill-mascot-flinch var(--skill-action-ms, 480ms) ease-in-out both; }
+.skill-mascot-dock[data-behavior="blush"] .skill-mascot-stage { animation: skill-mascot-shy var(--skill-action-ms, 980ms) ease-in-out both; }
+.skill-mascot-dock[data-behavior="peek_curious"] .skill-mascot-stage { animation: skill-mascot-curious var(--skill-action-ms, 1800ms) ease-in-out both; }
+.skill-mascot-dock[data-behavior="wander_slide"] .skill-mascot-stage { animation: skill-mascot-waddle 900ms ease-in-out infinite; }
+.skill-mascot-dock[data-behavior="subtle_tilt"] .skill-mascot-stage { animation: skill-mascot-tilt var(--skill-action-ms, 1200ms) ease-in-out both; }
+.skill-mascot-dock[data-behavior="sprout_sway"] .skill-mascot-sprout { animation: skill-mascot-sprout-long var(--skill-action-ms, 3500ms) ease-in-out both; }
+
+@keyframes skill-mascot-breathe { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(.994,1.012); } }
+@keyframes skill-mascot-blink { 0%,43%,47%,100% { transform: scaleY(1); } 45% { transform: scaleY(.08); } }
+@keyframes skill-mascot-sprout { 0%,100% { transform: rotate(calc(-1 * var(--skill-sprout-angle, 6deg))); } 50% { transform: rotate(var(--skill-sprout-angle, 6deg)); } }
+@keyframes skill-mascot-sprout-long { 0%,100% { transform: rotate(calc(-1 * var(--skill-sprout-angle, 6deg))); } 30% { transform: rotate(var(--skill-sprout-angle, 6deg)); } 65% { transform: rotate(-4deg); } }
+@keyframes skill-mascot-wiggle { 0%,100% { transform: rotate(0); } 24% { transform: rotate(-25deg); } 48% { transform: rotate(10deg); } 70% { transform: rotate(-9deg); } 86% { transform: rotate(4deg); } }
+@keyframes skill-mascot-hop { 0%,100% { transform: translateY(0) scale(1); } 28% { transform: translateY(-9px) scale(.97,1.04); } 55% { transform: translateY(0) scale(1.03,.96); } 75% { transform: translateY(-2px); } }
+@keyframes skill-mascot-flinch { 0%,100% { transform: scale(1) rotate(0); } 25% { transform: scale(1.07,.88) rotate(-5deg); } 60% { transform: scale(.94,1.06) rotate(5deg); } }
+@keyframes skill-mascot-shy { 0%,100% { transform: rotate(0) scale(1); } 30% { transform: rotate(-5deg) scale(.98,1.02); } 65% { transform: rotate(4deg) scale(1.02,.98); } }
+@keyframes skill-mascot-curious { 0%,100% { transform: rotate(0); } 35%,65% { transform: rotate(3deg); } }
+@keyframes skill-mascot-waddle { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+@keyframes skill-mascot-tilt { 0%,100% { transform: rotate(0); } 45% { transform: rotate(-7deg); } 70% { transform: rotate(4deg); } }
+@keyframes skill-mascot-blush { 0%,100% { opacity: 0; } 28%,83% { opacity: .82; } }
+
+@media (min-width: 768px) {
+  .skill-mascot-dock { --skill-rest-offset: var(--skill-desktop-rest, 77px); --skill-peek-offset: var(--skill-desktop-peek, 63px); --skill-hidden-offset: var(--skill-desktop-hidden, 176px); width: var(--skill-desktop-width, 132px); height: var(--skill-desktop-height, 145px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skill-mascot-dock, .skill-mascot-stage, .skill-mascot-core, .skill-mascot-sprout, .skill-mascot-eye, .skill-mascot-cheek, .skill-mascot-slot img {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+
+.skill-mascot-dock[data-behavior="click_react"] .skill-mascot-whetstone img,
+.skill-mascot-dock[data-behavior="practice_polish"] .skill-mascot-whetstone img { animation: skill-polish var(--skill-action-ms,760ms) ease-in-out both; }
+.skill-mascot-dock[data-behavior="click_react"] .skill-mascot-star img,
+.skill-mascot-dock[data-behavior="practice_polish"] .skill-mascot-star img { animation: skill-glint var(--skill-action-ms,760ms) ease-in-out both; }
+.skill-mascot-dock[data-behavior="flinch"] .skill-mascot-slot img { animation: skill-rattle var(--skill-action-ms,480ms) ease-in-out both; }
+@keyframes skill-polish { 0%,100%{transform:translateX(0) rotate(0)} 25%{transform:translateX(-4px) rotate(-5deg)} 55%{transform:translateX(3px) rotate(4deg)} 80%{transform:translateX(-1px)} }
+@keyframes skill-glint { 0%,100%{transform:scale(1) rotate(0);opacity:.75} 40%{transform:scale(1.13) rotate(-8deg);opacity:1} 70%{transform:scale(.98) rotate(4deg)} }
+@keyframes skill-rattle { 0%,100%{transform:rotate(0)} 30%{transform:rotate(-9deg)} 65%{transform:rotate(6deg)} }
+.skill-mascot-dock[data-mode="sleep"] .skill-mascot-eye { animation:none; transform:scaleY(.16); }
+@media(prefers-reduced-motion:reduce){.skill-mascot-slot img{animation:none!important}}

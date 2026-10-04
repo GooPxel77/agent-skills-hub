@@ -118,7 +118,7 @@ export function AboutPage() {
               <Database className="w-5 h-5" />
             </div>
             <h3 className="text-lg font-bold">
-              {lang === "zh" ? "91,000+ 仓库索引" : "91,000+ Indexed Repos"}
+              {lang === "zh" ? "10,000+ 技能" : "10,000+ Skills"}
             </h3>
             <p className="text-sm leading-relaxed" style={{ color: "var(--ps-text-secondary)" }}>
               {lang === "zh"

@@ -1,0 +1,84 @@
+{
+  "base": {
+    "dark": "core/body_dark.png",
+    "light": "core/body_light.png"
+  },
+  "penetration_test": {
+    "backgrounds": [
+      "black",
+      "white",
+      "termgreen",
+      "brightyellow"
+    ],
+    "status": "pass"
+  },
+  "pipeline": "mascot_db v1 (Mascot Asset Pipeline Agent)",
+  "situation": "skill-lab",
+  "slots": [
+    {
+      "anchor": {
+        "right": "-23%",
+        "top": "55%",
+        "transform": "rotate(-3deg)",
+        "transform_origin": "50% 50%",
+        "width": "46%",
+        "z_index": 3
+      },
+      "behavior": {
+        "follow_breath": true,
+        "on_click": "stone_stroke",
+        "on_shock": "stone_recoil",
+        "on_antic": "practice_polish"
+      },
+      "id": "whetstone",
+      "size": [
+        1130,
+        435
+      ],
+      "src": "skins/skill-lab/whetstone_clean.png",
+      "src_dark": "skins/skill-lab/whetstone_dark.png"
+    },
+    {
+      "anchor": {
+        "left": "8%",
+        "top": "10%",
+        "transform": "rotate(12deg)",
+        "transform_origin": "50% 50%",
+        "width": "14%",
+        "z_index": 4
+      },
+      "behavior": {
+        "follow_breath": true,
+        "on_click": "star_ping",
+        "on_shock": "star_recoil",
+        "on_antic": "practice_polish"
+      },
+      "id": "star",
+      "size": [
+        1284,
+        1453
+      ],
+      "src": "skins/skill-lab/star_clean.png",
+      "src_dark": "skins/skill-lab/star_dark.png"
+    }
+  ],
+  "states": {
+    "companion": {
+      "bottom_offset": "16px",
+      "idle_timeout": 10
+    },
+    "hiding": {
+      "bottom_offset": "-98px",
+      "show_sprout": true
+    },
+    "scared": {
+      "duration": 0.38,
+      "idle_timeout": 12
+    },
+    "shy": {
+      "blush": true,
+      "duration": 2.5
+    }
+  },
+  "version": "1.0.0"
+}

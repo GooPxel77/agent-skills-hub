@@ -1,0 +1,30 @@
+{
+ "space": "core plate 1122x1228",
+ "eyes": [
+  {
+   "x": 728.9,
+   "y": 563.8,
+   "r_moon": 48.6,
+   "r_halo": 66
+  },
+  {
+   "x": 382.7,
+   "y": 563.9,
+   "r_moon": 48.6,
+   "r_halo": 66
+  }
+ ],
+ "sprout": {
+  "bbox": [
+   493,
+   0,
+   628,
+   137
+  ],
+  "pivot": [
+   558.8,
+   117.0
+  ]
+ },
+ "note": "vector eyes drawn at runtime (moon + halo ring); blink = scaleY on moon"
+}

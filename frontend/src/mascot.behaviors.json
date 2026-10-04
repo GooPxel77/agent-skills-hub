@@ -1,0 +1,587 @@
+{
+  "version": 1,
+  "active_skin": "skill-lab",
+  "weight_semantics": "Direct events have weight 0 and never enter roulette. Antic weights are relative within each site pool, eligible only after an idle threshold and cooldown.",
+  "skins": {
+    "book-library": {
+      "status": "catalog_only",
+      "slots": {
+        "book": {
+          "follow_breath": true,
+          "click": {
+            "action": "book_open",
+            "weight": 0
+          },
+          "shock": {
+            "action": "book_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "book_read",
+            "weight": 2
+          }
+        },
+        "pages": {
+          "follow_breath": true,
+          "click": {
+            "action": "page_turn",
+            "weight": 0
+          },
+          "shock": {
+            "action": "page_rattle",
+            "weight": 0
+          },
+          "antic": {
+            "action": "pages_settle",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "dev-library": {
+      "status": "catalog_only",
+      "slots": {
+        "terminal": {
+          "follow_breath": true,
+          "click": {
+            "action": "study",
+            "weight": 0
+          },
+          "shock": {
+            "action": "rattle",
+            "weight": 0
+          },
+          "antic": {
+            "action": "study_scan",
+            "weight": 2
+          }
+        },
+        "brackets": {
+          "follow_breath": true,
+          "click": {
+            "action": "code_ping",
+            "weight": 0
+          },
+          "shock": {
+            "action": "rattle",
+            "weight": 0
+          },
+          "antic": {
+            "action": "code_scan",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "gershom": {
+      "status": "catalog_only",
+      "slots": {
+        "frame": {
+          "follow_breath": true,
+          "click": {
+            "action": "frame_tilt",
+            "weight": 0
+          },
+          "shock": {
+            "action": "frame_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "frame_observe",
+            "weight": 2
+          }
+        },
+        "frame_small": {
+          "follow_breath": true,
+          "click": {
+            "action": "frame_echo",
+            "weight": 0
+          },
+          "shock": {
+            "action": "frame_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "frame_observe",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "habit-runner": {
+      "status": "catalog_only",
+      "slots": {
+        "stopwatch": {
+          "follow_breath": true,
+          "click": {
+            "action": "stopwatch_tick",
+            "weight": 0
+          },
+          "shock": {
+            "action": "stopwatch_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "stopwatch_check",
+            "weight": 2
+          }
+        },
+        "checkmark": {
+          "follow_breath": true,
+          "click": {
+            "action": "checkmark_bounce",
+            "weight": 0
+          },
+          "shock": {
+            "action": "checkmark_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "checkmark_settle",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "knowledge-garden": {
+      "status": "catalog_only",
+      "slots": {
+        "potseed": {
+          "follow_breath": true,
+          "click": {
+            "action": "sprout_water",
+            "weight": 0
+          },
+          "shock": {
+            "action": "pot_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "plant_tend",
+            "weight": 2
+          }
+        },
+        "watercan": {
+          "follow_breath": true,
+          "click": {
+            "action": "water_tilt",
+            "weight": 0
+          },
+          "shock": {
+            "action": "can_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "plant_tend",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "language-hub": {
+      "status": "catalog_only",
+      "slots": {
+        "bubble": {
+          "follow_breath": true,
+          "click": {
+            "action": "syllable_pulse",
+            "weight": 0
+          },
+          "shock": {
+            "action": "bubble_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "syllable_rehearse",
+            "weight": 2
+          }
+        },
+        "sound": {
+          "follow_breath": true,
+          "click": {
+            "action": "sound_wave",
+            "weight": 0
+          },
+          "shock": {
+            "action": "sound_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "syllable_rehearse",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "news-hub": {
+      "status": "catalog_only",
+      "slots": {
+        "paper": {
+          "follow_breath": true,
+          "click": {
+            "action": "page_turn",
+            "weight": 0
+          },
+          "shock": {
+            "action": "rattle",
+            "weight": 0
+          },
+          "antic": {
+            "action": "paper_read",
+            "weight": 2
+          }
+        },
+        "signal": {
+          "follow_breath": true,
+          "click": {
+            "action": "ping",
+            "weight": 0
+          },
+          "shock": {
+            "action": "rattle",
+            "weight": 0
+          },
+          "antic": {
+            "action": "signal_scan",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "osint-navigator": {
+      "status": "catalog_only",
+      "slots": {
+        "magnifier": {
+          "follow_breath": true,
+          "click": {
+            "action": "lens_scan",
+            "weight": 0
+          },
+          "shock": {
+            "action": "lens_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "trace_follow",
+            "weight": 2
+          }
+        },
+        "trail": {
+          "follow_breath": true,
+          "click": {
+            "action": "trail_reveal",
+            "weight": 0
+          },
+          "shock": {
+            "action": "trail_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "trace_follow",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "poker-lab": {
+      "status": "catalog_only",
+      "slots": {
+        "cards": {
+          "follow_breath": true,
+          "click": {
+            "action": "cards_fan",
+            "weight": 0
+          },
+          "shock": {
+            "action": "cards_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "cards_review",
+            "weight": 2
+          }
+        },
+        "branches": {
+          "follow_breath": true,
+          "click": {
+            "action": "branch_focus",
+            "weight": 0
+          },
+          "shock": {
+            "action": "branch_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "branch_review",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "postsoma-tools": {
+      "status": "catalog_only",
+      "slots": {
+        "toolbox": {
+          "follow_breath": true,
+          "click": {
+            "action": "toolbox_open",
+            "weight": 0
+          },
+          "shock": {
+            "action": "toolbox_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "tool_check",
+            "weight": 2
+          }
+        },
+        "gear": {
+          "follow_breath": true,
+          "click": {
+            "action": "gear_turn",
+            "weight": 0
+          },
+          "shock": {
+            "action": "gear_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "tool_check",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "pray-selah": {
+      "status": "catalog_only",
+      "slots": {
+        "rays": {
+          "follow_breath": true,
+          "click": {
+            "action": "rays_open",
+            "weight": 0
+          },
+          "shock": {
+            "action": "rays_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "rays_settle",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "prompt-kit": {
+      "status": "catalog_only",
+      "slots": {
+        "bubble": {
+          "follow_breath": true,
+          "click": {
+            "action": "prompt_pulse",
+            "weight": 0
+          },
+          "shock": {
+            "action": "rattle",
+            "weight": 0
+          },
+          "antic": {
+            "action": "prompt_think",
+            "weight": 2
+          }
+        },
+        "sparkles": {
+          "follow_breath": true,
+          "click": {
+            "action": "spark_ping",
+            "weight": 0
+          },
+          "shock": {
+            "action": "spark_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "draft_spark",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "quant-brew": {
+      "status": "catalog_only",
+      "slots": {
+        "pot": {
+          "follow_breath": true,
+          "click": {
+            "action": "pot_tilt",
+            "weight": 0
+          },
+          "shock": {
+            "action": "pot_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "brew_watch",
+            "weight": 2
+          }
+        },
+        "ksteam": {
+          "follow_breath": true,
+          "click": {
+            "action": "steam_rise",
+            "weight": 0
+          },
+          "shock": {
+            "action": "steam_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "brew_watch",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "read-selah": {
+      "status": "catalog_only",
+      "slots": {
+        "scroll": {
+          "follow_breath": true,
+          "click": {
+            "action": "scroll_unroll",
+            "weight": 0
+          },
+          "shock": {
+            "action": "scroll_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "scroll_read",
+            "weight": 2
+          }
+        },
+        "wisp": {
+          "follow_breath": true,
+          "click": {
+            "action": "wisp_drift",
+            "weight": 0
+          },
+          "shock": {
+            "action": "wisp_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "scroll_read",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "recipe": {
+      "status": "catalog_only",
+      "slots": {
+        "hat": {
+          "follow_breath": true,
+          "click": {
+            "action": "hat_bob",
+            "weight": 0
+          },
+          "shock": {
+            "action": "rattle",
+            "weight": 0
+          },
+          "antic": {
+            "action": "stir",
+            "weight": 2
+          }
+        },
+        "spatula": {
+          "follow_breath": true,
+          "click": {
+            "action": "spatula_flick",
+            "weight": 0
+          },
+          "shock": {
+            "action": "rattle",
+            "weight": 0
+          },
+          "antic": {
+            "action": "stir",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "skill-lab": {
+      "status": "implemented_here",
+      "slots": {
+        "whetstone": {
+          "follow_breath": true,
+          "click": {
+            "action": "stone_stroke",
+            "weight": 0
+          },
+          "shock": {
+            "action": "stone_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "practice_polish",
+            "weight": 2
+          }
+        },
+        "star": {
+          "follow_breath": true,
+          "click": {
+            "action": "star_ping",
+            "weight": 0
+          },
+          "shock": {
+            "action": "star_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "practice_polish",
+            "weight": 2
+          }
+        }
+      }
+    },
+    "vault-quant": {
+      "status": "catalog_only",
+      "slots": {
+        "ledger": {
+          "follow_breath": true,
+          "click": {
+            "action": "ledger_open",
+            "weight": 0
+          },
+          "shock": {
+            "action": "ledger_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "ledger_review",
+            "weight": 2
+          }
+        },
+        "brush": {
+          "follow_breath": true,
+          "click": {
+            "action": "brush_mark",
+            "weight": 0
+          },
+          "shock": {
+            "action": "brush_recoil",
+            "weight": 0
+          },
+          "antic": {
+            "action": "ledger_review",
+            "weight": 2
+          }
+        }
+      }
+    }
+  }
+}

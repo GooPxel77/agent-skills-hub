@@ -129,7 +129,7 @@ export function Home() {
     <div className="min-h-screen">
       <Helmet>
         <title>Agent Skills Hub - Discover Agent Skills, Tools &amp; MCP Servers</title>
-        <meta name="description" content="Discover, compare and explore 91,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills. Find the best skills for your AI agent workflow." />
+        <meta name="description" content="Discover, compare and explore 10,000+ open-source Agent Skills, AI tools, MCP servers and Claude skills. Find the best skills for your AI agent workflow." />
         {/* Open Graph */}
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Agent Skills Hub" />
@@ -204,7 +204,7 @@ export function Home() {
                 <p>
                   Agent Skills Hub is an automated indexing platform that continuously crawls GitHub
                   to discover, classify, and score AI skills, MCP servers, agent tools, and automation scripts.
-                  The index currently covers 11,700+ repositories and is refreshed every 8 hours.
+                  The index currently covers 10,000+ repositories and is refreshed every 8 hours.
                 </p>
                 <p>
                   Built and maintained by{" "}

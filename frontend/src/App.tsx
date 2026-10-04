@@ -1,4 +1,6 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useCompare } from "./hooks/useCompare";
+import SkillMascot from "./mascot/Mascot";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { I18nProvider } from "./i18n/I18nContext";
@@ -10,6 +12,12 @@ import { CompareBar } from "./components/CompareBar";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { CategoryPage } from "./pages/CategoryPage";
 import { AboutPage } from "./pages/AboutPage";
+
+function SkillMascotMount() {
+  const { pathname } = useLocation();
+  const { items } = useCompare();
+  return pathname.startsWith("/admin") || items.length > 0 ? null : <SkillMascot />;
+}
 
 function App() {
   return (
@@ -29,6 +37,7 @@ function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
               <CompareBar />
+              <SkillMascotMount />
             </BrowserRouter>
           </I18nProvider>
         </ThemeProvider>
