@@ -55,7 +55,7 @@
 .skill-mascot-slot img { display: block; width: 100%; height: auto; transform-origin: 50% 80%; }
 .skill-mascot-star img { opacity: .75; }
 .skill-mascot-eyes { position: absolute; inset: 0; z-index: 6; width: 100%; height: 100%; overflow: visible; }
-.skill-mascot-eye { animation: skill-mascot-blink var(--skill-blink-ms, 5200ms) ease-in-out infinite; }
+.skill-mascot-eye { position: absolute; display: block; transform-origin: center; will-change: transform; animation: skill-mascot-blink var(--skill-blink-ms, 5200ms) ease-in-out infinite; }
 .skill-mascot-eye:nth-child(2) { animation-delay: 120ms; }
 .skill-mascot-eye-halo { fill: #f9f8f5; stroke: #242423; stroke-width: 13; }
 .skill-mascot-eye-moon { fill: #111110; }
@@ -106,5 +106,14 @@
 @keyframes skill-polish { 0%,100%{transform:translateX(0) rotate(0)} 25%{transform:translateX(-4px) rotate(-5deg)} 55%{transform:translateX(3px) rotate(4deg)} 80%{transform:translateX(-1px)} }
 @keyframes skill-glint { 0%,100%{transform:scale(1) rotate(0);opacity:.75} 40%{transform:scale(1.13) rotate(-8deg);opacity:1} 70%{transform:scale(.98) rotate(4deg)} }
 @keyframes skill-rattle { 0%,100%{transform:rotate(0)} 30%{transform:rotate(-9deg)} 65%{transform:rotate(6deg)} }
-.skill-mascot-dock[data-mode="sleep"] .skill-mascot-eye { animation:none; transform:scaleY(.16); }
+.skill-mascot-dock[data-mode="sleep"] .skill-mascot-eye { position: absolute; display: block; transform-origin: center; will-change: transform; animation:none; transform:scaleY(.16); }
 @media(prefers-reduced-motion:reduce){.skill-mascot-slot img{animation:none!important}}
+
+/* Keep rasterization local to small animated layers; preserve protruding slots. */
+.skill-mascot-eye svg { display: block; width: 100%; height: 100%; }
+.skill-mascot-core { will-change: transform; contain: layout style; }
+.skill-mascot-plate { transform: translateZ(0); }
+.skill-mascot-sprout { will-change: transform; }
+.skill-mascot-dock[data-render-paused="true"] *,
+.skill-mascot-dock[data-render-paused="true"] *::before,
+.skill-mascot-dock[data-render-paused="true"] *::after { animation-play-state: paused !important; }

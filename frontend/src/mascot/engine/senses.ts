@@ -41,8 +41,11 @@ export function useMascotSenses(buttonRef: RefObject<HTMLButtonElement | null>, 
     }
     let lastPointer = { x: 0, y: 0, at: 0 }
     let lastPointerActivityAt = 0
+    let lastPointerSampleAt = 0
     const onPointerMove = (event: PointerEvent) => {
       const now = Date.now()
+      if (now - lastPointerSampleAt < mascotConfig.scheduler.tickMs) return
+      lastPointerSampleAt = now
       const current = { x: event.clientX, y: event.clientY, at: now }
       const bounds = buttonRef.current?.getBoundingClientRect()
       const near = Boolean(bounds && Math.hypot(current.x - (bounds.left + bounds.width / 2), current.y - (bounds.top + bounds.height / 2)) < mascotConfig.scheduler.nearbyRadiusPx)
@@ -53,16 +56,22 @@ export function useMascotSenses(buttonRef: RefObject<HTMLButtonElement | null>, 
       const elapsed = now - lastPointer.at
       if (lastPointer.at && elapsed > 0) {
         const speed = Math.hypot(current.x - lastPointer.x, current.y - lastPointer.y) / elapsed * 1_000
-        const box = buttonRef.current?.getBoundingClientRect()
-        const distance = box
-          ? Math.hypot(current.x - (box.left + box.width / 2), current.y - (box.top + box.height / 2))
-          : Number.POSITIVE_INFINITY
-        if (speed >= mascotConfig.scheduler.rapidPointerSpeedPxPerSecond && distance < mascotConfig.scheduler.nearbyRadiusPx)
+        if (speed >= mascotConfig.scheduler.rapidPointerSpeedPxPerSecond && near)
           signalsRef.current.push({ type: "nearby" })
       }
       lastPointer = current
     }
-    const onVisibility = () => signalsRef.current.push({ type: "document_hidden", value: document.hidden })
+    let interval: number | undefined
+    const step = () => {
+      engine.tick(Date.now(), signalsRef.current.splice(0), motionQuery.matches)
+      if (engine.consumeChanged()) setSnapshot(engine.snapshot())
+    }
+    const onVisibility = () => {
+      signalsRef.current.push({ type: "document_hidden", value: document.hidden })
+      step()
+      if (interval !== undefined) window.clearInterval(interval)
+      interval = document.hidden ? undefined : window.setInterval(step, mascotConfig.scheduler.tickMs)
+    }
     const onFullscreen = () => signalsRef.current.push({ type: "fullscreen", value: Boolean(document.fullscreenElement) })
     let lastBusy: boolean | null = null
     const updateBusy = () => {
@@ -83,11 +92,6 @@ export function useMascotSenses(buttonRef: RefObject<HTMLButtonElement | null>, 
     onVisibility()
     onFullscreen()
     updateBusy()
-
-    const interval = window.setInterval(() => {
-      engine.tick(Date.now(), signalsRef.current.splice(0), motionQuery.matches)
-      if (engine.consumeChanged()) setSnapshot(engine.snapshot())
-    }, mascotConfig.scheduler.tickMs)
 
     return () => {
       window.clearInterval(interval)

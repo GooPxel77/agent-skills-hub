@@ -1,6 +1,6 @@
 "use client";
 
-import { type CSSProperties, useRef, useState } from "react"
+import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { mascotConfig } from "../mascot.config"
 import { type MascotSignal, type MascotSnapshot } from "./engine/player"
 import "./mascot.css"
@@ -20,6 +20,17 @@ export default function SkillMascot() {
   const [theme, setTheme] = useState<"light" | "dark">("dark")
   const signalsRef = useRef<MascotSignal[]>([])
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const dockRef = useRef<HTMLElement>(null)
+  const [renderPaused, setRenderPaused] = useState(false)
+  useEffect(() => {
+    let visible = true
+    const sync = () => setRenderPaused(document.hidden || !visible)
+    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync() })
+    if (dockRef.current) observer.observe(dockRef.current)
+    document.addEventListener("visibilitychange", sync)
+    sync()
+    return () => { observer.disconnect(); document.removeEventListener("visibilitychange", sync) }
+  }, [])
 
   useMascotSenses(buttonRef, signalsRef, setSnapshot, setTheme)
 
@@ -56,7 +67,7 @@ export default function SkillMascot() {
 
   return (
     <div className="skill-mascot-boundary">
-    <aside aria-label="Skill Lab mascot" className="skill-mascot-dock" data-mode={snapshot.mode}
+    <aside ref={dockRef} data-render-paused={renderPaused || snapshot.mode === "guarded" || snapshot.mode === "shy_wait" ? "true" : "false"} aria-label="Skill Lab mascot" className="skill-mascot-dock" data-mode={snapshot.mode}
       data-behavior={snapshot.behavior ?? "idle"} data-theme={theme} style={style}
       onTransitionEnd={(event) => {
         if (event.target === event.currentTarget && event.propertyName === "transform")
@@ -84,13 +95,22 @@ export default function SkillMascot() {
                 transform: slot.transform, transformOrigin: slot.pivot,
               }}><img src={theme === "dark" ? slot.dark : slot.light} alt="" draggable={false} /></span>
             ))}
-            <svg className="skill-mascot-eyes" viewBox={`0 0 ${mascotConfig.core.width} ${mascotConfig.core.height}`}>
-              {mascotConfig.core.eyes.map((eye, index) => <g className="skill-mascot-eye" key={index}
-                style={{ transformOrigin: `${eye.x}px ${eye.y}px` }}>
-                <circle className="skill-mascot-eye-halo" cx={eye.x} cy={eye.y} r={eye.haloRadius} />
-                <circle className="skill-mascot-eye-moon" cx={eye.x} cy={eye.y} r={eye.moonRadius} />
-              </g>)}
-            </svg>
+            <span className="skill-mascot-eyes">
+              {mascotConfig.core.eyes.map((eye, index) => {
+                const extent = eye.haloRadius + 6.5
+                return <span className="skill-mascot-eye" key={index} style={{
+                  left: `${(eye.x - extent) / mascotConfig.core.width * 100}%`,
+                  top: `${(eye.y - extent) / mascotConfig.core.height * 100}%`,
+                  width: `${extent * 2 / mascotConfig.core.width * 100}%`,
+                  height: `${extent * 2 / mascotConfig.core.height * 100}%`,
+                }}>
+                  <svg viewBox={`0 0 ${extent * 2} ${extent * 2}`}>
+                    <circle className="skill-mascot-eye-halo" cx={extent} cy={extent} r={eye.haloRadius} />
+                    <circle className="skill-mascot-eye-moon" cx={extent} cy={extent} r={eye.moonRadius} />
+                  </svg>
+                </span>
+              })}
+            </span>
             <span className="skill-mascot-cheek skill-mascot-cheek-left" />
             <span className="skill-mascot-cheek skill-mascot-cheek-right" />
           </span>

@@ -90,8 +90,10 @@ export class MascotEngine {
       this.dirty = true;
       return;
     }
-    if (this.view.mode === "shy_hide" && now >= this.phaseUntil) {
-      this.enterShyWait(now);
+    // Shy phases own recovery; generic interrupt completion must not undo hiding.
+    if (this.view.mode === "shy") return;
+    if (this.view.mode === "shy_hide") {
+      if (now >= this.phaseUntil) this.enterShyWait(now);
       return;
     }
     if (this.view.mode === "shy_wait") {

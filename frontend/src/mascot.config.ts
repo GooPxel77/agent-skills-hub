@@ -3,13 +3,13 @@ export const mascotConfig = {
   version: "1.0.0-skill-lab",
   storageKey: "postsoma-skill-lab-mascot-v1",
   core: {
-    light: "/mascot/core/plate_light.png",
-    dark: "/mascot/core/plate_dark.png",
+    light: "/mascot/optimized/plate_light.webp",
+    dark: "/mascot/optimized/plate_dark.webp",
     width: 1122,
     height: 1228,
     sprout: {
-      light: "/mascot/core/sprout_light.png",
-      dark: "/mascot/core/sprout_dark.png",
+      light: "/mascot/optimized/sprout_light.webp",
+      dark: "/mascot/optimized/sprout_dark.webp",
       left: "43.94%", top: "0%", displayWidth: "12.03%", displayHeight: "11.16%",
       pivot: "48.74% 85.4%",
     },
@@ -19,8 +19,8 @@ export const mascotConfig = {
     ],
   },
   slots: {
-    whetstone: { light: '/mascot/skins/skill-lab/whetstone_clean.png', dark: '/mascot/skins/skill-lab/whetstone_dark.png', right: '-23%', top: '55%', width: '46%', zIndex: 3, pivot: '50% 50%', transform: 'rotate(-3deg)', behavior: { follow_breath: true, on_click: 'stone_stroke', on_shock: 'stone_recoil', on_antic: 'practice_polish' } },
-    star: { light: '/mascot/skins/skill-lab/star_clean.png', dark: '/mascot/skins/skill-lab/star_dark.png', left: '8%', top: '10%', width: '14%', zIndex: 4, pivot: '50% 50%', transform: 'rotate(12deg)', behavior: { follow_breath: true, on_click: 'star_ping', on_shock: 'star_recoil', on_antic: 'practice_polish' } },
+    whetstone: { light: '/mascot/optimized/whetstone_clean.webp', dark: '/mascot/optimized/whetstone_dark.webp', right: '-23%', top: '55%', width: '46%', zIndex: 3, pivot: '50% 50%', transform: 'rotate(-3deg)', behavior: { follow_breath: true, on_click: 'stone_stroke', on_shock: 'stone_recoil', on_antic: 'practice_polish' } },
+    star: { light: '/mascot/optimized/star_clean.webp', dark: '/mascot/optimized/star_dark.webp', left: '8%', top: '10%', width: '14%', zIndex: 4, pivot: '50% 50%', transform: 'rotate(12deg)', behavior: { follow_breath: true, on_click: 'star_ping', on_shock: 'star_recoil', on_antic: 'practice_polish' } },
   },
   animation: { breathMs: 3400, blinkMs: 5200, sproutDegrees: 6 },
   behaviorWheel: [
