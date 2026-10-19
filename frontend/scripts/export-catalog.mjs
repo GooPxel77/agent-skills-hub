@@ -62,10 +62,17 @@ if (process.env.CATALOG_REUSE_SNAPSHOT === '1') {
       and:bounds, order:'id.asc', limit:'500'
     });
     if (!page.length) break;
-    if (page.some(s => !Number.isSafeInteger(s.id) || s.id <= lastId || s.stars < 20 || (s.readme_content?.length ?? 0) > 1500)) throw new Error('Unsafe export page');
-    for (const row of page) byId.set(row.id,row);
+    let currentId = lastId;
+    for (const row of page) {
+      if (!Number.isSafeInteger(row.id) || row.id <= currentId) {
+        throw new Error(`Unsafe export page: invalid ID sequence id=${row.id} previous=${currentId}`);
+      }
+      currentId = row.id;
+      if (row.readme_content) row.readme_content = row.readme_content.slice(0, 1500);
+      if (row.stars >= 20) byId.set(row.id, row);
+    }
     fetched += page.length;
-    lastId = page.at(-1).id;
+    lastId = currentId;
     if (page.length < 500) break;
   }
   // Lightweight ID reconciliation handles deletions and rows falling below the public threshold.
