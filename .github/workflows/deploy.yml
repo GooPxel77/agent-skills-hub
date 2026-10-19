@@ -58,8 +58,13 @@ jobs:
           if [ "$EVENT_NAME" != "workflow_run" ] && [ -f .cache/catalog-snapshot.json ]; then
             CATALOG_REUSE_SNAPSHOT=1 npm run export:catalog
           elif ! npm run export:catalog; then
-            # Keep serving the last complete snapshot during a quota/network outage.
-            CATALOG_REUSE_SNAPSHOT=1 npm run export:catalog
+            if [ -f .cache/catalog-snapshot.json ]; then
+              echo "Export failed; falling back to existing snapshot"
+              CATALOG_REUSE_SNAPSHOT=1 npm run export:catalog
+            else
+              echo "First export failed and no cached snapshot exists. Check VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY secrets."
+              exit 1
+            fi
           fi
 
       - name: Build from the validated snapshot

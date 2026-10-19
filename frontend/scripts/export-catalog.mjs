@@ -4,8 +4,8 @@ if (process.env.CATALOG_REUSE_SNAPSHOT === '1') {
   const snapshot = readSnapshot();
   console.log(`Reusing catalog snapshot ${snapshot.generated_at}: ${snapshot.skills.length} skills`);
 } else {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = process.env.SUPABASE_URL?.trim();
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   if (!url || !key) throw new Error('Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY; old-project fallbacks are disabled');
   const project = new URL(url);
   if (project.protocol !== 'https:' || !project.hostname.endsWith('.supabase.co')) throw new Error('Invalid Supabase project URL');
