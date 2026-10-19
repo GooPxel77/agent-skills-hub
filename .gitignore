@@ -24,3 +24,7 @@ frontend/dist/
 .DS_Store
 Thumbs.db
 tools/union-search-skill
+
+# Export snapshots and Cloudflare local state
+frontend/.cache/
+gateway/.wrangler/

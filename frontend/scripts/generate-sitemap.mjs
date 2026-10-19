@@ -19,9 +19,7 @@
 
 import { writeFileSync } from "fs";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://vknzzecmzsfmohglpfgm.supabase.co";
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrbnp6ZWNtenNmbW9oZ2xwZmdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MDQ3MzIsImV4cCI6MjA4ODM4MDczMn0.zFAGZH-lDcL-GwyMkR-9sSV8pJToVzomsJ_fuXZIoDo";
+import { readSnapshot } from './lib/catalog.mjs';
 const SITE = "https://www.205055.xyz";
 
 const CATEGORIES = [
@@ -43,53 +41,6 @@ function shouldIndex(skill) {
   if (skill.stars >= 20 && skill.readme_size && skill.readme_size > 100) return true;
   if (skill.stars >= 20 && skill.description && skill.description.length > 80) return true;
   return false;
-}
-
-async function fetchWithRetry(url, options = {}, retries = 5, delay = 1000) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const res = await fetch(url, options);
-      if (!res.ok) {
-        let errBody = "";
-        try {
-          errBody = await res.text();
-        } catch (_) {}
-        throw new Error(`HTTP error! status: ${res.status}, body: ${errBody}`);
-      }
-      return res;
-    } catch (err) {
-      if (i === retries - 1) throw err;
-      console.warn(`Fetch failed (${err.message}). Retrying in ${delay}ms... (Attempt ${i + 1}/${retries})`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      delay *= 2;
-    }
-  }
-}
-
-async function fetchAllSkills() {
-  const skills = [];
-  let lastId = null;
-  const limit = 1000;
-
-  while (true) {
-    let url = `${SUPABASE_URL}/rest/v1/skills?select=id,repo_full_name,stars,last_commit_at,category,description,readme_size&order=id.asc&limit=${limit}`;
-    if (lastId !== null) {
-      url += `&id=gt.${lastId}`;
-    }
-    console.log(`Fetching skills after ID ${lastId || 'start'}...`);
-    const res = await fetchWithRetry(url, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      },
-    });
-    const data = await res.json();
-    if (!data.length) break;
-    skills.push(...data);
-    lastId = data[data.length - 1].id;
-    if (data.length < limit) break;
-  }
-  return skills;
 }
 
 function buildUrlEntries(skills) {
@@ -130,7 +81,7 @@ ${entries.join("\n")}
 
 async function main() {
   console.log("Fetching skills from Supabase...");
-  const allSkills = await fetchAllSkills();
+  const allSkills = readSnapshot().skills;
   // Sort in-memory by stars desc
   allSkills.sort((a, b) => (b.stars || 0) - (a.stars || 0));
   console.log(`Found ${allSkills.length} total skills`);
@@ -209,4 +160,4 @@ async function main() {
   console.log(`Total indexed URLs: ${totalUrls} (excluded ${noindexCount} low-quality pages)`);
 }
 
-main().catch(console.error);
+main().catch(error => { console.error(error); process.exitCode = 1; });

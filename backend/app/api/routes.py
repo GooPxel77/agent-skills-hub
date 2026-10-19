@@ -5,8 +5,8 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse, Response
-from sqlalchemy import desc, func
-from sqlalchemy.orm import Session
+from sqlalchemy import desc, func, or_, and_
+from sqlalchemy.orm import Session, load_only
 
 from app.config import settings
 from app.database import get_db
@@ -27,6 +27,12 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
 
 
+def _public_skills(db):
+    return db.query(Skill).options(load_only(
+        *(getattr(Skill, field) for field in SkillResponse.model_fields), raiseload=True
+    ))
+
+
 def _cached_json(data, max_age: int = 300) -> JSONResponse:
     """Return a JSONResponse with Cache-Control header.
 
@@ -40,17 +46,29 @@ def _cached_json(data, max_age: int = 300) -> JSONResponse:
 
 @router.get("/skills", response_model=PaginatedSkillsResponse)
 def list_skills(
-    page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
+    page: int = Query(1, ge=1, le=500),
+    page_size: int = Query(20, ge=1, le=50),
     sort_by: SortField = Query(SortField.score),
     sort_order: SortOrder = Query(SortOrder.desc),
-    search: Optional[str] = Query(None),
+    search: Optional[str] = Query(None, max_length=100),
     category: Optional[str] = Query(None),
     platform: Optional[str] = Query(None),
     size_category: Optional[str] = Query(None),
+    min_stars: int = Query(20, ge=20, le=10000000),
+    quality_tiers: Optional[str] = Query(None, max_length=9),
     db: Session = Depends(get_db),
 ) -> PaginatedSkillsResponse:
-    query = db.query(Skill)
+    query = _public_skills(db).filter(Skill.stars >= min_stars)
+    if quality_tiers:
+        filters = {"S":Skill.quality_score >= 80,
+                   "A":and_(Skill.quality_score >= 65, Skill.quality_score < 80),
+                   "B":and_(Skill.quality_score >= 50, Skill.quality_score < 65),
+                   "C":and_(Skill.quality_score >= 35, Skill.quality_score < 50),
+                   "D":Skill.quality_score < 35}
+        tiers = set(quality_tiers.split(","))
+        if not tiers <= filters.keys():
+            raise HTTPException(status_code=400, detail="Invalid quality tiers")
+        query = query.filter(or_(*(filters[tier] for tier in tiers)))
 
     if category:
         query = query.filter(Skill.category == category)
@@ -72,9 +90,9 @@ def list_skills(
 
     sort_column = getattr(Skill, sort_by.value)
     if sort_order == SortOrder.desc:
-        query = query.order_by(desc(sort_column))
+        query = query.order_by(desc(sort_column).nullslast(), desc(Skill.id))
     else:
-        query = query.order_by(sort_column)
+        query = query.order_by(sort_column.nullslast(), Skill.id)
 
     total = query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
@@ -91,8 +109,8 @@ def list_skills(
 @router.get("/skills/category/{category_name}", response_model=PaginatedSkillsResponse)
 def list_skills_by_category(
     category_name: str,
-    page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
+    page: int = Query(1, ge=1, le=500),
+    page_size: int = Query(20, ge=1, le=50),
     sort_by: SortField = Query(SortField.score),
     sort_order: SortOrder = Query(SortOrder.desc),
     db: Session = Depends(get_db),
@@ -110,24 +128,32 @@ def list_skills_by_category(
     )
 
 
+@router.get("/skills/batch", response_model=list[SkillResponse])
+def batch_skills(ids: str = Query(..., max_length=1000), db: Session = Depends(get_db)):
+    parts = ids.split(",")
+    if not parts or len(parts) > 50 or any(not p.isdecimal() or int(p) <= 0 or int(p) > 2147483647 for p in parts):
+        raise HTTPException(status_code=400, detail="Invalid skill ids")
+    return _public_skills(db).filter(Skill.id.in_(set(map(int, parts)))).all()
+
+
 @router.get("/skills/by-slug/{owner}/{repo}", response_model=SkillDetailResponse)
 def get_skill_by_slug(owner: str, repo: str, db: Session = Depends(get_db)) -> SkillDetailResponse:
     """Look up a skill by owner/repo slug (repo_full_name)."""
     full_name = f"{owner}/{repo}"
-    skill = db.query(Skill).filter(Skill.repo_full_name == full_name).first()
+    skill = _public_skills(db).filter(Skill.repo_full_name == full_name).first()
     if not skill:
         raise HTTPException(status_code=404, detail="Skill not found")
 
     compositions = (
         db.query(SkillComposition)
-        .filter(SkillComposition.skill_id == skill.id)
+        .filter(SkillComposition.skill_id == skill.id, SkillComposition.compatible_skill_id != skill.id)
         .order_by(desc(SkillComposition.compatibility_score))
         .limit(5)
         .all()
     )
     compatible_skills = []
     for comp in compositions:
-        other = db.query(Skill).filter(Skill.id == comp.compatible_skill_id).first()
+        other = db.query(Skill.id, Skill.repo_name, Skill.score).filter(Skill.id == comp.compatible_skill_id).first()
         if other:
             compatible_skills.append(SkillCompositionItem(
                 skill_id=other.id,
@@ -144,20 +170,20 @@ def get_skill_by_slug(owner: str, repo: str, db: Session = Depends(get_db)) -> S
 
 @router.get("/skills/{skill_id}", response_model=SkillDetailResponse)
 def get_skill(skill_id: int, db: Session = Depends(get_db)) -> SkillDetailResponse:
-    skill = db.query(Skill).filter(Skill.id == skill_id).first()
+    skill = _public_skills(db).filter(Skill.id == skill_id).first()
     if not skill:
         raise HTTPException(status_code=404, detail="Skill not found")
 
     compositions = (
         db.query(SkillComposition)
-        .filter(SkillComposition.skill_id == skill_id)
+        .filter(SkillComposition.skill_id == skill_id, SkillComposition.compatible_skill_id != skill_id)
         .order_by(desc(SkillComposition.compatibility_score))
         .limit(5)
         .all()
     )
     compatible_skills = []
     for comp in compositions:
-        other = db.query(Skill).filter(Skill.id == comp.compatible_skill_id).first()
+        other = db.query(Skill.id, Skill.repo_name, Skill.score).filter(Skill.id == comp.compatible_skill_id).first()
         if other:
             compatible_skills.append(SkillCompositionItem(
                 skill_id=other.id,
@@ -314,7 +340,7 @@ def get_trending(
     """
     since = datetime.now(timezone.utc) - timedelta(days=days)
     items = (
-        db.query(Skill)
+        _public_skills(db)
         .filter(Skill.stars >= 50)
         .filter(Skill.created_at.isnot(None))
         .filter(Skill.created_at >= since)
@@ -343,7 +369,7 @@ def get_rising(
     """New & rising: repos created in the last N days, sorted by stars. Cached 5 min."""
     since = datetime.now(timezone.utc) - timedelta(days=days)
     items = (
-        db.query(Skill)
+        _public_skills(db)
         .filter(Skill.created_at >= since)
         .order_by(desc(Skill.stars))
         .limit(limit)
@@ -430,7 +456,7 @@ def get_masters(db: Session = Depends(get_db)) -> list[dict]:
         known_githubs.update(all_usernames)
 
         repos = (
-            db.query(Skill)
+            _public_skills(db)
             .filter(Skill.author_name.in_(all_usernames))
             .order_by(desc(Skill.stars))
             .all()
@@ -486,7 +512,7 @@ def get_masters(db: Session = Depends(get_db)) -> list[dict]:
         if author in known_githubs:
             continue
         repos = (
-            db.query(Skill)
+            _public_skills(db)
             .filter(Skill.author_name == author)
             .order_by(desc(Skill.stars))
             .limit(5)
@@ -528,7 +554,7 @@ def get_top_rated(
 ):
     """All-time highest scored skills. Cached for 10 minutes."""
     items = (
-        db.query(Skill)
+        _public_skills(db)
         .order_by(desc(Skill.score))
         .limit(limit)
         .all()
@@ -545,7 +571,7 @@ def get_most_starred(
     """Community classics: time-tested repos (>6 months old, 100+ stars). Cached 10 min."""
     cutoff = datetime.now(timezone.utc) - timedelta(days=180)
     items = (
-        db.query(Skill)
+        _public_skills(db)
         .filter(Skill.stars >= 100)
         .filter(Skill.created_at.isnot(None))
         .filter(Skill.created_at <= cutoff)
@@ -564,7 +590,7 @@ def get_recently_updated(
 ):
     """Skills most recently pushed to GitHub. Cached 5 min."""
     items = (
-        db.query(Skill)
+        _public_skills(db)
         .filter(Skill.last_commit_at.isnot(None))
         .order_by(desc(Skill.last_commit_at))
         .limit(limit)
@@ -633,7 +659,7 @@ def submit_skill(
     full_name = match.group(1)
 
     # Check if already exists in skills
-    existing_skill = db.query(Skill).filter(Skill.repo_full_name == full_name).first()
+    existing_skill = _public_skills(db).filter(Skill.repo_full_name == full_name).first()
     if existing_skill:
         return {"status": "already_tracked", "message": f"{full_name} is already in our database", "skill_id": existing_skill.id}
 
@@ -736,7 +762,7 @@ def verify_email(token: str = Query(...), db: Session = Depends(get_db)):
         from sqlalchemy import desc as _desc
 
         trending_raw = (
-            db.query(Skill)
+            _public_skills(db)
             .filter(Skill.score > 0)
             .order_by(_desc(Skill.star_momentum))
             .limit(5)
@@ -853,7 +879,7 @@ def rss_feed(
 ) -> Response:
     """RSS 2.0 feed of latest skills added or updated."""
     items = (
-        db.query(Skill)
+        _public_skills(db)
         .filter(Skill.last_commit_at.isnot(None))
         .order_by(desc(Skill.last_synced))
         .limit(limit)
@@ -1065,7 +1091,7 @@ def get_workflows(db: Session = Depends(get_db)):
             continue  # skip uncategorized etc.
 
         skills = (
-            db.query(Skill)
+            _public_skills(db)
             .filter(Skill.category == cat_name)
             .order_by(desc(Skill.score))
             .limit(4)
@@ -1132,7 +1158,7 @@ def get_landing_data(db: Session = Depends(get_db)):
     # 2. Trending (star velocity, last 7 days)
     since_7 = now - timedelta(days=7)
     trending_raw = (
-        db.query(Skill)
+        _public_skills(db)
         .filter(Skill.stars >= 50, Skill.created_at.isnot(None), Skill.created_at >= since_7)
         .all()
     )
@@ -1148,7 +1174,7 @@ def get_landing_data(db: Session = Depends(get_db)):
 
     # 3. Rising (new this week)
     rising_raw = (
-        db.query(Skill)
+        _public_skills(db)
         .filter(Skill.created_at >= since_7)
         .order_by(desc(Skill.stars))
         .limit(10)
@@ -1158,14 +1184,14 @@ def get_landing_data(db: Session = Depends(get_db)):
 
     # 4. Top rated
     top_rated = (
-        db.query(Skill).order_by(desc(Skill.score)).limit(10).all()
+        _public_skills(db).order_by(desc(Skill.score)).limit(10).all()
     )
     top_rated_data = [SkillResponse.model_validate(s).model_dump(mode="json") for s in top_rated]
 
     # 5. Hall of fame (community classics, >6 months, 100+ stars)
     cutoff = now - timedelta(days=180)
     hall = (
-        db.query(Skill)
+        _public_skills(db)
         .filter(Skill.stars >= 100, Skill.created_at.isnot(None), Skill.created_at <= cutoff)
         .order_by(desc(Skill.stars))
         .limit(10)
@@ -1175,7 +1201,7 @@ def get_landing_data(db: Session = Depends(get_db)):
 
     # 6. Recently updated
     recent = (
-        db.query(Skill)
+        _public_skills(db)
         .filter(Skill.last_commit_at.isnot(None))
         .order_by(desc(Skill.last_commit_at))
         .limit(10)

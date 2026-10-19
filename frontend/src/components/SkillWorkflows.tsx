@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   RiServerLine,
@@ -15,7 +15,7 @@ import {
   RiFocus2Line,
 } from "@remixicon/react";
 import { useI18n } from "../i18n/I18nContext";
-import { supabase } from "../lib/supabase";
+import { fetchWorkflowCategories } from "../api/client";
 import { CATEGORY_GUIDE_MAP, type CategoryMeta } from "../data/categories";
 
 interface WorkflowSkill {
@@ -34,8 +34,6 @@ interface CategoryData {
   skills: WorkflowSkill[];
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
-const USE_SUPABASE = !!supabase && !API_BASE;
 
 function getCategoryIcon(iconName: string) {
   switch (iconName) {
@@ -56,50 +54,6 @@ function getCategoryIcon(iconName: string) {
   }
 }
 
-async function fetchCategoriesFromSupabase(): Promise<CategoryData[]> {
-  if (!supabase) return [];
-  const sb = supabase;
-  const categories = Object.keys(CATEGORY_GUIDE_MAP);
-
-  // Parallel requests for all categories
-  const results = await Promise.all(
-    categories.map(async (cat) => {
-      const { data: skills, count } = await sb
-        .from("skills")
-        .select("repo_name,repo_full_name,description,stars,score,quality_score,author_name", {
-          count: "exact",
-        })
-        .eq("category", cat)
-        .order("stars", { ascending: false })
-        .limit(3);
-      return { cat, skills, count };
-    })
-  );
-
-  const list: CategoryData[] = [];
-  for (const { cat, skills, count } of results) {
-    const meta = CATEGORY_GUIDE_MAP[cat];
-    if (!meta) continue;
-
-    list.push({
-      id: cat,
-      meta,
-      skill_count: count ?? (skills?.length || 0),
-      skills: (skills || []).map((s) => ({
-        repo_name: s.repo_name,
-        repo_full_name: s.repo_full_name,
-        description: s.description || "",
-        stars: s.stars,
-        score: s.score || s.quality_score || 0,
-        author_name: s.author_name,
-      })),
-    });
-  }
-
-  list.sort((a, b) => a.meta.sort_order - b.meta.sort_order);
-  return list;
-}
-
 export function SkillWorkflows() {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
@@ -108,51 +62,23 @@ export function SkillWorkflows() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (USE_SUPABASE) {
-      fetchCategoriesFromSupabase()
-        .then((data) => {
-          setCategories(data);
-          if (data.length > 0) setActiveCatId(data[0].id);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    } else {
-      fetch(`${API_BASE}/api/workflows`)
-        .then((r) => r.json())
-        .then((data) => {
-          if (Array.isArray(data)) {
-            const mapped = data.map((d: any) => ({
-              id: d.id,
-              meta: CATEGORY_GUIDE_MAP[d.id] || {
-                id: d.id,
-                icon: "layers",
-                title_zh: d.title_zh || d.id,
-                title_en: d.title_en || d.id,
-                badge_zh: "生态分类",
-                badge_en: "Category",
-                scene_zh: d.description_zh || "",
-                scene_en: d.description_en || "",
-                target_zh: "开发者",
-                target_en: "Developers",
-                sort_order: 99,
-              },
-              skill_count: d.skill_count || 0,
-              skills: d.skills || [],
-            }));
-            setCategories(mapped);
-            if (mapped.length > 0) setActiveCatId(mapped[0].id);
-          }
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }
+    let cancelled = false;
+    fetchWorkflowCategories().then(data => {
+      if (cancelled) return;
+      const mapped: CategoryData[] = data.filter(d => CATEGORY_GUIDE_MAP[d.id]).map(d => ({
+        id: d.id, meta: CATEGORY_GUIDE_MAP[d.id], skill_count: d.skill_count, skills: d.skills
+      })).sort((a, b) => a.meta.sort_order - b.meta.sort_order);
+      setCategories(mapped);
+      if (mapped.length) setActiveCatId(mapped[0].id);
+    }).catch(console.error).finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
   if (loading || categories.length === 0) return null;
 
   const activeCategory =
     categories.find((c) => c.id === activeCatId) || categories[0];
-  const ActiveIcon = getCategoryIcon(activeCategory?.meta.icon || "layers");
+  const activeIcon = createElement(getCategoryIcon(activeCategory?.meta.icon || "layers"), { className: "w-5 h-5" });
 
   return (
     <section className="mb-10">
@@ -230,7 +156,7 @@ export function SkillWorkflows() {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[var(--ps-border)]/60 mb-4">
             <div className="flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-[var(--ps-neon-cyan)]/10 text-[var(--ps-neon-cyan)] border border-[var(--ps-neon-cyan)]/20 flex items-center justify-center shrink-0 mt-0.5">
-                <ActiveIcon className="w-5 h-5" />
+                {activeIcon}
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">

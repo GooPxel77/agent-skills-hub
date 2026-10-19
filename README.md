@@ -113,11 +113,13 @@ Under your repository **Settings → Secrets and variables → Actions**, config
 | `GH_TOKEN` | GitHub Personal Access Token with `public_repo` scope |
 | `SUPABASE_DB_URL` | PostgreSQL transaction pooler URI from Supabase |
 | `VITE_SUPABASE_URL` | Supabase Project API URL (`https://xxxx.supabase.co`) |
-| `VITE_SUPABASE_ANON_KEY` | Supabase Anon Public API Key |
+| `VITE_SUPABASE_ANON_KEY` | Browser key for Auth/favorites/community actions |
+| `SUPABASE_SERVICE_ROLE_KEY` | Actions export secret; never exposed to Vite |
+| `CATALOG_API_BASE_URL` | Optional Actions variable for the live catalog Worker origin |
 
 ### Workflows
 - **`sync.yml`**: Triggers every 8 hours or upon pushes to `data/curated/*.txt` to pull, cleanse, and score repositories.
-- **`deploy.yml`**: Compiles frontend assets and automatically deploys to GitHub Pages.
+- **`deploy.yml`**: Exports or reuses one validated catalog snapshot, compiles assets and deploys to GitHub Pages. Public reads use static JSON by default. See [egress rollout](docs/egress-optimization-rollout.md) before the first deployment.
 
 ---
 

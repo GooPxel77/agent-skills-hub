@@ -2,6 +2,8 @@
 import json
 import logging
 import time
+from types import SimpleNamespace
+from sqlalchemy import func
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -28,7 +30,9 @@ class ComposabilityEngine:
                          (delete their old links, recompute against all).
                          If None, full recompute for all skills.
         """
-        if changed_ids:
+        if changed_ids is not None and not changed_ids:
+            return 0
+        if changed_ids is not None:
             db.query(SkillComposition).filter(
                 SkillComposition.skill_id.in_(changed_ids)
             ).delete(synchronize_session=False)
@@ -42,7 +46,11 @@ class ComposabilityEngine:
         from datetime import datetime, timezone, timedelta
         
         since_30d = datetime.now(timezone.utc) - timedelta(days=30)
-        skills = db.query(Skill).filter(
+        rows = db.query(
+            Skill.id, Skill.description, Skill.topics, Skill.category, Skill.platforms,
+            Skill.language, Skill.stars, Skill.quality_score, Skill.author_name,
+            func.substr(Skill.readme_content, 1, 3000).label("readme_content")
+        ).filter(
             or_(
                 Skill.stars >= 20,
                 and_(
@@ -55,6 +63,8 @@ class ComposabilityEngine:
             )
         ).all()
         
+        skills = [SimpleNamespace(**dict(row._mapping)) for row in rows]
+
         if not skills:
             db.commit()
             return 0
@@ -86,7 +96,7 @@ class ComposabilityEngine:
             platforms_by_idx[i] = set(json.loads(s.platforms)) if s.platforms else set()
 
         # Determine which skills to process
-        if changed_ids:
+        if changed_ids is not None:
             process_indices = [i for i, s in enumerate(skills) if s.id in changed_ids]
         else:
             process_indices = list(range(len(skills)))

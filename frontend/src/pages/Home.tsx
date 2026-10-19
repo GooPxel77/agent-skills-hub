@@ -25,7 +25,6 @@ import { ScrollToTop } from "../components/ScrollToTop";
 import { SiteFooter } from "../components/SiteFooter";
 import { useI18n } from "../i18n/I18nContext";
 import { useUrlParams } from "../hooks/useUrlParams";
-import { useStats } from "../hooks/useStats";
 import { useLandingData } from "../hooks/useLandingData";
 import { useFavorites } from "../hooks/useFavorites";
 import type { PaginatedSkills, Skill } from "../types/skill";
@@ -34,8 +33,9 @@ export function Home() {
   const { t } = useI18n();
   const navigate = useNavigate();
   const { params, tab, setTab, updateParams, setPage } = useUrlParams();
-  const { stats, categories } = useStats();
   const { data: landingData } = useLandingData();
+  const stats = landingData?.stats ?? null;
+  const categories = stats?.categories ?? [];
   const [view, setView] = useState<"card" | "table">("card");
 
   // Explore tab data

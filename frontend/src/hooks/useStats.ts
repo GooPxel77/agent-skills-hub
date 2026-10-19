@@ -1,8 +1,7 @@
-import { useCachedQuery } from "./useCachedQuery";
-import { fetchStats } from "../api/client";
-import type { Stats } from "../types/skill";
+import { useLandingData } from "./useLandingData";
 
 export function useStats() {
-  const { data: stats, refetch } = useCachedQuery<Stats>("stats_data", fetchStats);
+  const { data, refetch } = useLandingData();
+  const stats = data?.stats ?? null;
   return { stats, categories: stats?.categories ?? [], refetchStats: refetch };
 }

@@ -5,7 +5,7 @@
  * On subsequent loads, if `lastSyncAt` from the server changed, cache is refreshed.
  */
 
-const PREFIX = "ash_v6_";
+const PREFIX = "ash_v7_";
 
 interface CacheEntry<T> {
   data: T;

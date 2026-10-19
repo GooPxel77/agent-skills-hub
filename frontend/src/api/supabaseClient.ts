@@ -15,7 +15,7 @@ import type {
 import type { Master } from "./client";
 
 // Columns to SELECT for list queries (exclude readme_content to save bandwidth)
-const SKILL_COLUMNS = [
+export const SKILL_COLUMNS = [
   "id", "repo_full_name", "repo_name", "repo_url", "description", "homepage_url",
   "author_name", "author_avatar_url", "author_followers",
   "stars", "forks", "open_issues", "total_issues", "total_commits",
@@ -33,15 +33,9 @@ function ensureSupabase() {
   return supabase;
 }
 
-/** Simple retry wrapper for flaky network calls */
-async function withRetry<T>(fn: () => Promise<T>, retries = 1, delay = 1000): Promise<T> {
-  try {
-    return await fn();
-  } catch (err) {
-    if (retries <= 0) throw err;
-    await new Promise((r) => setTimeout(r, delay));
-    return withRetry(fn, retries - 1, delay);
-  }
+// Quota/auth/validation errors are terminal. Callers retain their last good cache.
+async function readOnce<T>(fn: () => Promise<T>): Promise<T> {
+  return fn();
 }
 
 export async function sbFetchSkills(params: SkillsQueryParams, source: "v_curated_skills" | "skills" = "v_curated_skills"): Promise<PaginatedSkills> {
@@ -50,18 +44,20 @@ export async function sbFetchSkills(params: SkillsQueryParams, source: "v_curate
   // Match the existing static-page inclusion rule when the curated view is unavailable.
   if (source === "skills") query = query.gte("stars", 20);
 
+  let searchCondition = "";
   if (params.category) query = query.eq("category", params.category);
   if (params.size_category) query = query.eq("size_category", params.size_category);
   if (params.platform) query = query.ilike("platforms", `%"${params.platform}"%`);
   if (params.search) {
-    const trimmed = params.search.trim();
+    const trimmed = params.search.trim().slice(0,100).replace(/[(),\\]/g, " ");
     const words = trimmed.split(/\s+/).filter(Boolean);
     // Use Full Text Search for multi-word queries; ILIKE fallback for short/single-char queries
     if (words.length >= 2) {
       query = query.textSearch("search_vector", trimmed, { type: "websearch" });
     } else {
       const pat = `%${trimmed}%`;
-      query = query.or(`repo_name.ilike.${pat},description.ilike.${pat},author_name.ilike.${pat},topics.ilike.${pat}`);
+      searchCondition = `repo_name.ilike.${pat},description.ilike.${pat},author_name.ilike.${pat},topics.ilike.${pat}`;
+      query = query.or(searchCondition);
     }
   }
 
@@ -79,7 +75,9 @@ export async function sbFetchSkills(params: SkillsQueryParams, source: "v_curate
       }
     }
     if (conditions.length > 0) {
-      query = query.or(conditions.join(","));
+      query = query.or(searchCondition
+        ? `and(or(${searchCondition}),or(${conditions.join(",")}))`
+        : conditions.join(","));
     }
   }
   // Min stars filter
@@ -88,10 +86,13 @@ export async function sbFetchSkills(params: SkillsQueryParams, source: "v_curate
   }
 
   const ascending = params.sort_order === "asc";
-  query = query.order(params.sort_by, { ascending });
+  const sort = ["score","stars","last_commit_at","created_at","quality_score","star_momentum"].includes(params.sort_by) ? params.sort_by : "score";
+  query = query.order(sort, { ascending, nullsFirst: false }).order("id", { ascending });
 
-  const from = (params.page - 1) * params.page_size;
-  const to = from + params.page_size - 1;
+  const pageSize = Math.min(50, Math.max(1, Math.trunc(params.page_size) || 20));
+  const page = Math.max(1, Math.min(500, Math.trunc(params.page) || 1));
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
   query = query.range(from, to);
 
   const { data, count, error } = await query;
@@ -106,14 +107,14 @@ export async function sbFetchSkills(params: SkillsQueryParams, source: "v_curate
   return {
     items: (data ?? []) as unknown as Skill[],
     total,
-    page: params.page,
-    page_size: params.page_size,
-    total_pages: Math.max(1, Math.ceil(total / params.page_size)),
+    page,
+    page_size: pageSize,
+    total_pages: Math.max(1, Math.ceil(total / pageSize)),
   };
 }
 
 export async function sbFetchStats(): Promise<Stats> {
-  return withRetry(async () => {
+  return readOnce(async () => {
     const sb = ensureSupabase();
     const { data, error } = await sb.from("v_stats").select("*").single();
     if (error) throw new Error(error.message);
@@ -144,17 +145,18 @@ export async function sbFetchTrending(limit = 10): Promise<Skill[]> {
   const { data, error } = await sb
     .from("v_trending")
     .select(SKILL_COLUMNS)
-    .limit(limit);
+    .limit(Math.min(50, Math.max(1, Math.trunc(limit) || 10)));
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as Skill[];
 }
 
 export async function sbFetchRising(_days = 7, limit = 10): Promise<Skill[]> {
+  void _days; // v_rising is a fixed seven-day window.
   const sb = ensureSupabase();
   const { data, error } = await sb
     .from("v_rising")
     .select(SKILL_COLUMNS)
-    .limit(limit);
+    .limit(Math.min(50, Math.max(1, Math.trunc(limit) || 10)));
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as Skill[];
 }
@@ -166,7 +168,7 @@ export async function sbFetchTopRated(limit = 10): Promise<Skill[]> {
   const { data, error } = await sb
     .from("v_top_rated")
     .select(SKILL_COLUMNS)
-    .limit(limit);
+    .limit(Math.min(50, Math.max(1, Math.trunc(limit) || 10)));
 
   if (!error && data && data.length > 0) {
     return data as unknown as Skill[];
@@ -179,7 +181,7 @@ export async function sbFetchTopRated(limit = 10): Promise<Skill[]> {
     .gte("stars", 20)
     .gt("quality_score", 0)
     .order("quality_score", { ascending: false })
-    .limit(limit);
+    .limit(Math.min(50, Math.max(1, Math.trunc(limit) || 10)));
 
   if (fallbackError) throw new Error(fallbackError.message);
 
@@ -187,7 +189,7 @@ export async function sbFetchTopRated(limit = 10): Promise<Skill[]> {
   const skills = (fallbackData ?? []) as unknown as Skill[];
   return skills.map((s) => ({
     ...s,
-    score: s.score && s.score > 0 ? s.score : (s as any).quality_score ?? 0,
+    score: s.score && s.score > 0 ? s.score : s.quality_score ?? 0,
   }));
 }
 
@@ -196,7 +198,7 @@ export async function sbFetchMostStarred(limit = 10): Promise<Skill[]> {
   const { data, error } = await sb
     .from("v_community_classics")
     .select(SKILL_COLUMNS)
-    .limit(limit);
+    .limit(Math.min(50, Math.max(1, Math.trunc(limit) || 10)));
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as Skill[];
 }
@@ -206,7 +208,7 @@ export async function sbFetchRecentlyUpdated(limit = 10): Promise<Skill[]> {
   const { data, error } = await sb
     .from("v_recently_updated")
     .select(SKILL_COLUMNS)
-    .limit(limit);
+    .limit(Math.min(50, Math.max(1, Math.trunc(limit) || 10)));
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as Skill[];
 }
@@ -217,9 +219,9 @@ export async function sbFetchSkillDetail(id: number): Promise<SkillDetail> {
   // Fetch skill
   const { data: skill, error } = await sb
     .from("skills")
-    .select("*")
+    .select(SKILL_COLUMNS)
     .eq("id", id)
-    .single();
+    .single<Skill>();
   if (error) throw new Error(error.message);
 
   // Fetch compositions
@@ -227,6 +229,7 @@ export async function sbFetchSkillDetail(id: number): Promise<SkillDetail> {
     .from("skill_compositions")
     .select("compatible_skill_id, compatibility_score, reason")
     .eq("skill_id", id)
+    .neq("compatible_skill_id", id)
     .order("compatibility_score", { ascending: false })
     .limit(5);
 
@@ -262,9 +265,9 @@ export async function sbFetchSkillBySlug(slug: string): Promise<SkillDetail> {
   // slug = "owner/repo" = repo_full_name
   const { data: skill, error } = await sb
     .from("skills")
-    .select("*")
+    .select(SKILL_COLUMNS)
     .eq("repo_full_name", slug)
-    .single();
+    .single<Skill>();
   if (error) throw new Error(error.message);
 
   // Fetch compositions
@@ -272,6 +275,7 @@ export async function sbFetchSkillBySlug(slug: string): Promise<SkillDetail> {
     .from("skill_compositions")
     .select("compatible_skill_id, compatibility_score, reason")
     .eq("skill_id", skill.id)
+    .neq("compatible_skill_id", skill.id)
     .order("compatibility_score", { ascending: false })
     .limit(5);
 
@@ -311,12 +315,12 @@ export async function sbFetchLanguageStats(): Promise<{ language: string; count:
 // ═══ Landing page single-RPC optimization ═══
 
 export async function sbFetchLandingData(): Promise<LandingData> {
-  return withRetry(async () => {
+  return readOnce(async () => {
     const sb = ensureSupabase();
     const { data, error } = await sb.rpc("get_landing_data");
     if (error) throw new Error(error.message);
 
-    const d = data as any;
+    const d = data as Omit<LandingData, "stats" | "generated_at"> & { stats: Omit<Stats, "categories">; categories?: CategoryCount[] };
     return {
       stats: {
         total_skills: d.stats?.total_skills ?? 0,
@@ -340,14 +344,16 @@ export async function sbFetchLandingData(): Promise<LandingData> {
 
 export async function sbFetchNewThisWeek(limit = 10): Promise<Skill[]> {
   const sb = ensureSupabase();
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const cutoff = new Date();
+  cutoff.setUTCHours(0, 0, 0, 0);
+  const sevenDaysAgo = new Date(cutoff.getTime() - 7 * 86400000).toISOString();
   const { data, error } = await sb
     .from("skills")
     .select(SKILL_COLUMNS)
     .gte("stars", 20)
     .gte("first_seen", sevenDaysAgo)
     .order("stars", { ascending: false })
-    .limit(limit);
+    .limit(Math.min(50, Math.max(1, Math.trunc(limit) || 10)));
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as Skill[];
 }
@@ -393,7 +399,7 @@ export async function sbFetchOrgBuilders(): Promise<OrgBuilder[]> {
   const { data, error } = await sb.rpc("get_org_builders");
   if (error) throw new Error(error.message);
 
-  const orgs = (data ?? []) as any[];
+  const orgs = (data ?? []) as OrgBuilder[];
   return orgs.map((o) => ({
     github: o.github,
     name: o.name,
@@ -502,7 +508,7 @@ export async function sbFetchMasters(): Promise<Master[]> {
   return enriched;
 }
 
-function getFallbackMasters(): Master[] {
+export function getFallbackMasters(): Master[] {
   const hardcodedMasters: Master[] = [
     {
       github: "joeseesun",
@@ -614,19 +620,10 @@ export async function sbSubmitSkill(
   }
   const fullName = match[1].replace(/\.git$/, "");
 
-  // Check if already in skills table
-  const { data: existing } = await sb
-    .from("skills")
-    .select("id")
-    .eq("repo_full_name", fullName)
-    .maybeSingle();
-
-  if (existing) {
-    return {
-      status: "already_tracked",
-      message: "This skill is already tracked!",
-      skill_id: existing.id,
-    };
+  // Scalar RPC remains available after public catalog table access is removed.
+  const { data: existingId } = await sb.rpc("lookup_skill_id", { p_repo_full_name: fullName });
+  if (existingId) {
+    return { status: "already_tracked", message: "This skill is already tracked!", skill_id: existingId as number };
   }
 
   // Check if already submitted in extra_repos (may fail if SELECT RLS is not set)

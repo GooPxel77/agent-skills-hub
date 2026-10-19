@@ -18,22 +18,24 @@ export function useUrlParams() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const params: SkillsQueryParams = useMemo(() => {
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const page_size = parseInt(searchParams.get("page_size") || "20", 10);
-    const sort_by = (searchParams.get("sort_by") || "score") as SkillsQueryParams["sort_by"];
-    const sort_order = (searchParams.get("sort_order") || "desc") as SkillsQueryParams["sort_order"];
-    const search = searchParams.get("search") || undefined;
+    const page = Math.min(500, Math.max(1, Math.trunc(Number(searchParams.get("page"))) || 1));
+    const page_size = Math.min(50, Math.max(1, Math.trunc(Number(searchParams.get("page_size"))) || 20));
+    const rawSort = searchParams.get("sort_by") || "score";
+    const sort_by = (["score","stars","last_commit_at","created_at","quality_score","star_momentum"].includes(rawSort) ? rawSort : "score") as SkillsQueryParams["sort_by"];
+    const sort_order = searchParams.get("sort_order") === "asc" ? "asc" : "desc";
+    const search = searchParams.get("search")?.slice(0,100) || undefined;
     const category = searchParams.get("category") || undefined;
     const platform = searchParams.get("platform") || undefined;
     const size_category = searchParams.get("size_category") || undefined;
     const quality_tiers = searchParams.get("quality_tiers") || undefined;
     const min_stars_raw = searchParams.get("min_stars");
-    const min_stars = min_stars_raw ? parseInt(min_stars_raw, 10) : undefined;
+    const min_stars = min_stars_raw ? Math.max(20, Math.min(10000000, Number(min_stars_raw) || 20)) : undefined;
 
     return { page, page_size, sort_by, sort_order, search, category, platform, size_category, quality_tiers, min_stars };
   }, [searchParams]);
 
-  const tab = (searchParams.get("tab") || "overview") as "overview" | "explore" | "favorites";
+  const rawTab = searchParams.get("tab");
+  const tab: "overview" | "explore" | "favorites" = (rawTab === "explore" || rawTab === "favorites" ? rawTab : "overview");
 
   const setTab = useCallback(
     (newTab: "overview" | "explore" | "favorites") => {

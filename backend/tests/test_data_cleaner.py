@@ -1,9 +1,15 @@
 """Unit tests for DataCleaner."""
 
 import json
+import pytest
 from datetime import datetime, timezone
 
 from app.services.data_cleaner import DataCleaner
+
+
+@pytest.fixture(autouse=True)
+def ingestion_threshold(monkeypatch):
+    monkeypatch.setenv("MIN_STAR_THRESHOLD", "5")
 
 
 def _make_repo(**overrides):

@@ -1,0 +1,21 @@
+{
+  "name": "agent-skills-catalog",
+  "main": "index.mjs",
+  "compatibility_date": "2026-10-06",
+  "vars": {
+    "ALLOWED_ORIGIN": "https://www.205055.xyz"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "ratelimits": [
+    {
+      "name": "CATALOG_LIMITER",
+      "namespace_id": "205055",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      }
+    }
+  ]
+}

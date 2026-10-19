@@ -1,7 +1,7 @@
 """Estimate token consumption for skills."""
 import logging
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 
 from app.models.skill import Skill
 
@@ -34,8 +34,12 @@ class TokenEstimator:
     }
 
     def estimate_all(self, db: Session, changed_ids: set[int] | None = None) -> int:
-        query = db.query(Skill)
-        if changed_ids:
+        if changed_ids is not None and not changed_ids:
+            return 0
+        query = db.query(Skill).options(load_only(
+            Skill.id, Skill.repo_size_kb, Skill.readme_size, Skill.language, Skill.estimated_tokens,
+            raiseload=True))
+        if changed_ids is not None:
             query = query.filter(Skill.id.in_(changed_ids))
         skills = query.all()
         for skill in skills:

@@ -3,6 +3,10 @@ name: Sync Extra Repos Fast
 on:
   workflow_dispatch:
 
+concurrency:
+  group: catalog-db-maintenance
+  cancel-in-progress: false
+
 jobs:
   sync-extra-repos:
     runs-on: ubuntu-latest

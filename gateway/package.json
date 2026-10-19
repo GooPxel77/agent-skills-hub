@@ -1,0 +1,16 @@
+{
+  "name": "agent-skills-catalog",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "4.147.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

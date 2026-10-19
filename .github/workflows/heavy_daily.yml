@@ -18,7 +18,7 @@ env:
   MIN_STAR_THRESHOLD: ${{ inputs.min_star_threshold || '50' }}
 
 concurrency:
-  group: heavy-daily-${{ github.ref }}
+  group: catalog-db-maintenance
   cancel-in-progress: false
 
 jobs:

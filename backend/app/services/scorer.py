@@ -4,7 +4,8 @@ import math
 from datetime import datetime, timezone
 from typing import List
 
-from sqlalchemy.orm import Session
+from sqlalchemy import or_, and_
+from sqlalchemy.orm import Session, load_only
 
 from app.models.skill import Skill
 from app.services.platform_inferrer import PlatformInferrer
@@ -75,6 +76,8 @@ class ScoringEngine:
 
     def score_all(self, db: Session, changed_ids: set[int] | None = None) -> int:
         """Re-score skills. If changed_ids provided, only update their scores."""
+        if changed_ids is not None and not changed_ids:
+            return 0
         # Run quality analysis first (populates quality_* fields)
         analyzer = QualityAnalyzer()
         analyzer.analyze_all(db, changed_ids)
@@ -92,30 +95,34 @@ class ScoringEngine:
         
         # Only score skills that are curated candidates (stars >= 20 or active stars >= 5 or categorized)
         since_30d = datetime.now(timezone.utc) - timedelta(days=30)
-        skills = db.query(Skill).filter(
-            or_(
-                Skill.stars >= 20,
-                and_(
-                    Skill.stars >= 5,
-                    or_(
-                        Skill.last_commit_at >= since_30d,
-                        Skill.category != "uncategorized"
-                    )
-                )
-            )
-        ).all()
-        
+        candidate_filter = or_(
+            Skill.stars >= 20,
+            and_(Skill.stars >= 5, or_(Skill.last_commit_at >= since_30d,
+                                     Skill.category != "uncategorized"))
+        )
+        population = db.query(Skill.stars, Skill.forks, Skill.author_followers,
+                              Skill.total_commits, Skill.prev_stars).filter(candidate_filter).all()
+        query = db.query(Skill).options(load_only(
+            Skill.id, Skill.stars, Skill.forks, Skill.author_followers, Skill.total_commits,
+            Skill.prev_stars, Skill.total_issues, Skill.open_issues, Skill.last_commit_at,
+            Skill.quality_score, Skill.repo_size_kb, Skill.category, Skill.topics,
+            Skill.score, Skill.star_momentum, raiseload=True
+        )).filter(candidate_filter)
+        if changed_ids is not None:
+            query = query.filter(Skill.id.in_(changed_ids))
+        skills = query.all()
+
         if not skills:
             return 0
 
         # Pre-compute log values for normalization (reduces outlier dominance)
-        stars_log = [math.log1p(s.stars) for s in skills]
-        forks_log = [math.log1p(s.forks) for s in skills]
-        followers_log = [math.log1p(s.author_followers) for s in skills]
-        commits_log = [math.log1p(s.total_commits) for s in skills]
+        stars_log = [math.log1p(s.stars) for s in population]
+        forks_log = [math.log1p(s.forks) for s in population]
+        followers_log = [math.log1p(s.author_followers) for s in population]
+        commits_log = [math.log1p(s.total_commits) for s in population]
 
         # Momentum: compute z-score stats
-        deltas = [s.stars - (s.prev_stars or 0) for s in skills]
+        deltas = [s.stars - (s.prev_stars or 0) for s in population]
         delta_mean = sum(deltas) / len(deltas) if deltas else 0
         delta_std = (
             math.sqrt(sum((d - delta_mean) ** 2 for d in deltas) / len(deltas))
@@ -125,15 +132,25 @@ class ScoringEngine:
         if delta_std < 1:
             delta_std = 1  # avoid division by near-zero
 
+        bounds = {
+            "stars": (min(stars_log), max(stars_log)),
+            "forks": (min(forks_log), max(forks_log)),
+            "followers": (min(followers_log), max(followers_log)),
+            "commits": (min(commits_log), max(commits_log)),
+        }
+        def normalize(value, metric):
+            lo, hi = bounds[metric]
+            return 0.0 if hi <= lo else (math.log1p(value) - lo) / (hi - lo)
+
         updated = 0
-        for i, skill in enumerate(skills):
+        for skill in skills:
             if changed_ids is not None and skill.id not in changed_ids:
                 continue
 
-            norm_stars = self._log_normalize(stars_log[i], stars_log)
-            norm_forks = self._log_normalize(forks_log[i], forks_log)
-            norm_followers = self._log_normalize(followers_log[i], followers_log)
-            norm_commits = self._log_normalize(commits_log[i], commits_log)
+            norm_stars = normalize(skill.stars, "stars")
+            norm_forks = normalize(skill.forks, "forks")
+            norm_followers = normalize(skill.author_followers, "followers")
+            norm_commits = normalize(skill.total_commits, "commits")
             ir = self._issue_resolution_rate(skill)
             recency = self._recency_decay(skill)
             quality = (skill.quality_score or 0) / 100.0  # normalize to 0-1

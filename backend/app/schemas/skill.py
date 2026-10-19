@@ -10,6 +10,8 @@ class SortField(str, Enum):
     stars = "stars"
     updated = "last_commit_at"
     created = "created_at"
+    quality_score = "quality_score"
+    star_momentum = "star_momentum"
 
 
 class SortOrder(str, Enum):

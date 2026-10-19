@@ -1,3 +1,4 @@
+import { readPublished, staticSkills, staticDetail, staticByIds } from "./staticCatalog";
 import type {
   CategoryCount,
   ExtraRepoData,
@@ -36,6 +37,8 @@ import {
   sbSubmitMasterApplication,
   sbSubmitWorkflow,
   sbAdminAction,
+  SKILL_COLUMNS,
+  getFallbackMasters,
 } from "./supabaseClient";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
@@ -44,6 +47,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
 // When VITE_API_BASE_URL is set (local dev), use FastAPI backend.
 // When deployed (no API base), use Supabase directly.
 const USE_SUPABASE = !!supabase && !API_BASE;
+const USE_STATIC = import.meta.env.PROD && !API_BASE;
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, options);
@@ -56,6 +60,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 // ═══ Public API (auto-switches between Supabase and FastAPI) ═══
 
 export async function fetchSkills(params: SkillsQueryParams): Promise<PaginatedSkills> {
+  if (USE_STATIC) return staticSkills(params);
   if (USE_SUPABASE) return sbFetchSkills(params);
   const sp = new URLSearchParams();
   sp.set("page", String(params.page));
@@ -66,55 +71,70 @@ export async function fetchSkills(params: SkillsQueryParams): Promise<PaginatedS
   if (params.category) sp.set("category", params.category);
   if (params.platform) sp.set("platform", params.platform);
   if (params.size_category) sp.set("size_category", params.size_category);
+  if (params.quality_tiers) sp.set("quality_tiers", params.quality_tiers);
+  if (params.min_stars !== undefined) sp.set("min_stars", String(params.min_stars));
   return request<PaginatedSkills>(`/api/skills?${sp}`);
 }
 
 export async function fetchStats(): Promise<Stats> {
+  if (USE_STATIC) return (await fetchLandingData()).stats;
   if (USE_SUPABASE) return sbFetchStats();
   return request<Stats>("/api/stats");
 }
 
 export async function fetchCategories(): Promise<CategoryCount[]> {
+  if (USE_STATIC) return (await fetchLandingData()).stats.categories;
   if (USE_SUPABASE) return sbFetchCategories();
   return request<CategoryCount[]>("/api/categories");
 }
 
 export async function fetchTrending(limit = 10): Promise<Skill[]> {
+  if (import.meta.env.PROD && !API_BASE) return (await fetchLandingData()).trending.slice(0, limit);
   if (USE_SUPABASE) return sbFetchTrending(limit);
   return request<Skill[]>(`/api/trending?limit=${limit}`);
 }
 
 export async function fetchRising(days = 7, limit = 10): Promise<Skill[]> {
+  if (USE_STATIC) return (await fetchLandingData()).rising.slice(0,limit);
   if (USE_SUPABASE) return sbFetchRising(days, limit);
   return request<Skill[]>(`/api/rising?days=${days}&limit=${limit}`);
 }
 
 export async function fetchTrendingWeeks(): Promise<import("../types/skill").TrendingWeek[]> {
+  if (USE_STATIC) return readPublished<import("../types/skill").TrendingWeek[]>("weeks.json");
   if (USE_SUPABASE) return sbFetchTrendingWeeks();
-  return request<import("../types/skill").TrendingWeek[]>("/api/trending/weeks", { cache: "no-store" });
+  return request<import("../types/skill").TrendingWeek[]>("/api/trending/weeks", { cache: "default" });
 }
 
 export async function fetchTrendingHistory(weekStart: string): Promise<import("../types/skill").WeeklyTrendingEntry[]> {
+  if (USE_STATIC) return readPublished<import("../types/skill").WeeklyTrendingEntry[]>(`history/${encodeURIComponent(weekStart)}.json`);
   if (USE_SUPABASE) return sbFetchTrendingHistory(weekStart);
-  return request<import("../types/skill").WeeklyTrendingEntry[]>(`/api/trending/history?week_start=${weekStart}`, { cache: "no-store" });
+  return request<import("../types/skill").WeeklyTrendingEntry[]>(`/api/trending/history?week_start=${weekStart}`, { cache: "default" });
 }
 
 export async function fetchTopRated(limit = 10): Promise<Skill[]> {
+  if (USE_STATIC) return (await fetchLandingData()).top_rated.slice(0,limit);
   if (USE_SUPABASE) return sbFetchTopRated(limit);
   return request<Skill[]>(`/api/top-rated?limit=${limit}`);
 }
 
 export async function fetchMostStarred(limit = 10): Promise<Skill[]> {
+  if (import.meta.env.PROD && !API_BASE) return (await fetchLandingData()).hall_of_fame.slice(0, limit);
   if (USE_SUPABASE) return sbFetchMostStarred(limit);
   return request<Skill[]>(`/api/most-starred?limit=${limit}`);
 }
 
 export async function fetchRecentlyUpdated(limit = 10): Promise<Skill[]> {
+  if (USE_STATIC) return (await fetchLandingData()).recently_updated.slice(0,limit);
   if (USE_SUPABASE) return sbFetchRecentlyUpdated(limit);
   return request<Skill[]>(`/api/recently-updated?limit=${limit}`);
 }
 
 export async function fetchNewThisWeek(limit = 10): Promise<Skill[]> {
+  if (import.meta.env.PROD && !API_BASE) {
+    const bundle = await fetchLandingData();
+    return (bundle.new_this_week ?? bundle.rising).slice(0, limit);
+  }
   if (USE_SUPABASE) return sbFetchNewThisWeek(limit);
   // Fallback: use rising endpoint
   return request<Skill[]>(`/api/rising?days=7&limit=${limit}`);
@@ -122,6 +142,7 @@ export async function fetchNewThisWeek(limit = 10): Promise<Skill[]> {
 
 export async function fetchQuickSearch(query: string, limit = 8): Promise<Skill[]> {
   if (!query.trim()) return [];
+  if (USE_STATIC) return (await staticSkills({ page:1, page_size:Math.min(50,limit), sort_by:"score", sort_order:"desc", search:query })).items;
   if (USE_SUPABASE) {
     const sb = supabase!;
     const pat = `%${query}%`;
@@ -132,36 +153,43 @@ export async function fetchQuickSearch(query: string, limit = 8): Promise<Skill[
       .order("score", { ascending: false })
       .limit(limit);
     if (error) throw new Error(error.message);
-    return (data ?? []) as Skill[];
+    return (data ?? []) as unknown as Skill[];
   }
-  return request<Skill[]>(`/api/skills?search=${encodeURIComponent(query)}&page_size=${limit}&sort_by=score&sort_order=desc`).then(
-    (r: any) => r.items || r,
+  return request<PaginatedSkills | Skill[]>(`/api/skills?search=${encodeURIComponent(query)}&page_size=${Math.min(50,limit)}&sort_by=score&sort_order=desc`).then(
+    result => Array.isArray(result) ? result : result.items,
   );
 }
 
 export async function fetchSkillDetail(id: number): Promise<SkillDetail> {
+  if (USE_STATIC) {
+    const skills = await staticByIds([id]);
+    if (!skills.length) throw new Error("Skill not found");
+    return skills[0] as SkillDetail;
+  }
   if (USE_SUPABASE) return sbFetchSkillDetail(id);
   return request<SkillDetail>(`/api/skills/${id}`);
 }
 
 export async function fetchSkillBySlug(slug: string): Promise<SkillDetail> {
+  if (USE_STATIC) return staticDetail(slug);
   if (USE_SUPABASE) return sbFetchSkillBySlug(slug);
   return request<SkillDetail>(`/api/skills/by-slug/${encodeURIComponent(slug)}`);
 }
 
 export async function fetchSkillsByIds(ids: number[]): Promise<Skill[]> {
   if (ids.length === 0) return [];
+  if (USE_STATIC) return staticByIds(ids);
+  ids = [...new Set(ids)].filter(id => Number.isSafeInteger(id) && id > 0).slice(0, 50);
   if (USE_SUPABASE) {
-    const { data, error } = await supabase!.from("skills").select("*").in("id", ids);
+    const { data, error } = await supabase!.from("skills").select(SKILL_COLUMNS).in("id", ids);
     if (error) throw new Error(error.message);
-    return (data ?? []) as Skill[];
+    return (data ?? []) as unknown as Skill[];
   }
-  // Local API fallback - fetch individually
-  const results = await Promise.all(ids.map(id => request<SkillDetail>(`/api/skills/${id}`).catch(() => null)));
-  return results.filter(Boolean) as Skill[];
+  return request<Skill[]>(`/api/skills/batch?ids=${ids.join(",")}`);
 }
 
 export async function fetchLanguageStats(): Promise<{ language: string; count: number }[]> {
+  if (USE_STATIC) return (await fetchLandingData()).languages;
   if (USE_SUPABASE) return sbFetchLanguageStats();
   return request(`/api/language-stats?limit=10`);
 }
@@ -197,6 +225,10 @@ export interface Master {
 }
 
 export async function fetchMasters(): Promise<Master[]> {
+  if (USE_STATIC) {
+    const masters = await readPublished<Master[]>("masters.json");
+    return masters.length ? masters : getFallbackMasters();
+  }
   if (USE_SUPABASE) return sbFetchMasters();
   return request<Master[]>("/api/masters");
 }
@@ -204,13 +236,31 @@ export async function fetchMasters(): Promise<Master[]> {
 export type { OrgBuilder } from "./supabaseClient";
 
 export async function fetchOrgBuilders(): Promise<import("./supabaseClient").OrgBuilder[]> {
+  if (USE_STATIC) return readPublished<import("./supabaseClient").OrgBuilder[]>("org-builders.json");
   if (USE_SUPABASE) return sbFetchOrgBuilders();
-  return []; // FastAPI fallback not implemented yet
+  return request<import("./supabaseClient").OrgBuilder[]>("/api/org-builders");
 }
 
 // ═══ Landing Page Bundle (single-request for all overview data) ═══
 
+let landingPending: Promise<LandingData> | null = null;
+let landingCache: { data: LandingData; expires: number } | null = null;
+
 export async function fetchLandingData(): Promise<LandingData> {
+  if (landingCache && landingCache.expires > Date.now()) return landingCache.data;
+  if (landingPending) return landingPending;
+  landingPending = loadLandingData().then(data => {
+    landingCache = { data, expires: Date.now() + 600000 };
+    return data;
+  }).finally(() => { landingPending = null; });
+  return landingPending;
+}
+
+async function loadLandingData(): Promise<LandingData> {
+  if (import.meta.env.PROD && !API_BASE) {
+    // Published with the deployment: never fall back to a quota-restricted database.
+    return request<LandingData>(`${import.meta.env.BASE_URL}data/landing.json`);
+  }
   if (USE_SUPABASE) {
     // Single RPC call replaces 7+ individual requests
     return sbFetchLandingData();
@@ -289,7 +339,7 @@ function adminHeaders(token: string): HeadersInit {
 }
 
 export async function adminFetchMasters(token: string): Promise<MasterData[]> {
-  if (USE_SUPABASE) return sbAdminAction<MasterData[]>(token, "fetch_masters");
+  if (supabase) return sbAdminAction<MasterData[]>(token, "fetch_masters");
   return request<MasterData[]>("/api/admin/masters", { headers: adminHeaders(token) });
 }
 
@@ -297,7 +347,7 @@ export async function adminCreateMaster(
   token: string,
   data: { github: string; name: string; github_aliases?: string[]; x_handle?: string; bio?: string; tags?: string[] }
 ): Promise<MasterData> {
-  if (USE_SUPABASE) {
+  if (supabase) {
     return sbAdminAction<MasterData>(token, "create_master", {
       github: data.github,
       name: data.name,
@@ -319,7 +369,7 @@ export async function adminUpdateMaster(
   id: number,
   data: Partial<{ name: string; github_aliases: string[]; x_handle: string; bio: string; tags: string[]; is_active: boolean; x_followers: number; x_posts_count: number; x_notes: string }>
 ): Promise<MasterData> {
-  if (USE_SUPABASE) {
+  if (supabase) {
     const payload: Record<string, unknown> = { id };
     if (data.name !== undefined) payload.name = data.name;
     if (data.github_aliases !== undefined) payload.github_aliases = JSON.stringify(data.github_aliases);
@@ -340,17 +390,17 @@ export async function adminUpdateMaster(
 }
 
 export async function adminDeleteMaster(token: string, id: number): Promise<void> {
-  if (USE_SUPABASE) { await sbAdminAction(token, "delete_master", { id }); return; }
+  if (supabase) { await sbAdminAction(token, "delete_master", { id }); return; }
   await request(`/api/admin/masters/${id}`, { method: "DELETE", headers: adminHeaders(token) });
 }
 
 export async function adminFetchExtraRepos(token: string): Promise<ExtraRepoData[]> {
-  if (USE_SUPABASE) return sbAdminAction<ExtraRepoData[]>(token, "fetch_extra_repos");
+  if (supabase) return sbAdminAction<ExtraRepoData[]>(token, "fetch_extra_repos");
   return request<ExtraRepoData[]>("/api/admin/extra-repos", { headers: adminHeaders(token) });
 }
 
 export async function adminCreateExtraRepo(token: string, full_name: string): Promise<ExtraRepoData> {
-  if (USE_SUPABASE) return sbAdminAction<ExtraRepoData>(token, "create_extra_repo", { full_name });
+  if (supabase) return sbAdminAction<ExtraRepoData>(token, "create_extra_repo", { full_name });
   return request<ExtraRepoData>("/api/admin/extra-repos", {
     method: "POST",
     headers: adminHeaders(token),
@@ -359,27 +409,27 @@ export async function adminCreateExtraRepo(token: string, full_name: string): Pr
 }
 
 export async function adminDeleteExtraRepo(token: string, id: number): Promise<void> {
-  if (USE_SUPABASE) { await sbAdminAction(token, "delete_extra_repo", { id }); return; }
+  if (supabase) { await sbAdminAction(token, "delete_extra_repo", { id }); return; }
   await request(`/api/admin/extra-repos/${id}`, { method: "DELETE", headers: adminHeaders(token) });
 }
 
 export async function adminApproveExtraRepo(token: string, id: number): Promise<{ message: string }> {
-  if (USE_SUPABASE) return sbAdminAction<{ message: string }>(token, "approve_extra_repo", { id });
+  if (supabase) return sbAdminAction<{ message: string }>(token, "approve_extra_repo", { id });
   return request(`/api/admin/extra-repos/${id}/approve`, { method: "PUT", headers: adminHeaders(token) });
 }
 
 export async function adminRejectExtraRepo(token: string, id: number): Promise<{ message: string }> {
-  if (USE_SUPABASE) return sbAdminAction<{ message: string }>(token, "reject_extra_repo", { id });
+  if (supabase) return sbAdminAction<{ message: string }>(token, "reject_extra_repo", { id });
   return request(`/api/admin/extra-repos/${id}/reject`, { method: "PUT", headers: adminHeaders(token) });
 }
 
 export async function adminFetchSearchQueries(token: string): Promise<SearchQueryData[]> {
-  if (USE_SUPABASE) return sbAdminAction<SearchQueryData[]>(token, "fetch_search_queries");
+  if (supabase) return sbAdminAction<SearchQueryData[]>(token, "fetch_search_queries");
   return request<SearchQueryData[]>("/api/admin/search-queries", { headers: adminHeaders(token) });
 }
 
 export async function adminCreateSearchQuery(token: string, query: string): Promise<SearchQueryData> {
-  if (USE_SUPABASE) return sbAdminAction<SearchQueryData>(token, "create_search_query", { query });
+  if (supabase) return sbAdminAction<SearchQueryData>(token, "create_search_query", { query });
   return request<SearchQueryData>("/api/admin/search-queries", {
     method: "POST",
     headers: adminHeaders(token),
@@ -388,7 +438,7 @@ export async function adminCreateSearchQuery(token: string, query: string): Prom
 }
 
 export async function adminDeleteSearchQuery(token: string, id: number): Promise<void> {
-  if (USE_SUPABASE) { await sbAdminAction(token, "delete_search_query", { id }); return; }
+  if (supabase) { await sbAdminAction(token, "delete_search_query", { id }); return; }
   await request(`/api/admin/search-queries/${id}`, { method: "DELETE", headers: adminHeaders(token) });
 }
 
@@ -404,22 +454,22 @@ export interface SubscriberData {
 }
 
 export async function adminFetchSubscribers(token: string): Promise<SubscriberData[]> {
-  if (USE_SUPABASE) return sbAdminAction<SubscriberData[]>(token, "fetch_subscribers");
+  if (supabase) return sbAdminAction<SubscriberData[]>(token, "fetch_subscribers");
   return request<SubscriberData[]>("/api/admin/subscribers", { headers: adminHeaders(token) });
 }
 
 export async function adminDeleteSubscriber(token: string, id: number): Promise<void> {
-  if (USE_SUPABASE) { await sbAdminAction(token, "delete_subscriber", { id }); return; }
+  if (supabase) { await sbAdminAction(token, "delete_subscriber", { id }); return; }
   await request(`/api/admin/subscribers/${id}`, { method: "DELETE", headers: adminHeaders(token) });
 }
 
 export async function adminFetchSyncLogs(token: string): Promise<SyncLogData[]> {
-  if (USE_SUPABASE) return sbAdminAction<SyncLogData[]>(token, "fetch_sync_logs");
+  if (supabase) return sbAdminAction<SyncLogData[]>(token, "fetch_sync_logs");
   return request<SyncLogData[]>("/api/admin/sync-logs", { headers: adminHeaders(token) });
 }
 
 export async function adminTriggerSync(token: string): Promise<{ message: string; sync_id: number }> {
-  if (USE_SUPABASE) return sbAdminAction<{ message: string; sync_id: number }>(token, "trigger_sync");
+  if (supabase) return sbAdminAction<{ message: string; sync_id: number }>(token, "trigger_sync");
   return request("/api/admin/sync", { method: "POST", headers: adminHeaders(token) });
 }
 
@@ -428,14 +478,14 @@ export async function adminFetchSkills(
   page = 1,
   search?: string
 ): Promise<Skill[]> {
-  if (USE_SUPABASE) return sbAdminAction<Skill[]>(token, "fetch_skills", { page, search: search ?? "" });
+  if (supabase) return sbAdminAction<Skill[]>(token, "fetch_skills", { page, search: search ?? "" });
   const sp = new URLSearchParams({ page: String(page), page_size: "50" });
   if (search) sp.set("search", search);
   return request<Skill[]>(`/api/admin/skills?${sp}`, { headers: adminHeaders(token) });
 }
 
 export async function adminDeleteSkill(token: string, id: number): Promise<void> {
-  if (USE_SUPABASE) { await sbAdminAction(token, "delete_skill", { id }); return; }
+  if (supabase) { await sbAdminAction(token, "delete_skill", { id }); return; }
   await request(`/api/admin/skills/${id}`, { method: "DELETE", headers: adminHeaders(token) });
 }
 
@@ -452,16 +502,33 @@ export interface MasterApplicationData {
 }
 
 export async function adminFetchMasterApplications(token: string): Promise<MasterApplicationData[]> {
-  if (USE_SUPABASE) return sbAdminAction<MasterApplicationData[]>(token, "fetch_master_applications");
+  if (supabase) return sbAdminAction<MasterApplicationData[]>(token, "fetch_master_applications");
   return request<MasterApplicationData[]>("/api/admin/master-applications", { headers: adminHeaders(token) });
 }
 
 export async function adminApproveMasterApplication(token: string, id: number): Promise<{ message: string }> {
-  if (USE_SUPABASE) return sbAdminAction<{ message: string }>(token, "approve_master_application", { id });
+  if (supabase) return sbAdminAction<{ message: string }>(token, "approve_master_application", { id });
   return request(`/api/admin/master-applications/${id}/approve`, { method: "PUT", headers: adminHeaders(token) });
 }
 
 export async function adminRejectMasterApplication(token: string, id: number): Promise<{ message: string }> {
-  if (USE_SUPABASE) return sbAdminAction<{ message: string }>(token, "reject_master_application", { id });
+  if (supabase) return sbAdminAction<{ message: string }>(token, "reject_master_application", { id });
   return request(`/api/admin/master-applications/${id}/reject`, { method: "PUT", headers: adminHeaders(token) });
+}
+
+export interface WorkflowCategory {
+  id: string;
+  skill_count: number;
+  skills: Pick<Skill, "repo_name" | "repo_full_name" | "description" | "stars" | "score" | "author_name">[];
+}
+
+export async function fetchWorkflowCategories(): Promise<WorkflowCategory[]> {
+  if (import.meta.env.PROD && !API_BASE) {
+    const bundle = await fetchLandingData();
+    return bundle.workflows ?? [];
+  }
+  if (!USE_SUPABASE) return request<WorkflowCategory[]>("/api/workflows");
+  const { data, error } = await supabase!.rpc("get_workflow_categories");
+  if (error) throw new Error(error.message);
+  return data ?? [];
 }

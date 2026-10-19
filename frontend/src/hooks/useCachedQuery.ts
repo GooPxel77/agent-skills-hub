@@ -1,83 +1,58 @@
-/**
- * Generic cached query hook.
- *
- * 1. Has cache? → Return cached data immediately, then silently check for updates.
- * 2. No cache? → Show loading → fetch → cache → return.
- * 3. If lastSyncAt changed → refetch and update cache.
- */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { sbFetchLastSyncAt } from "../api/supabaseClient";
-import { supabase } from "../lib/supabase";
 import { cacheGet, cacheSet } from "./useCache";
 
-interface UseCachedQueryResult<T> {
-  data: T | null;
-  loading: boolean;
-  error: string | null;
-  refetch: () => void;
+const FRESH_MS = 10 * 60 * 1000;
+const STALE_MS = 24 * 60 * 60 * 1000;
+const pending = new Map<string, Promise<unknown>>();
+
+function sharedFetch<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  const existing = pending.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = Promise.resolve().then(fetcher).then((result) => {
+    cacheSet(key, result, null);
+    return result;
+  }).finally(() => pending.delete(key));
+  pending.set(key, promise);
+  return promise;
 }
 
-export function useCachedQuery<T>(
-  cacheKey: string,
-  fetcher: () => Promise<T>,
-): UseCachedQueryResult<T> {
-  const cached = cacheGet<T>(cacheKey);
-  const [data, setData] = useState<T | null>(cached?.data ?? null);
-  const [loading, setLoading] = useState(!cached);
+export function useCachedQuery<T>(cacheKey: string, fetcher: () => Promise<T>) {
+  const initial = cacheGet<T>(cacheKey, STALE_MS);
+  const [data, setData] = useState<T | null>(initial?.data ?? null);
+  const [loading, setLoading] = useState(!initial);
   const [error, setError] = useState<string | null>(null);
-  const fetchId = useRef(0);
+  const generation = useRef(0);
 
-  const doFetch = useCallback(
-    async (silent = false) => {
-      const id = ++fetchId.current;
-      if (!silent) setLoading(true);
-
-      try {
-        // Get current lastSyncAt if supabase is available
-        let lastSyncAt: string | null = null;
-        if (supabase) {
-          try {
-            lastSyncAt = await sbFetchLastSyncAt();
-          } catch {
-            // ignore — use null
-          }
-        }
-
-        // If we have cache and lastSyncAt hasn't changed, skip refetch
-        if (silent && cached && cached.lastSyncAt === lastSyncAt && lastSyncAt !== null) {
-          return;
-        }
-
-        const result = await fetcher();
-        if (id === fetchId.current) {
-          setData(result);
-          setError(null);
-          cacheSet(cacheKey, result, lastSyncAt);
-        }
-      } catch (err) {
-        if (id === fetchId.current) {
-          setError(err instanceof Error ? err.message : "Unknown error");
-        }
-      } finally {
-        if (id === fetchId.current) setLoading(false);
+  const load = useCallback(async (force = false) => {
+    const id = ++generation.current;
+    const cached = cacheGet<T>(cacheKey, STALE_MS);
+    if (cached) setData(cached.data);
+    if (!force && cached && Date.now() - cached.cachedAt < FRESH_MS) {
+      setLoading(false);
+      setError(null);
+      return;
+    }
+    if (!cached) setLoading(true);
+    try {
+      const result = await sharedFetch(cacheKey, fetcher);
+      if (id === generation.current) {
+        setData(result);
+        setError(null);
       }
-    },
-    [cacheKey, fetcher, cached],
-  );
+    } catch (err) {
+      // Keep usable cached data during an upstream outage.
+      if (id === generation.current) setError(err instanceof Error ? err.message : "Request failed");
+    } finally {
+      if (id === generation.current) setLoading(false);
+    }
+  }, [cacheKey, fetcher]);
 
   useEffect(() => {
-    if (cached) {
-      // We have cached data — silently check for updates in background
-      doFetch(true);
-    } else {
-      // No cache — normal fetch
-      doFetch(false);
-    }
-    // Only run on mount (cacheKey change)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cacheKey]);
+    void load();
+    const currentGeneration = generation;
+    return () => { ++currentGeneration.current; };
+  }, [load]);
 
-  const refetch = useCallback(() => doFetch(false), [doFetch]);
-
+  const refetch = useCallback(() => { void load(true); }, [load]);
   return { data, loading, error, refetch };
 }

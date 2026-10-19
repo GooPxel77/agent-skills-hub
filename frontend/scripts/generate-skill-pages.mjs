@@ -15,9 +15,7 @@
 import { readFileSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://vknzzecmzsfmohglpfgm.supabase.co";
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrbnp6ZWNtenNmbW9oZ2xwZmdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MDQ3MzIsImV4cCI6MjA4ODM4MDczMn0.zFAGZH-lDcL-GwyMkR-9sSV8pJToVzomsJ_fuXZIoDo";
+import { readSnapshot, buildLanding, enrichMasters, SKILL_FIELDS } from './lib/catalog.mjs';
 const SITE = "https://www.205055.xyz";
 
 const CATEGORY_LABELS = {
@@ -112,120 +110,6 @@ function shouldIndex(skill) {
   if (skill.stars >= 20 && skill.readme_content && skill.readme_content.length > 100) return true;
   if (skill.stars >= 20 && skill.description && skill.description.length > 80) return true;
   return false;
-}
-
-/* ── fetch skills from Supabase ────────────────── */
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function fetchWithRetry(url, options = {}, retries = 5, delay = 3000) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const res = await fetch(url, options);
-      if (!res.ok) {
-        let errBody = "";
-        try {
-          errBody = await res.text();
-        } catch (_) {}
-        throw new Error(`HTTP error! status: ${res.status}, body: ${errBody}`);
-      }
-      return res;
-    } catch (err) {
-      if (i === retries - 1) throw err;
-      console.warn(`Fetch failed (${err.message}). Retrying in ${delay}ms... (Attempt ${i + 1}/${retries})`);
-      await sleep(delay);
-      delay *= 2;
-    }
-  }
-}
-
-async function fetchTotalSkillsCount() {
-  const url = `${SUPABASE_URL}/rest/v1/skills?select=id&limit=1`;
-  const res = await fetchWithRetry(url, {
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      Prefer: "count=exact",
-      "x-statement-timeout": "25000",
-    },
-  });
-  const contentRange = res.headers.get("content-range");
-  if (contentRange) {
-    const parts = contentRange.split("/");
-    if (parts.length === 2) {
-      const total = parseInt(parts[1]);
-      if (!isNaN(total)) return total;
-    }
-  }
-  return 91000; // fallback
-}
-
-async function fetchAllSkills() {
-  const skills = [];
-  let lastId = null;
-  const limit = 500; // reduced from 1000 to avoid statement timeout
-  const fields = [
-    "id", "repo_full_name", "repo_name", "author_name", "author_avatar_url",
-    "stars", "forks", "description", "category", "language", "score", "license",
-    "readme_content", "last_commit_at", "created_at", "topics",
-    "quality_score", "platforms", "star_momentum", "estimated_tokens",
-    "open_issues", "total_commits",
-  ].join(",");
-
-  while (true) {
-    let url = `${SUPABASE_URL}/rest/v1/skills?stars=gte.20&select=${fields}&order=id.asc&limit=${limit}`;
-    if (lastId !== null) {
-      url += `&id=gt.${lastId}`;
-    }
-    const res = await fetchWithRetry(url, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        "x-statement-timeout": "25000",
-      },
-    });
-    const data = await res.json();
-    if (!data.length) break;
-    for (const row of data) {
-      // Keep more README for expanded content (1500 chars)
-      if (row.readme_content) {
-        row.readme_content = row.readme_content.slice(0, 1500);
-      }
-      skills.push(row);
-    }
-    lastId = data[data.length - 1].id;
-    console.log(`  ... fetched ${skills.length} skills so far (last id: ${lastId})`);
-    if (data.length < limit) break;
-    await sleep(300); // brief pause between pages to avoid overwhelming Supabase
-  }
-  return skills;
-}
-
-async function fetchAllCompositions() {
-  const comps = new Map();
-  let offset = 0;
-  const limit = 500; // reduced from 1000 to avoid statement timeout
-
-  while (true) {
-    const url = `${SUPABASE_URL}/rest/v1/skill_compositions?select=skill_id,compatible_skill_id,compatibility_score,reason&order=skill_id.asc,compatibility_score.desc&offset=${offset}&limit=${limit}`;
-    const res = await fetchWithRetry(url, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        "x-statement-timeout": "25000",
-      },
-    });
-    const data = await res.json();
-    if (!Array.isArray(data) || !data.length) break;
-    for (const row of data) {
-      if (!comps.has(row.skill_id)) comps.set(row.skill_id, []);
-      comps.get(row.skill_id).push(row);
-    }
-    offset += limit;
-    if (data.length < limit) break;
-    await sleep(300); // brief pause between pages
-  }
-  return comps;
 }
 
 /* ── build HTML for one skill ──────────────────── */
@@ -720,15 +604,31 @@ async function main() {
   const assetTags = extractAssetTags(indexHtml);
   console.log(`Assets: ${assetTags.scriptTags.length} scripts, ${assetTags.linkTags.length} links`);
 
-  console.log("Fetching skills from Supabase...");
-  const totalSkills = await fetchTotalSkillsCount();
-  const skills = await fetchAllSkills();
+  const snapshot = readSnapshot();
+  const totalSkills = snapshot.skills.length;
+  const skills = [...snapshot.skills];
   // Sort in-memory by stars desc
   skills.sort((a, b) => (b.stars || 0) - (a.stars || 0));
-  console.log(`Fetched ${skills.length} skills (total database count: ${totalSkills})`);
+  console.log(`Loaded ${skills.length} public skills from snapshot`);
 
-  console.log("Fetching compositions...");
-  const compositions = await fetchAllCompositions();
+  const compositions = new Map();
+  for (const row of snapshot.compositions) {
+    if (!compositions.has(row.skill_id)) compositions.set(row.skill_id, []);
+    compositions.get(row.skill_id).push(row);
+  }
+  for (const rows of compositions.values()) rows.sort((a,b) => b.compatibility_score-a.compatibility_score);
+  mkdirSync(join(distDir, 'data'), { recursive: true });
+  writeFileSync(join(distDir, 'data/landing.json'), JSON.stringify(buildLanding(skills, snapshot.generated_at)));
+  writeFileSync(join(distDir, 'data/catalog.json'), JSON.stringify({columns:SKILL_FIELDS,rows:skills.map(s => SKILL_FIELDS.map(k => s[k] ?? null))}));
+  writeFileSync(join(distDir, 'data/ids.json'), JSON.stringify(Object.fromEntries(skills.map(s => [s.id,s.repo_full_name]))));
+  writeFileSync(join(distDir, 'data/masters.json'), JSON.stringify(enrichMasters(snapshot.masters,skills)));
+  writeFileSync(join(distDir, 'data/org-builders.json'), JSON.stringify(snapshot.orgs ?? []));
+  writeFileSync(join(distDir, 'data/weeks.json'), JSON.stringify(snapshot.weeks ?? []));
+  mkdirSync(join(distDir,'data/history'),{recursive:true});
+  for (const [week,entries] of Object.entries(snapshot.history ?? {})) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(week)) throw new Error('Invalid history date');
+    writeFileSync(join(distDir,'data/history',`${week}.json`),JSON.stringify(entries));
+  }
   console.log(`Fetched compositions for ${compositions.size} skills`);
 
   // Build lookup maps
@@ -769,6 +669,15 @@ async function main() {
     mkdirSync(dir, { recursive: true });
 
     const skillComps = compositions.get(skill.id) || [];
+    const detailDir = join(distDir, 'data/skills', owner);
+    mkdirSync(detailDir, {recursive:true});
+    const detail = Object.fromEntries(SKILL_FIELDS.map(k => [k,skill[k] ?? null]));
+    detail.compatible_skills = skillComps.slice(0,5).filter(c => skillById.has(c.compatible_skill_id)).map(c => {
+      const other = skillById.get(c.compatible_skill_id);
+      return {skill_id:other.id,skill_name:other.repo_name,skill_score:other.score || 0,
+              compatibility_score:c.compatibility_score,reason:c.reason};
+    });
+    writeFileSync(join(detailDir, `${repo}.json`),JSON.stringify(detail));
     writeFileSync(
       join(dir, "index.html"),
       buildSkillHtml(skill, assetTags, skillComps, skillById, categoryIndex, languageIndex),

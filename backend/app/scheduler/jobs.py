@@ -612,53 +612,12 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
         db = SessionLocal()
         sync_log = db.query(SyncLog).filter(SyncLog.id == sync_log_id_ref).first()
 
-        BATCH_SIZE = 200
-        new_count, updated_count = 0, 0
-        new_repo_names = []  # Track truly new skill repo names for composability
-        for i, repo_data in enumerate(cleaned):
-            try:
-                existing = (
-                    db.query(Skill)
-                    .filter(Skill.repo_full_name == repo_data["repo_full_name"])
-                    .first()
-                )
-                if existing:
-                    existing.prev_stars = existing.stars
-                    for key, val in repo_data.items():
-                        setattr(existing, key, val)
-                    readme = readme_cache.get(existing.repo_full_name)
-                    if readme:
-                        existing.readme_content = readme
-                        existing.readme_size = len(readme)
-                    updated_count += 1
-                else:
-                    new_skill = Skill(**repo_data)
-                    readme = readme_cache.get(repo_data.get("repo_full_name", ""))
-                    if readme:
-                        new_skill.readme_content = readme
-                        new_skill.readme_size = len(readme)
-                    db.add(new_skill)
-                    new_repo_names.append(repo_data.get("repo_full_name", ""))
-                    new_count += 1
-            except Exception as row_exc:
-                logger.warning("Upsert failed for %s: %s", repo_data.get("repo_full_name", "?"), row_exc)
-                db.rollback()
-
-            if (i + 1) % BATCH_SIZE == 0:
-                try:
-                    db.commit()
-                    logger.info("Batch commit: %d/%d (%d new, %d updated)", i + 1, len(cleaned), new_count, updated_count)
-                except Exception as batch_exc:
-                    logger.error("Batch commit failed at %d: %s", i + 1, batch_exc)
-                    db.rollback()
-
-        try:
-            db.commit()
-        except Exception as final_exc:
-            logger.error("Final commit failed: %s", final_exc)
-            db.rollback()
-
-        logger.info("Database upsert complete: %d new, %d updated", new_count, updated_count)
+        from app.services.skill_upsert import upsert_skills
+        new_count, updated_count, unchanged_count, new_repo_names = upsert_skills(
+            db, cleaned, readme_cache
+        )
+        logger.info("Database sync: %d new, %d changed, %d unchanged (no writes)",
+                    new_count, updated_count, unchanged_count)
 
         skip_scoring = os.environ.get("SKIP_SCORING") == "1"
         skip_composability = os.environ.get("SKIP_COMPOSABILITY") == "1"

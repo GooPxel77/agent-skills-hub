@@ -102,6 +102,12 @@ export interface LandingData {
   recently_updated: Skill[];
   languages: { language: string; count: number }[];
   generated_at: string;
+  new_this_week?: Skill[];
+  workflows?: {
+    id: string;
+    skill_count: number;
+    skills: Pick<Skill, "repo_name" | "repo_full_name" | "description" | "stars" | "score" | "author_name">[];
+  }[];
 }
 
 // Weekly trending history

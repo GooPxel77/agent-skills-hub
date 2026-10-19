@@ -67,8 +67,10 @@ class PlatformInferrer:
     }
 
     def infer_all(self, db: Session, changed_ids: set[int] | None = None) -> int:
+        if changed_ids is not None and not changed_ids:
+            return 0
         query = db.query(Skill)
-        if changed_ids:
+        if changed_ids is not None:
             query = query.filter(Skill.id.in_(changed_ids))
         skills = query.all()
         for skill in skills:

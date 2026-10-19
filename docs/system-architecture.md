@@ -25,7 +25,8 @@ ScoringEngine (9 signals → 0-100)
     ▼
 ComposabilityEngine (TF-IDF + 8 signals → skill pairs)
     │
-    ├──▸ Supabase Views + RPCs (production)
+    ├──▸ Lightweight export → GitHub Pages JSON (public production reads)
+    ├──▸ Cloudflare catalog gateway (optional cached live reads)
     ├──▸ FastAPI REST (dev/admin)
     └──▸ Newsletter (weekly via Resend)
 ```
@@ -46,9 +47,13 @@ ComposabilityEngine (TF-IDF + 8 signals → skill pairs)
 | `backend/app/models/skill.py` | Database schema + indexes |
 | `backend/sync_runner.py` | GitHub Actions entry point |
 | `backend/newsletter_runner.py` | Weekly newsletter sender |
-| `frontend/src/api/client.ts` | Dual-mode API client (Supabase / FastAPI) |
+| `frontend/src/api/client.ts` | Catalog client (static JSON / gateway / local FastAPI) |
 | `frontend/src/api/supabaseClient.ts` | PostgREST queries + RPC calls |
 | `.github/workflows/sync.yml` | 8h sync cron + error handling |
+| `frontend/scripts/export-catalog.mjs` | One incremental, validated public snapshot export |
+| `frontend/src/api/staticCatalog.ts` | Lazy static search, details and comparison |
+| `gateway/index.mjs` | Public cache, quota circuit breaker, validation and rate limit |
+| `backend/app/services/skill_upsert.py` | Batched metadata comparisons without stored README reads |
 
 ## Database Schema
 
@@ -164,10 +169,8 @@ Weekly (Monday): newsletter_runner.py → query verified subscribers
 
 ## Performance
 
-1. Incremental sync saves 60-80% API calls
-2. `get_landing_data()` RPC replaces 7+ requests
-3. Batch upsert (200 per batch)
-4. GIN-indexed full-text search
-5. HTTP Cache-Control: 5min → 1hr
-6. NullPool for PgBouncer compatibility
-7. README truncation at 50KB
+Public catalog reads use the deployment's static JSON by default, so visitor count does not multiply Supabase reads. Optional live reads use the Cloudflare gateway with ten-minute freshness, retained stale data, a quota circuit breaker and bounded query parameters. Auth, favorites and writes remain separate.
+
+Exports reuse one snapshot for HTML/sitemap/JSON. Subsequent exports use database timestamp watermarks plus lightweight ID reconciliation; README excerpts are truncated in PostgreSQL to 1500 characters. Sync compares batches of metadata instead of loading full ORM rows. Scoring reads target README only and global numeric columns; composability reads 3000-character server-side previews.
+
+See [rollout and verification](egress-optimization-rollout.md) and [gateway setup](../gateway/README.md). Production migrations and the separate catalog ACL lockdown must be applied in that order after validation. Savings require measurement after deployment.

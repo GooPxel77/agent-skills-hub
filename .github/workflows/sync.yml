@@ -17,6 +17,10 @@ on:
 env:
   MIN_STAR_THRESHOLD: ${{ inputs.min_star_threshold || '50' }}
 
+concurrency:
+  group: catalog-db-maintenance
+  cancel-in-progress: false
+
 permissions:
   contents: read
   issues: write

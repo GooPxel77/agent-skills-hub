@@ -50,7 +50,7 @@ def run_heavy():
         )
         
         # 1. Scoring Missing ones
-        skills_to_score = db.query(Skill).filter(
+        skills_to_score = db.query(Skill.id).filter(
             or_(Skill.score == 0, Skill.quality_score == 0),
             candidate_filter
         ).order_by(Skill.first_seen.desc().nullslast(), Skill.id.desc()).limit(limit).all()
@@ -64,7 +64,7 @@ def run_heavy():
             
         # 2. Composability Missing ones
         # Outerjoin to find skills with no child compositions
-        skills_without_comp = db.query(Skill).outerjoin(
+        skills_without_comp = db.query(Skill.id).outerjoin(
             SkillComposition, Skill.id == SkillComposition.skill_id
         ).filter(
             SkillComposition.id == None,
