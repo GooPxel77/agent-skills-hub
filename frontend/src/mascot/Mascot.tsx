@@ -16,6 +16,7 @@ const initialSnapshot: MascotSnapshot = {
 }
 
 export default function SkillMascot() {
+  const [dismissed, setDismissed] = useState(false)
   const [snapshot, setSnapshot] = useState(initialSnapshot)
   const [theme, setTheme] = useState<"light" | "dark">("dark")
   const signalsRef = useRef<MascotSignal[]>([])
@@ -65,8 +66,11 @@ export default function SkillMascot() {
     "--skill-action-ms": `${snapshot.actionMs}ms`,
   } as CSSProperties
 
+  if (dismissed) return null
+
   return (
     <div className="skill-mascot-boundary">
+      <button type="button" aria-label="Hide mascot" className="pointer-events-auto fixed right-4 bottom-4 min-w-11 min-h-11 rounded-full border border-[var(--ps-border)] bg-[var(--ps-bg-card)] text-[var(--ps-text-secondary)]" onClick={() => setDismissed(true)}>×</button>
     <aside ref={dockRef} data-render-paused={renderPaused || snapshot.mode === "guarded" || snapshot.mode === "shy_wait" ? "true" : "false"} aria-label="Skill Lab mascot" className="skill-mascot-dock" data-mode={snapshot.mode}
       data-behavior={snapshot.behavior ?? "idle"} data-theme={theme} style={style}
       onTransitionEnd={(event) => {

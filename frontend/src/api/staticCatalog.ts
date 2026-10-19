@@ -7,6 +7,9 @@ export function readPublished<T>(path: string): Promise<T> {
   if (!promise) {
     promise = fetch(`${import.meta.env.BASE_URL}data/${path}`).then(async response => {
       if (!response.ok) throw new Error(`Published catalog unavailable (${response.status})`);
+      if (response.headers.get('content-type')?.includes('text/html')) {
+        throw new Error('This skill’s published data is temporarily unavailable. Please try again later.');
+      }
       return response.json();
     }).catch(error => { resources.delete(path); throw error; });
     resources.set(path, promise);
@@ -34,7 +37,7 @@ export async function staticSkills(params: SkillsQueryParams): Promise<Paginated
   }
   const all = await decodedCatalog;
   const pageSize = Math.min(50,Math.max(1,Math.trunc(params.page_size)||20));
-  const page = Math.min(500,Math.max(1,Math.trunc(params.page)||1));
+  const requestedPage = Math.min(Number.MAX_SAFE_INTEGER,Math.max(1,Math.trunc(params.page)||1));
   const words = (params.search||'').trim().toLocaleLowerCase().slice(0,100).split(/\s+/).filter(Boolean);
   const tiers = new Set((params.quality_tiers || '').split(',').filter(Boolean));
   const tier = (score: number) => score>=80 ? 'S' : score>=65 ? 'A' : score>=50 ? 'B' : score>=35 ? 'C' : 'D';
@@ -44,7 +47,7 @@ export async function staticSkills(params: SkillsQueryParams): Promise<Paginated
     && (!params.min_stars || s.stars>=params.min_stars)
     && (!tiers.size || tiers.has(tier(s.quality_score || 0)))
     && (!words.length || words.every(word => `${s.repo_name} ${s.description} ${s.author_name} ${s.topics}`.toLocaleLowerCase().includes(word))));
-  const sort = ['score','stars','last_commit_at','created_at','quality_score','star_momentum'].includes(params.sort_by) ? params.sort_by : 'score';
+  const sort = ['score','stars','last_commit_at','created_at','quality_score','star_momentum'].includes(params.sort_by) ? params.sort_by : 'stars';
   const ascending = params.sort_order==='asc';
   matches.sort((a,b) => {
     const left=a[sort],right=b[sort];
@@ -53,5 +56,6 @@ export async function staticSkills(params: SkillsQueryParams): Promise<Paginated
     const diff=typeof left==='number' && typeof right==='number' ? left-right : String(left).localeCompare(String(right));
     return (diff || a.id-b.id)*(ascending ? 1 : -1);
   });
+  const page = Math.min(requestedPage, Math.max(1, Math.ceil(matches.length / pageSize)));
   return { items:matches.slice((page-1)*pageSize,page*pageSize),total:matches.length,page,page_size:pageSize,total_pages:Math.max(1,Math.ceil(matches.length/pageSize)) };
 }

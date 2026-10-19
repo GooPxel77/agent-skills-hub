@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   RiSearch2Line,
@@ -29,6 +29,10 @@ export function HeroSection({ onSearch }: Props) {
   const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listId = useId();
+  const searchRevision = useRef(0);
+
+  useEffect(() => () => { clearTimeout(searchTimer.current); searchRevision.current++; }, []);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -43,6 +47,7 @@ export function HeroSection({ onSearch }: Props) {
 
   const doSearch = useCallback((q: string) => {
     clearTimeout(searchTimer.current);
+    const revision = ++searchRevision.current;
     if (!q.trim()) {
       setResults([]);
       setSearching(false);
@@ -52,10 +57,11 @@ export function HeroSection({ onSearch }: Props) {
     searchTimer.current = setTimeout(() => {
       fetchQuickSearch(q, 6)
         .then((items) => {
+          if (revision !== searchRevision.current) return;
           setResults(items);
           setSearching(false);
         })
-        .catch(() => setSearching(false));
+        .catch(() => { if (revision === searchRevision.current) setSearching(false); });
     }, 200);
   }, []);
 
@@ -96,7 +102,7 @@ export function HeroSection({ onSearch }: Props) {
   ];
 
   return (
-    <section className="hero-gradient -mx-4 px-4 pt-6 pb-8 sm:pt-10 sm:pb-10 mb-6 relative overflow-hidden">
+    <section className="hero-gradient -mx-4 px-4 pt-6 pb-8 sm:pt-10 sm:pb-10 mb-6 relative z-20">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -140,12 +146,17 @@ export function HeroSection({ onSearch }: Props) {
             }}
             placeholder={t("hero.searchPlaceholder")}
             aria-label="Search skills"
-            className="w-full bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.05)] text-[var(--ps-text-primary)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--ps-neon-cyan)]/50 focus:bg-[rgba(255,255,255,0.05)] focus:ring-2 focus:ring-[var(--ps-neon-cyan)]/15 transition-all duration-300 outline-none rounded-2xl text-sm sm:text-base shadow-sm"
+            role="combobox" aria-autocomplete="list" aria-expanded={showDropdown && results.length > 0} aria-controls={showDropdown && results.length > 0 ? listId : undefined}
+            aria-activedescendant={showDropdown && activeIdx >= 0 && results[activeIdx] ? `${listId}-${results[activeIdx].id}` : undefined}
+            className="w-full bg-[var(--ps-bg-input)] hover:bg-[var(--ps-bg-input)] text-[var(--ps-text-primary)] border border-[var(--ps-border)] focus:border-[var(--ps-neon-cyan)]/50 focus:bg-[var(--ps-bg-input)] focus:ring-2 focus:ring-[var(--ps-neon-cyan)]/15 transition-all duration-300 outline-none rounded-2xl text-sm sm:text-base shadow-sm"
             style={{ paddingLeft: "48px", paddingRight: "48px", height: "52px" }}
           />
           {query && (
             <button
               onClick={() => {
+                clearTimeout(searchTimer.current);
+                searchRevision.current++;
+                setSearching(false);
                 setQuery("");
                 setResults([]);
                 setShowDropdown(false);
@@ -160,10 +171,10 @@ export function HeroSection({ onSearch }: Props) {
           {/* Quick Search Dropdown */}
           {showDropdown && (query.trim() || results.length > 0) && (
             <div
-              className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-[rgba(255,255,255,0.1)] overflow-hidden z-[100] text-left shadow-2xl"
+              className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-[var(--ps-border)] overflow-hidden z-[100] text-left shadow-2xl"
               style={{
                 boxShadow: "0 16px 48px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.05)",
-                background: "rgba(15, 17, 21, 0.96)",
+                background: "var(--ps-bg-surface)",
                 backdropFilter: "blur(20px)",
                 WebkitBackdropFilter: "blur(20px)",
               }}
@@ -174,13 +185,14 @@ export function HeroSection({ onSearch }: Props) {
                 </div>
               )}
               {!searching && results.length > 0 && (
-                <div className="max-h-72 overflow-y-auto">
+                <div id={listId} role="listbox" aria-label="Search suggestions" className="max-h-72 overflow-y-auto">
                   {results.map((skill, i) => {
                     const isHighValue = skill.stars >= 200 || skill.score >= 80;
                     const isVerified = skill.quality_score >= 70;
                     return (
                       <div
                         key={skill.id}
+                    id={`${listId}-${skill.id}`} role="option" aria-selected={i === activeIdx}
                         onClick={() => {
                           navigate(`/skill/${skill.repo_full_name}`);
                           setShowDropdown(false);
@@ -196,7 +208,7 @@ export function HeroSection({ onSearch }: Props) {
                           alt=""
                           width={32}
                           height={32}
-                          className="w-8 h-8 rounded-full shrink-0 border border-[rgba(255,255,255,0.1)]"
+                          className="w-8 h-8 rounded-full shrink-0 border border-[var(--ps-border)]"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
@@ -224,7 +236,7 @@ export function HeroSection({ onSearch }: Props) {
                             </span>
                           ) : isVerified ? (
                             <span className="text-[9px] px-1.5 py-0.5 rounded border border-[var(--ps-neon-green)]/30 text-[var(--ps-neon-green)] bg-[var(--ps-neon-green)]/10 shrink-0 font-medium">
-                              Verified
+                              Auto-scored
                             </span>
                           ) : null}
                         </div>

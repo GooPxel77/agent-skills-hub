@@ -117,3 +117,5 @@
 .skill-mascot-dock[data-render-paused="true"] *,
 .skill-mascot-dock[data-render-paused="true"] *::before,
 .skill-mascot-dock[data-render-paused="true"] *::after { animation-play-state: paused !important; }
+
+@media (max-width: 767px) { .skill-mascot-boundary { display: none; } }

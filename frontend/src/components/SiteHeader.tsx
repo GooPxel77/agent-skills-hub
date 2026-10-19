@@ -43,29 +43,29 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
   }, [tab]);
 
   return (
-    <header className="sticky top-0 z-10 backdrop-blur-xl" style={{ background: 'color-mix(in srgb, var(--bg-surface) 90%, transparent)', borderBottom: '1px solid var(--border-subtle)' }}>
-      <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4">
-        <div className="flex items-center justify-between mb-3">
+    <header className="sticky top-0 z-30 backdrop-blur-xl" style={{ background: 'color-mix(in srgb, var(--bg-surface) 90%, transparent)', borderBottom: '1px solid var(--border-subtle)' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2">
+        <div className="flex items-center justify-between gap-2 mb-1">
           <div className="min-w-0">
-            <Link to="/" className="inline-flex items-center gap-2.5 sm:gap-3 group">
+            <Link to="/" className="inline-flex max-w-full items-center gap-2.5 sm:gap-3 group">
               <BrandLogo className="w-6 h-6 sm:w-7 sm:h-7 shrink-0 transition-transform duration-200 group-hover:scale-105" />
-              <h1 className="text-lg sm:text-xl font-bold leading-none tracking-tight flex items-center" style={{ color: 'var(--ps-text-primary)' }}>
+              <h1 className="text-base sm:text-xl font-bold leading-none tracking-tight flex items-center" style={{ color: 'var(--ps-text-primary)' }}>
                 <span className="truncate group-hover:opacity-80 transition-opacity ps-neon-text">Agent Skills Hub</span>
               </h1>
             </Link>
-            <p className="text-xs sm:text-sm mt-1 hidden sm:block" style={{ color: 'var(--ps-text-secondary)' }}>
+            <p className="text-xs sm:text-sm mt-1 hidden lg:block" style={{ color: 'var(--ps-text-secondary)' }}>
               {t("header.subtitle")}
             </p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               to="/about"
-              className="text-xs sm:text-sm font-medium transition-colors px-2 py-1 rounded cursor-pointer"
+              className="hidden sm:inline-flex text-sm font-medium transition-colors px-2 py-1 rounded cursor-pointer"
               style={{ color: 'var(--ps-text-secondary)' }}
               onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
               onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-secondary)'}
             >
-              {lang === "zh" ? "关于 / E-E-A-T" : "About / E-E-A-T"}
+              {lang === "zh" ? "關於" : "About"}
             </Link>
             <ThemeToggle />
             <LanguageToggle />
@@ -74,7 +74,7 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
 
         {/* Tab Navigation or Breadcrumb */}
         {showTabs && onTabChange ? (
-          <div className="-mb-3 sm:-mb-4">
+          <div className="-mb-2">
             <div className="flex items-center gap-1 pb-0" style={{ borderBottom: '1px solid var(--ps-border)' }}>
               <button
                 onClick={() => onTabChange("overview")}
@@ -152,7 +152,7 @@ export function SiteHeader({ showTabs, tab, onTabChange, breadcrumb }: Props) {
             )}
           </div>
         ) : breadcrumb && breadcrumb.length > 0 ? (
-          <div className="flex items-center gap-2 text-sm -mb-3 sm:-mb-4 pb-2" style={{ borderBottom: '1px solid var(--ps-border)' }}>
+          <div className="flex items-center gap-2 text-sm -mb-2 pb-2" style={{ borderBottom: '1px solid var(--ps-border)' }}>
             <Link to="/" className="transition-colors" style={{ color: 'var(--ps-text-muted)' }}
               onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ps-neon-cyan)'}
               onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ps-text-muted)'}

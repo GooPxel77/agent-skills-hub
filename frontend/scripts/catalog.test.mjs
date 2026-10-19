@@ -105,3 +105,40 @@ test('published catalog filters, paginates and shares one lazy download',async()
     assert.equal(calls,1);
   } finally {globalThis.fetch=realFetch;}
 });
+
+test('static pagination reaches the final record beyond page 500', async () => {
+  const ts = await import('typescript');
+  const source = readFileSync(resolve('src/api/staticCatalog.ts'), 'utf8');
+  const compiled = ts.default.transpileModule(source, { compilerOptions: { module: ts.default.ModuleKind.ESNext, target: ts.default.ScriptTarget.ES2022 } }).outputText
+    .replaceAll('import.meta.env', '({ BASE_URL: "https://paging.test/" })');
+  const module = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
+  const originalFetch = globalThis.fetch;
+  const rows = Array.from({ length: 10021 }, (_, i) => [i + 1, 100, 50]);
+  globalThis.fetch = async () => new Response(JSON.stringify({ columns: ['id', 'stars', 'score'], rows }));
+  try {
+    const query = { page_size: 20, sort_by: 'score', sort_order: 'asc' };
+    const penultimate = await module.staticSkills({ ...query, page: 501 });
+    assert.equal(penultimate.items[0].id, 10001);
+    const final = await module.staticSkills({ ...query, page: 502 });
+    assert.equal(final.total_pages, 502);
+    assert.deepEqual(final.items.map(s => s.id), [10021]);
+    const beyond = await module.staticSkills({ ...query, page: 999999 });
+    assert.equal(beyond.page, 502);
+    assert.deepEqual(beyond.items.map(s => s.id), [10021]);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test('source download never invents package or MCP installation commands', async () => {
+  const ts = await import('typescript');
+  const source = readFileSync(resolve('src/utils/installation.ts'), 'utf8').replace(/^import .*;\n/gm, '');
+  const compiled = ts.default.transpileModule(source, { compilerOptions: { module: ts.default.ModuleKind.ESNext, jsx: ts.default.JsxEmit.React } }).outputText;
+  const module = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
+  for (const language of ['Python', 'JavaScript', 'TypeScript']) {
+    const commands = module.getInstallCommands(skill(1, { repo_full_name: 'owner/not-a-published-package', language, category: 'mcp-server', platforms: '["docker","mcp"]' }));
+    assert.equal(commands.length, 1);
+    assert.equal(commands[0].command, 'git clone https://github.com/owner/not-a-published-package.git');
+  }
+  for (const repo_full_name of ['../repo', 'owner/..', 'owner/repo;echo bad', 'owner/repo extra']) {
+    assert.deepEqual(module.getInstallCommands(skill(1, { repo_full_name })), []);
+  }
+});

@@ -293,7 +293,7 @@ export function NewThisWeek({ onShowDetail }: Props) {
           <span className="text-xs text-[var(--ps-text-muted)] ml-2">
             {lang === "zh"
               ? "共抓取收录 10,000+ 个项目，每 8 小时增量清洗入库"
-              : "10,000+ skills crawled & verified, continuously refreshed"}
+              : "10,000+ indexed repositories · Automated scores, not installation verification"}
           </span>
           <button
             onClick={handleExploreMore}

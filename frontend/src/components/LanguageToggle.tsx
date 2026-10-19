@@ -5,7 +5,7 @@ export function LanguageToggle() {
   return (
     <button
       onClick={() => setLang(lang === "zh" ? "en" : "zh")}
-      className="px-2.5 py-1 text-xs rounded-full transition-all cursor-pointer"
+      className="min-w-11 min-h-11 px-2.5 py-1 text-xs rounded-full transition-all cursor-pointer"
       style={{
         border: '1px solid var(--ps-border)',
         background: 'var(--ps-bg-elevated)',

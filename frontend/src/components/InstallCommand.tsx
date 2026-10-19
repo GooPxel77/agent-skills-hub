@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { isValidRepoFullName, getInstallCommands } from "../utils/installation";
+import { useEffect, useRef, useState } from "react";
 import { useI18n } from "../i18n/I18nContext";
 import type { Skill } from "../types/skill";
 
@@ -6,140 +7,137 @@ interface Props {
   skill: Skill;
 }
 
-export function getInstallCommands(skill: Skill): { label: string; command: string; primary?: boolean }[] {
-  const commands: { label: string; command: string; primary?: boolean }[] = [];
-  const platforms = parsePlatforms(skill.platforms);
-  const category = skill.category?.toLowerCase() || "";
-  const name = skill.repo_full_name;
-
-  // Claude Code install (for claude-skill, mcp-server categories)
-  if (
-    category.includes("claude") ||
-    category.includes("mcp") ||
-    platforms.includes("claude-code") ||
-    platforms.includes("mcp")
-  ) {
-    commands.push({
-      label: "Claude Code",
-      command: `claude mcp add ${skill.repo_name} -- npx -y @anthropic-ai/mcp-remote@latest https://github.com/${name}`,
-      primary: true,
-    });
-  }
-
-  // npx for Node/TypeScript
-  if (skill.language === "TypeScript" || skill.language === "JavaScript" || platforms.includes("node")) {
-    commands.push({
-      label: "npx",
-      command: `npx ${skill.repo_name}`,
-    });
-  }
-
-  // pip for Python
-  if (skill.language === "Python" || platforms.includes("python")) {
-    commands.push({
-      label: "pip",
-      command: `pip install ${skill.repo_name}`,
-    });
-  }
-
-  // Docker
-  if (platforms.includes("docker")) {
-    commands.push({
-      label: "Docker",
-      command: `docker run ghcr.io/${name}`,
-    });
-  }
-
-  // Always add git clone as fallback
-  commands.push({
-    label: "Git Clone",
-    command: `git clone https://github.com/${name}.git`,
-  });
-
-  // Mark first as primary if none set
-  if (commands.length > 0 && !commands.some((c) => c.primary)) {
-    commands[0].primary = true;
-  }
-
-  return commands;
-}
-
-export function parsePlatforms(platforms: string): string[] {
-  try {
-    return JSON.parse(platforms || "[]");
-  } catch {
-    return [];
-  }
-}
-
 export function InstallCommand({ skill }: Props) {
-  const { t } = useI18n();
-  const commands = getInstallCommands(skill);
-  const [activeIdx, setActiveIdx] = useState(commands.findIndex((c) => c.primary) || 0);
-  const [copied, setCopied] = useState(false);
+  const { lang } = useI18n();
+  const isZh = lang === "zh";
 
-  const active = commands[activeIdx];
+  const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
+  const timerRef = useRef<number | null>(null);
+
+  useEffect(() => () => { if (timerRef.current) window.clearTimeout(timerRef.current); }, []);
+
+  const isValid = isValidRepoFullName(skill.repo_full_name);
+  const repoName = isValid ? skill.repo_full_name : "";
+  const cloneCommand = getInstallCommands(skill)[0]?.command || "";
+  const readmeUrl = isValid ? `https://github.com/${repoName}#readme` : "";
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(active.command);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback
-      const textarea = document.createElement("textarea");
-      textarea.value = active.command;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+    if (!cloneCommand) return;
+
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
+
+    let success = false;
+    try {
+      if (navigator?.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(cloneCommand);
+        success = true;
+      } else {
+        throw new Error("Clipboard API not available");
+      }
+    } catch {
+      let textarea: HTMLTextAreaElement | null = null;
+      try {
+        textarea = document.createElement("textarea");
+        textarea.value = cloneCommand;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.top = "-9999px";
+        textarea.style.left = "-9999px";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        success = document.execCommand("copy");
+      } catch {
+        success = false;
+      } finally {
+        if (textarea && textarea.parentNode) {
+          textarea.parentNode.removeChild(textarea);
+        }
+      }
+    }
+
+    setCopyStatus(success ? "success" : "error");
+    timerRef.current = window.setTimeout(() => {
+      setCopyStatus("idle");
+      timerRef.current = null;
+    }, 2500);
   };
 
-  return (
-    <div className="w-full">
-      {/* Tab selector for multiple install methods */}
-      {commands.length > 1 && (
-        <div className="flex items-center gap-1 mb-2">
-          {commands.map((cmd, i) => (
-            <button
-              key={cmd.label}
-              onClick={() => setActiveIdx(i)}
-              className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
-                i === activeIdx
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-medium"
-                  : "text-[var(--ps-text-secondary)] hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-              }`}
-            >
-              {cmd.label}
-            </button>
-          ))}
-        </div>
-      )}
+  if (!isValid) {
+    return (
+      <div className="w-full p-4 rounded-lg border border-[var(--ps-border)] bg-[var(--ps-bg-elevated)] text-[var(--ps-text-secondary)] text-sm">
+        {isZh ? "未提供有效的仓库路径。" : "No valid repository path provided."}
+      </div>
+    );
+  }
 
-      {/* Command display with copy button */}
-      <div className="flex items-center gap-2 bg-[var(--ps-bg-base)] rounded-lg pl-4 pr-2 py-2.5 group">
-        <code className="flex-1 text-sm text-green-400 font-mono truncate select-all">
-          {active.command}
-        </code>
-        <button
-          onClick={handleCopy}
-          className="shrink-0 w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-700 transition-colors text-gray-400 hover:text-white cursor-pointer"
-          aria-label={t("detail.copyCommand")}
-          title={t("detail.copyCommand")}
+  return (
+    <div className="w-full mt-6 pt-5 border-t border-[var(--ps-border)]">
+      <div className="flex items-center justify-between mb-2.5">
+        <span className="text-xs font-semibold uppercase tracking-wider text-[var(--ps-text-muted)]">
+          {isZh ? "获取源码 (Git Clone)" : "Source Code (Git Clone)"}
+        </span>
+        <a
+          href={readmeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-xs text-[var(--ps-neon-cyan)] hover:underline"
         >
-          {copied ? (
-            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+          <span>{isZh ? "官方文档与指引" : "Official Guide"}</span>
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </a>
+      </div>
+
+      <div className="flex items-center min-w-0 rounded-lg border border-[var(--ps-border)] bg-[var(--ps-bg-elevated)] p-1.5 focus-within:border-[var(--ps-border-glow)] transition-colors">
+        <span className="pl-2.5 pr-2 select-none text-xs font-mono text-[var(--ps-neon-cyan)] opacity-75">
+          $
+        </span>
+        <div className="flex-1 min-w-0 overflow-x-auto py-1 scrollbar-thin">
+          <code className="font-mono text-xs sm:text-sm whitespace-nowrap text-[var(--ps-text-primary)] select-all">
+            {cloneCommand}
+          </code>
+        </div>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="shrink-0 h-8 px-3 min-w-[70px] flex items-center justify-center gap-1.5 rounded-md border border-[var(--ps-border)] bg-[var(--ps-bg-surface)] text-xs font-medium text-[var(--ps-text-secondary)] hover:text-[var(--ps-neon-cyan)] hover:border-[var(--ps-border-glow)] transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--ps-neon-cyan)]"
+          aria-label={isZh ? "复制克隆命令" : "Copy clone command"}
+          title={isZh ? "复制克隆命令" : "Copy clone command"}
+        >
+          {copyStatus === "success" ? (
+            <>
+              <svg className="w-3.5 h-3.5 text-[var(--ps-neon-green)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-[var(--ps-neon-green)]">{isZh ? "已复制" : "Copied"}</span>
+            </>
           ) : (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
+            <>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span>{isZh ? "复制" : "Copy"}</span>
+            </>
           )}
         </button>
+      </div>
+
+      <div className="flex items-center justify-between text-[11px] text-[var(--ps-text-muted)] mt-1.5">
+        <span>
+          {isZh
+            ? "克隆命令仅下载源代码，依赖配置请以官方 README 为准"
+            : "Cloning only downloads source code; check README for requirements"}
+        </span>
+        {copyStatus === "error" && (
+          <span className="text-red-400 font-medium">
+            {isZh ? "复制失败，请手动选取" : "Copy failed"}
+          </span>
+        )}
       </div>
     </div>
   );

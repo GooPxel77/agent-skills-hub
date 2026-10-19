@@ -212,7 +212,7 @@ export function PicksSection() {
           return (
             <article
               key={pick.id}
-              className="p-5 rounded-2xl border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-strong)] hover:bg-[var(--ps-bg-card-hover)] transition-all duration-300 flex flex-col justify-between shadow-xs group"
+              className="p-5 rounded-2xl border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-border-glow)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.12)] transition-all duration-300 flex flex-col justify-between group"
             >
               <div>
                 {/* Header Row: Status Badge + Reuse Score */}
@@ -229,9 +229,9 @@ export function PicksSection() {
                     {lang === "zh" ? meta.label_zh : meta.label_en}
                   </span>
 
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--ps-neon-green)]/10 text-[var(--ps-neon-green)] border border-[var(--ps-neon-green)]/20 font-mono text-xs font-bold">
-                    <span>{pick.reuseScore}</span>
-                    <span className="text-[9px] font-sans text-[var(--ps-text-muted)]">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[var(--ps-bg-elevated)] border border-[var(--ps-border)] text-[11px] font-mono font-medium text-[var(--ps-text-secondary)]">
+                    <span className="text-[var(--ps-text-primary)] font-bold">{pick.reuseScore}</span>
+                    <span className="text-[10px] text-[var(--ps-text-muted)] font-sans">
                       {t("picks.reuseScore")}
                     </span>
                   </span>
@@ -253,10 +253,9 @@ export function PicksSection() {
                 </div>
 
                 {/* Architecture Role Badge */}
-                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--ps-bg-elevated)] border border-[var(--ps-border)] text-[10px] font-mono text-[var(--ps-text-muted)] mb-3">
-                  <span className="text-[var(--ps-neon-cyan)] font-semibold">
-                    {lang === "zh" ? pick.architecture_zh : pick.architecture_en}
-                  </span>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--ps-bg-elevated)] border border-[var(--ps-border)] text-[11px] text-[var(--ps-text-secondary)] mb-3 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--ps-neon-cyan)] opacity-70"></span>
+                  <span>{lang === "zh" ? pick.architecture_zh : pick.architecture_en}</span>
                 </div>
 
                 {/* Description */}
@@ -264,15 +263,15 @@ export function PicksSection() {
                   {lang === "zh" ? pick.description_zh : pick.description_en}
                 </p>
 
-                {/* Why This Pick (选型理由) */}
-                <div className="p-3 rounded-xl bg-[var(--ps-bg-elevated)] border-l-2 border-[var(--ps-neon-amber)] border-t border-r border-b border-[var(--ps-border)]/50 text-xs leading-relaxed mb-4">
-                  <span className="font-bold text-[var(--ps-neon-amber)] mr-1 inline-flex items-center gap-1">
-                    <RiLightbulbLine className="w-3.5 h-3.5" />
-                    <span>{t("picks.whyThisPick")}:</span>
-                  </span>
-                  <span className="text-[var(--ps-text-primary)] font-medium">
+                {/* Why This Pick (选型理由) - 优雅克制的排版，去掉刺眼的亮黄框 */}
+                <div className="p-3 rounded-xl bg-[var(--ps-bg-elevated)]/60 border border-[var(--ps-border)] text-xs leading-relaxed mb-4">
+                  <div className="flex items-center gap-1.5 text-[var(--ps-neon-cyan)] font-semibold mb-1 text-[11px]">
+                    <RiLightbulbLine className="w-3.5 h-3.5 opacity-90" />
+                    <span>{t("picks.whyThisPick")}</span>
+                  </div>
+                  <p className="text-[var(--ps-text-secondary)] leading-relaxed">
                     {lang === "zh" ? pick.whyThisPick_zh : pick.whyThisPick_en}
-                  </span>
+                  </p>
                 </div>
 
                 {/* Tags & Stars Row */}

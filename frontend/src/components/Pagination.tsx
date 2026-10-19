@@ -21,7 +21,7 @@ export function Pagination({ page, totalPages, onPageChange }: Props) {
   }
 
   return (
-    <div className="flex items-center justify-center gap-1 mt-6">
+    <div className="flex items-center justify-center flex-wrap gap-1 mt-6">
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page <= 1}
@@ -36,11 +36,12 @@ export function Pagination({ page, totalPages, onPageChange }: Props) {
         ) : (
           <button
             key={p}
+            aria-current={p === page ? "page" : undefined}
             onClick={() => onPageChange(p)}
-            className="w-9 h-9 text-sm rounded-lg transition-all cursor-pointer"
+            className="min-w-11 h-11 text-sm rounded-lg transition-all cursor-pointer"
             style={{
               background: p === page ? 'var(--ps-gradient-neon)' : 'var(--ps-bg-elevated)',
-              color: p === page ? '#0a0e1a' : 'var(--ps-text-secondary)',
+              color: p === page ? 'var(--ps-on-selected)' : 'var(--ps-text-secondary)',
               border: p === page ? 'none' : '1px solid var(--ps-border)',
               fontWeight: p === page ? 600 : 400,
             }}

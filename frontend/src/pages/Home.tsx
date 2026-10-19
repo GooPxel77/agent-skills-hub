@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { fetchSkills, fetchSkillsByIds } from "../api/client";
-import { CategoryFilter } from "../components/CategoryFilter";
 import { HeroSection } from "../components/HeroSection";
 import { LazySection } from "../components/LazySection";
 import { Pagination } from "../components/Pagination";
@@ -30,7 +29,7 @@ import { useFavorites } from "../hooks/useFavorites";
 import type { PaginatedSkills, Skill } from "../types/skill";
 
 export function Home() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const navigate = useNavigate();
   const { params, tab, setTab, updateParams, setPage } = useUrlParams();
   const { data: landingData } = useLandingData();
@@ -51,7 +50,10 @@ export function Home() {
     setError(null);
     fetchSkills(params)
       .then((result) => {
-        if (!cancelled) setData(result);
+        if (!cancelled) {
+          setData(result);
+          if (result.page !== params.page) setPage(result.page);
+        }
       })
       .catch((err) => {
         if (!cancelled) setError(err.message);
@@ -60,7 +62,7 @@ export function Home() {
         if (!cancelled) setLoading(false);
       });
     return () => { cancelled = true; };
-  }, [params, tab]);
+  }, [params, tab, setPage]);
 
   // Favorites tab data
   const { favorites } = useFavorites();
@@ -155,11 +157,12 @@ export function Home() {
 
       <SiteHeader showTabs tab={tab} onTabChange={setTab} />
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
         {/* Overview Tab */}
         {tab === "overview" && (
           <div className="animate-fade-in-up">
             {/* Hero: headline + search + trending tags + key stats */}
+            {landingData?.generated_at && <p className="mb-2 text-xs text-[var(--ps-text-secondary)]">{lang === "zh" ? "資料快照發布時間：" : "Snapshot published: "}<time dateTime={landingData.generated_at}>{new Date(landingData.generated_at).toLocaleString(lang === "zh" ? "zh-TW" : "en-US", { timeZoneName: "short" })}</time></p>}
             <HeroSection
               stats={landingData?.stats ?? stats}
               onSearch={(query) => {
@@ -228,13 +231,13 @@ export function Home() {
           <>
             {/* Top Controls */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
-              <div className="w-full sm:w-64">
+              <div className="w-full sm:flex-1 sm:max-w-xl">
                 <SearchBar
                   value={params.search || ""}
                   onChange={(search) => updateParams({ search })}
                 />
               </div>
-              <div className="flex items-center gap-3 flex-1">
+              <div className="flex items-center gap-2 sm:ml-auto">
                 <SortControls
                   sortBy={params.sort_by}
                   sortOrder={params.sort_order}
@@ -245,48 +248,21 @@ export function Home() {
               </div>
             </div>
 
-            {/* Mobile-only inline filters (hidden on lg+) */}
-            <div className="lg:hidden">
-              <div className="mb-4">
-                <CategoryFilter
-                  categories={categories}
-                  selected={params.category || ""}
-                  onSelect={(category) => updateParams({ category })}
-                />
+            <details className="lg:hidden mb-3 rounded-lg border border-[var(--ps-border)] bg-[var(--ps-bg-card)] px-3">
+              <summary className="min-h-11 flex items-center justify-between cursor-pointer text-sm font-medium text-[var(--ps-text-primary)]">
+                {lang === "zh" ? "篩選條件" : "Filters"} ({[params.category, params.platform, params.size_category, params.quality_tiers, params.min_stars].filter(Boolean).length})
+              <span aria-hidden="true" className="text-[var(--ps-text-muted)]">⌄</span></summary>
+              <div className="pb-3"><FilterSidebar params={params} onUpdate={updateParams} categories={categories} /></div>
+            </details>
+            {[params.category, params.platform, params.size_category, params.quality_tiers, params.min_stars].some(Boolean) && (
+              <div className="flex flex-wrap items-center gap-2 mb-4 text-sm text-[var(--ps-text-secondary)]" aria-live="polite">
+                {[params.category, params.platform, params.size_category, params.quality_tiers, params.min_stars ? `${params.min_stars}+ ★` : undefined].filter(Boolean).map(value => <span key={String(value)} className="px-3 py-1 rounded-full bg-[var(--ps-bg-elevated)]">{value}</span>)}
+                <button className="ps-btn" onClick={() => updateParams({category:undefined,platform:undefined,size_category:undefined,quality_tiers:undefined,min_stars:undefined})}>{lang === "zh" ? "清除全部" : "Clear all"}</button>
               </div>
-              <div className="flex flex-wrap items-center gap-2 mb-6">
-                <span className="text-xs text-[var(--ps-text-muted)]">{t("explore.size")}</span>
-                {["micro", "small", "medium", "large"].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => updateParams({ size_category: params.size_category === s ? undefined : s })}
-                    className={`px-2.5 py-1 text-xs rounded-full border transition-colors cursor-pointer ${params.size_category === s
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-[var(--ps-bg-card)] text-[var(--ps-text-secondary)] border-[var(--ps-border)] hover:border-blue-300"
-                      }`}
-                  >
-                    {s.charAt(0).toUpperCase() + s.slice(1)}
-                  </button>
-                ))}
-                <span className="text-xs text-[var(--ps-text-muted)] mx-1">|</span>
-                <span className="text-xs text-[var(--ps-text-muted)]">{t("explore.platform")}</span>
-                {["python", "node", "go", "docker", "claude", "mcp"].map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => updateParams({ platform: params.platform === p ? undefined : p })}
-                    className={`px-2.5 py-1 text-xs rounded-full border transition-colors cursor-pointer ${params.platform === p
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-[var(--ps-bg-card)] text-[var(--ps-text-secondary)] border-[var(--ps-border)] hover:border-blue-300"
-                      }`}
-                  >
-                    {p.charAt(0).toUpperCase() + p.slice(1)}
-                  </button>
-                ))}
-              </div>
-            </div>
+            )}
 
             {/* Desktop: Sidebar + Content */}
-            <div className="flex gap-6">
+            <div className="flex gap-5">
               {/* Sidebar — desktop only */}
               <div className="hidden lg:block">
                 <FilterSidebar
@@ -317,7 +293,7 @@ export function Home() {
                       {data.total.toLocaleString()} {t("explore.skills")}
                     </div>
                     {view === "card" ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 stagger-children">
+                      <div className="grid grid-cols-1 min-[680px]:grid-cols-2 xl:grid-cols-3 gap-4 stagger-children">
                         {data.items.map((skill) => (
                           <SkillCard key={skill.id} skill={skill} onSelect={handleOpenRepo} onShowDetail={handleShowDetail} />
                         ))}
@@ -352,7 +328,7 @@ export function Home() {
         {tab === "favorites" && (
           <>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-              <div className="w-full sm:w-64">
+              <div className="w-full sm:flex-1 sm:max-w-xl">
                 <SearchBar
                   value={params.search || ""}
                   onChange={(search) => updateParams({ search })}
@@ -381,7 +357,7 @@ export function Home() {
                     <span>{favData.length} {t("explore.skills")} in Favorites</span>
                   </div>
                   {view === "card" ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 stagger-children">
+                    <div className="grid grid-cols-1 min-[680px]:grid-cols-2 xl:grid-cols-3 gap-4 stagger-children">
                       {favData.map((skill) => (
                         <SkillCard key={skill.id} skill={skill} onSelect={handleOpenRepo} onShowDetail={handleShowDetail} />
                       ))}

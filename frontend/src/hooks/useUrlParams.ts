@@ -5,7 +5,7 @@ import type { SkillsQueryParams } from "../types/skill";
 const DEFAULT_PARAMS: SkillsQueryParams = {
   page: 1,
   page_size: 20,
-  sort_by: "score",
+  sort_by: "stars",
   sort_order: "desc",
 };
 
@@ -18,10 +18,10 @@ export function useUrlParams() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const params: SkillsQueryParams = useMemo(() => {
-    const page = Math.min(500, Math.max(1, Math.trunc(Number(searchParams.get("page"))) || 1));
+    const page = Math.min(Number.MAX_SAFE_INTEGER, Math.max(1, Math.trunc(Number(searchParams.get("page"))) || 1));
     const page_size = Math.min(50, Math.max(1, Math.trunc(Number(searchParams.get("page_size"))) || 20));
-    const rawSort = searchParams.get("sort_by") || "score";
-    const sort_by = (["score","stars","last_commit_at","created_at","quality_score","star_momentum"].includes(rawSort) ? rawSort : "score") as SkillsQueryParams["sort_by"];
+    const rawSort = searchParams.get("sort_by") || DEFAULT_PARAMS.sort_by;
+    const sort_by = (["score","stars","last_commit_at","created_at","quality_score","star_momentum"].includes(rawSort) ? rawSort : DEFAULT_PARAMS.sort_by) as SkillsQueryParams["sort_by"];
     const sort_order = searchParams.get("sort_order") === "asc" ? "asc" : "desc";
     const search = searchParams.get("search")?.slice(0,100) || undefined;
     const category = searchParams.get("category") || undefined;
@@ -93,7 +93,7 @@ export function useUrlParams() {
           next.set("page", String(page));
         }
         return next;
-      }, { replace: true });
+      }, { replace: false });
     },
     [setSearchParams],
   );

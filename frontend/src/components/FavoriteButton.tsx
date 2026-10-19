@@ -9,7 +9,7 @@ interface Props {
 export function FavoriteButton({ skillId, size = "md" }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const active = isFavorite(skillId);
-  const sz = size === "sm" ? "w-7 h-7 rounded" : "w-9 h-9 rounded-lg";
+  const sz = size === "sm" ? "w-11 h-11 rounded" : "w-11 h-11 rounded-lg";
   const iconSz = size === "sm" ? "w-4 h-4" : "w-5 h-5";
 
   return (
@@ -28,6 +28,7 @@ export function FavoriteButton({ skillId, size = "md" }: Props) {
             : "bg-[var(--ps-bg-elevated)] text-[var(--ps-text-secondary)] border-[var(--ps-border)] hover:border-[var(--ps-border-glow)] hover:text-[var(--ps-text-primary)]"
         }
       `}
+      aria-pressed={active}
       aria-label={active ? "Remove from favorites" : "Add to favorites"}
       title={active ? "Remove from favorites" : "Add to favorites"}
     >

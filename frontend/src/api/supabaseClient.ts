@@ -86,7 +86,7 @@ export async function sbFetchSkills(params: SkillsQueryParams, source: "v_curate
   }
 
   const ascending = params.sort_order === "asc";
-  const sort = ["score","stars","last_commit_at","created_at","quality_score","star_momentum"].includes(params.sort_by) ? params.sort_by : "score";
+  const sort = ["score","stars","last_commit_at","created_at","quality_score","star_momentum"].includes(params.sort_by) ? params.sort_by : "stars";
   query = query.order(sort, { ascending, nullsFirst: false }).order("id", { ascending });
 
   const pageSize = Math.min(50, Math.max(1, Math.trunc(params.page_size) || 20));

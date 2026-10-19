@@ -260,7 +260,7 @@ body::before {
 .ps-btn-primary {
   background: var(--ps-gradient-neon);
   border: none;
-  color: #0a0e1a;
+  color: var(--ps-on-selected);
   font-weight: 600;
 }
 
@@ -563,3 +563,14 @@ body::before {
 html[data-theme="dark"] { color-scheme: dark; }
 html[data-theme="light"] { color-scheme: light; }
 select option { background: var(--ps-bg-base); color: var(--ps-text-primary); }
+
+/* Shared interaction states for both themes. */
+:root, [data-theme="dark"] { --ps-on-selected: #0a0e1a; }
+[data-theme="light"] { --ps-on-selected: #fff; }
+:where(a, button, input, select, summary):focus-visible {
+  outline: 2px solid var(--ps-neon-cyan); outline-offset: 3px;
+}
+.ps-btn { min-height: 44px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

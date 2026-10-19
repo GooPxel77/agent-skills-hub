@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { fetchSkillDetail, fetchSkillBySlug } from "../api/client";
 import { useI18n } from "../i18n/I18nContext";
 import { QualityRadar } from "../components/QualityRadar";
-import { ScoreBadge } from "../components/ScoreBadge";
 import { ProjectTypeBadge } from "../components/ProjectTypeBadge";
 import { PlatformBadges } from "../components/PlatformBadges";
 import { SizeBadge } from "../components/SizeBadge";
+import { explainCompatibility } from "../utils/compatibility";
 import { InstallCommand } from "../components/InstallCommand";
 import { FavoriteButton } from "../components/FavoriteButton";
 import { SiteHeader } from "../components/SiteHeader";
@@ -15,9 +15,8 @@ import { SiteFooter } from "../components/SiteFooter";
 import type { SkillDetail } from "../types/skill";
 
 export function SkillDetailPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { id, owner, repo } = useParams<{ id?: string; owner?: string; repo?: string }>();
-  const navigate = useNavigate();
   const [detail, setDetail] = useState<SkillDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,12 +46,6 @@ export function SkillDetailPage() {
       .finally(() => setLoading(false));
   }, [id, owner, repo]);
 
-  const handleNavigateSkill = useCallback(
-    (skillId: number) => {
-      navigate(`/skill/${skillId}`);
-    },
-    [navigate],
-  );
 
   if (loading) {
     return (
@@ -127,73 +120,83 @@ export function SkillDetailPage() {
       <SiteHeader breadcrumb={[{ label: detail.repo_name }]} />
 
       <main className="max-w-4xl mx-auto px-4 py-6">
-        {/* Hero Section */}
+        {/* Hero Section - Clean Single Column Natural Flow */}
         <div className="bg-[var(--ps-bg-card)] rounded-[var(--ps-radius-card)] border border-[var(--ps-border)] p-6 mb-6">
-          <div className="flex items-start gap-4">
-            <ScoreBadge score={detail.score} size="lg" showTier />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <img src={detail.author_avatar_url} alt="" className="w-6 h-6 rounded-full" />
-                <a
-                  href={`https://github.com/${detail.author_name}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[var(--ps-text-secondary)] hover:text-[var(--ps-neon-cyan)] transition-colors"
-                >
-                  {detail.author_name}
-                </a>
-                <div className="ml-auto">
-                  <FavoriteButton skillId={detail.id} />
-                </div>
-              </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-[var(--ps-text-primary)] mb-2">{detail.repo_name}</h1>
-              {detail.description && (
-                <p className="text-sm text-[var(--ps-text-secondary)] leading-relaxed mb-4">{detail.description}</p>
-              )}
-
-              {/* Metadata badges */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="px-2.5 py-1 text-xs rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800">
-                  {detail.category}
-                </span>
-                <ProjectTypeBadge type={detail.project_type} />
-                {detail.language && (
-                  <span className="px-2.5 py-1 text-xs rounded-full bg-[var(--ps-bg-elevated)] text-[var(--ps-text-secondary)] border border-[var(--ps-border)]">
-                    {detail.language}
-                  </span>
-                )}
-                {detail.size_category && detail.size_category !== "unknown" && (
-                  <SizeBadge sizeCategory={detail.size_category} sizeKb={detail.repo_size_kb} />
-                )}
-                {detail.license && (
-                  <span className="px-2.5 py-1 text-xs rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800">
-                    {detail.license}
-                  </span>
-                )}
-              </div>
-
-              {/* Platforms */}
-              {detail.platforms && detail.platforms !== "[]" && (
-                <PlatformBadges platforms={detail.platforms} max={8} />
-              )}
+          {/* Author Row + Favorite CTA */}
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <img
+                src={detail.author_avatar_url}
+                alt={detail.author_name}
+                className="w-6 h-6 rounded-full border border-[var(--ps-border)] shrink-0"
+              />
+              <a
+                href={`https://github.com/${detail.author_name}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-[var(--ps-text-secondary)] hover:text-[var(--ps-neon-cyan)] transition-colors truncate"
+              >
+                {detail.author_name}
+              </a>
+            </div>
+            <div className="shrink-0">
+              <FavoriteButton skillId={detail.id} />
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="mt-5 flex flex-wrap gap-3">
+          {/* Title */}
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--ps-text-primary)] mb-2">
+            {detail.repo_name}
+          </h1>
+
+          {/* Description */}
+          {detail.description && (
+            <p className="text-sm sm:text-base text-[var(--ps-text-secondary)] leading-relaxed mb-4">
+              {detail.description}
+            </p>
+          )}
+
+          {/* Metadata Badges */}
+          <div className="flex flex-wrap gap-2 mb-5">
+            <span className="px-2.5 py-1 text-xs rounded-full bg-[rgba(0,240,255,0.08)] text-[var(--ps-neon-cyan)] border border-[rgba(0,240,255,0.25)] font-medium">
+              {detail.category}
+            </span>
+            <ProjectTypeBadge type={detail.project_type} />
+            {detail.language && (
+              <span className="px-2.5 py-1 text-xs rounded-full bg-[var(--ps-bg-elevated)] text-[var(--ps-text-secondary)] border border-[var(--ps-border)]">
+                {detail.language}
+              </span>
+            )}
+            {detail.size_category && detail.size_category !== "unknown" && (
+              <SizeBadge sizeCategory={detail.size_category} sizeKb={detail.repo_size_kb} />
+            )}
+            {detail.license && (
+              <span className="px-2.5 py-1 text-xs rounded-full bg-[rgba(34,197,94,0.08)] text-[var(--ps-neon-green)] border border-[rgba(34,197,94,0.25)]">
+                {detail.license}
+              </span>
+            )}
+            {detail.platforms && detail.platforms !== "[]" && (
+              <PlatformBadges platforms={detail.platforms} max={8} />
+            )}
+          </div>
+
+          {/* Primary Action Button (View on GitHub) */}
+          <div className="flex items-center gap-3">
             <a
               href={detail.repo_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 ps-btn ps-btn-primary rounded-lg  transition-colors font-medium text-sm cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 ps-btn ps-btn-primary rounded-lg transition-colors font-medium text-sm cursor-pointer shadow-sm hover:shadow-[0_0_15px_rgba(0,240,255,0.2)]"
             >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
               </svg>
               {t("detail.viewOnGitHub")}
             </a>
-            <InstallCommand skill={detail} />
           </div>
+
+          {/* Quick Install / Git Clone Terminal Box */}
+          <InstallCommand skill={detail} />
         </div>
 
         {/* Stats + Quality Grid */}
@@ -273,24 +276,24 @@ export function SkillDetailPage() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {detail.compatible_skills.map((cs) => (
-                <div
+                <Link
                   key={cs.skill_id}
-                  onClick={() => handleNavigateSkill(cs.skill_id)}
+                  to={`/skill/${cs.skill_id}`}
                   className="flex items-center gap-3 p-3 bg-[var(--ps-bg-elevated)] rounded-lg cursor-pointer hover:bg-[rgba(0,240,255,0.04)] transition-colors"
                 >
                   <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-bold shrink-0">
                     {cs.skill_score.toFixed(0)}
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="w-full flex-1 min-w-0">
                     <span className="text-sm font-medium text-[var(--ps-text-primary)] block truncate">
                       {cs.skill_name}
                     </span>
-                    <span className="text-xs text-[var(--ps-text-muted)] block truncate">{cs.reason}</span>
+                    <span className="text-xs text-[var(--ps-text-muted)] block">{explainCompatibility(cs.reason, lang === "zh")}</span>
                   </div>
                   <span className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">
-                    {(cs.compatibility_score * 100).toFixed(0)}%
+                    {lang === "zh" ? "估算 " : "Est. "}{(cs.compatibility_score * 100).toFixed(0)}%
                   </span>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

@@ -38,7 +38,7 @@ export function FilterSidebar({ params, onUpdate, categories }: Props) {
   };
 
   return (
-    <aside className="w-56 shrink-0 space-y-5">
+    <aside className="w-full lg:w-56 shrink-0 space-y-5">
       {/* Quality Grade */}
       <div>
         <h4 className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: 'var(--ps-neon-cyan)' }}>
@@ -48,7 +48,7 @@ export function FilterSidebar({ params, onUpdate, categories }: Props) {
           {TIERS.map((tier, i) => (
             <label
               key={tier}
-              className="flex items-center gap-2 py-1 px-2 rounded-md cursor-pointer transition-colors"
+              className="flex items-center gap-2 min-h-11 py-1 px-2 rounded-md cursor-pointer transition-colors"
               style={{ color: 'var(--ps-text-secondary)' }}
               onMouseEnter={(e) => e.currentTarget.style.background = 'var(--ps-bg-elevated)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
@@ -85,7 +85,7 @@ export function FilterSidebar({ params, onUpdate, categories }: Props) {
                 padding: '4px 12px',
                 fontSize: '12px',
                 background: params.min_stars === value ? 'var(--ps-gradient-neon)' : 'var(--ps-bg-elevated)',
-                color: params.min_stars === value ? '#0a0e1a' : 'var(--ps-text-secondary)',
+                color: params.min_stars === value ? 'var(--ps-on-selected)' : 'var(--ps-text-secondary)',
                 border: params.min_stars === value ? 'none' : '1px solid var(--ps-border)',
                 fontWeight: params.min_stars === value ? 600 : 400,
               }}
@@ -146,7 +146,7 @@ export function FilterSidebar({ params, onUpdate, categories }: Props) {
                 padding: '4px 12px',
                 fontSize: '12px',
                 background: params.size_category === s ? 'var(--ps-gradient-neon)' : 'var(--ps-bg-elevated)',
-                color: params.size_category === s ? '#0a0e1a' : 'var(--ps-text-secondary)',
+                color: params.size_category === s ? 'var(--ps-on-selected)' : 'var(--ps-text-secondary)',
                 border: params.size_category === s ? 'none' : '1px solid var(--ps-border)',
                 fontWeight: params.size_category === s ? 600 : 400,
               }}
@@ -172,7 +172,7 @@ export function FilterSidebar({ params, onUpdate, categories }: Props) {
                 padding: '4px 12px',
                 fontSize: '12px',
                 background: params.platform === p ? 'var(--ps-gradient-neon)' : 'var(--ps-bg-elevated)',
-                color: params.platform === p ? '#0a0e1a' : 'var(--ps-text-secondary)',
+                color: params.platform === p ? 'var(--ps-on-selected)' : 'var(--ps-text-secondary)',
                 border: params.platform === p ? 'none' : '1px solid var(--ps-border)',
                 fontWeight: params.platform === p ? 600 : 400,
               }}

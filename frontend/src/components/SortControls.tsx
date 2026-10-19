@@ -15,10 +15,11 @@ export function SortControls({
   onSortByChange,
   onSortOrderChange,
 }: Props) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   return (
     <div className="flex items-center gap-2">
       <select
+        aria-label={lang === "zh" ? "排序方式" : "Sort by"}
         value={sortBy}
         onChange={(e) =>
           onSortByChange(e.target.value as SkillsQueryParams["sort_by"])
@@ -26,8 +27,8 @@ export function SortControls({
         className="ps-input cursor-pointer"
         style={{ padding: "8px 12px", width: "auto" }}
       >
-        <option value="score">Score</option>
-        <option value="stars">Stars</option>
+        <option value="stars">{lang === "zh" ? "GitHub 星標" : "GitHub Stars"}</option>
+        <option value="score">{lang === "zh" ? "綜合評分" : "Score"}</option>
         <option value="quality_score">{t("sort.qualityScore")}</option>
         <option value="star_momentum">{t("sort.momentum")}</option>
         <option value="last_commit_at">Last Updated</option>

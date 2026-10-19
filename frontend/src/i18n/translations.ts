@@ -286,12 +286,12 @@ export const translations = {
     "chart.skills": "技能数",
 
     // Live Data Stream & New This Week
-    "dataStream.title": "流动资产数据流",
-    "dataStream.subtitle": "每 8 小时动态抓取与评分，掌握 Agent 资产全网最新风向",
+    "dataStream.title": "技能更新",
+    "dataStream.subtitle": "GitHub 探索与自动评分快照，每 8 小时安排更新",
     "dataStream.tabNew": "本周最新",
     "dataStream.tabTrending": "热门飙升",
     "dataStream.tabMostStars": "Stars 排行",
-    "dataStream.liveSync": "滚动数据流 · 每 8h 自动更新",
+    "dataStream.liveSync": "数据快照 · 每 8h 安排更新",
     "dataStream.viewAllInExplore": "进入 Explorer 查看全部流动资产 →",
     "dataStream.starVelocity": "增速",
     "newThisWeek.title": "本周新增",
@@ -600,12 +600,12 @@ export const translations = {
     "hero.step3Desc": "Copy config to integrate with Cursor / Claude",
 
     // Live Data Stream & New This Week
-    "dataStream.title": "Live Skill Stream",
-    "dataStream.subtitle": "Auto-crawled & scored every 8h, tracking real-time trends in the AI agent ecosystem",
+    "dataStream.title": "Skill Updates",
+    "dataStream.subtitle": "Published snapshots of GitHub discovery and automated scoring; refresh scheduled every 8h",
     "dataStream.tabNew": "New This Week",
     "dataStream.tabTrending": "Trending",
     "dataStream.tabMostStars": "Most Stars",
-    "dataStream.liveSync": "Live Stream · Auto-synced every 8h",
+    "dataStream.liveSync": "Snapshot · Scheduled every 8h",
     "dataStream.viewAllInExplore": "View full dynamic stream in Explorer →",
     "dataStream.starVelocity": "Velocity",
     "newThisWeek.title": "New This Week",

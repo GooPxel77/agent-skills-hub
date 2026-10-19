@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   RiSearch2Line,
@@ -42,6 +42,8 @@ export function SearchBar({ value, onChange }: Props) {
   const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listId = useId();
+  const searchRevision = useRef(0);
 
   useEffect(() => {
     setLocal(value);
@@ -70,6 +72,7 @@ export function SearchBar({ value, onChange }: Props) {
 
   const doQuickSearch = useCallback((query: string) => {
     clearTimeout(searchTimer.current);
+    const revision = ++searchRevision.current;
     if (!query.trim()) {
       setResults([]);
       setSearching(false);
@@ -79,10 +82,12 @@ export function SearchBar({ value, onChange }: Props) {
     searchTimer.current = setTimeout(() => {
       fetchQuickSearch(query, 6)
         .then((items) => {
+          if (revision !== searchRevision.current) return;
           setResults(items);
           setSearching(false);
         })
         .catch(() => {
+          if (revision !== searchRevision.current) return;
           setSearching(false);
         });
     }, 200);
@@ -98,6 +103,9 @@ export function SearchBar({ value, onChange }: Props) {
   };
 
   const handleClear = () => {
+    clearTimeout(searchTimer.current);
+    searchRevision.current++;
+    setSearching(false);
     setLocal("");
     setResults([]);
     setShowDropdown(false);
@@ -106,6 +114,7 @@ export function SearchBar({ value, onChange }: Props) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") { setShowDropdown(false); return; }
     if (!showDropdown || results.length === 0) {
       if (e.key === "Enter") {
         setShowDropdown(false);
@@ -167,8 +176,10 @@ export function SearchBar({ value, onChange }: Props) {
         onFocus={handleFocus}
         placeholder={t("explore.search")}
         aria-label="Search skills"
-        className="w-full bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.04)] text-[var(--ps-text-primary)] border border-[rgba(255,255,255,0.08)] focus:border-[var(--ps-neon-cyan)]/40 focus:bg-[rgba(255,255,255,0.03)] focus:ring-1 focus:ring-[var(--ps-neon-cyan)]/10 transition-all duration-300 outline-none rounded-xl text-sm"
-        style={{ paddingLeft: "40px", paddingRight: "36px", height: "40px" }}
+            role="combobox" aria-autocomplete="list" aria-expanded={showDropdown && results.length > 0} aria-controls={showDropdown && results.length > 0 ? listId : undefined}
+            aria-activedescendant={showDropdown && activeIdx >= 0 && results[activeIdx] ? `${listId}-${results[activeIdx].id}` : undefined}
+        className="w-full bg-[var(--ps-bg-input)] hover:bg-[rgba(255,255,255,0.04)] text-[var(--ps-text-primary)] border border-[var(--ps-border)] focus:border-[var(--ps-neon-cyan)]/40 focus:bg-[var(--ps-bg-input)] focus:ring-1 focus:ring-[var(--ps-neon-cyan)]/10 transition-all duration-300 outline-none rounded-xl text-sm"
+        style={{ paddingLeft: "40px", paddingRight: "36px", height: "44px" }}
       />
       {local && (
         <button
@@ -190,11 +201,11 @@ export function SearchBar({ value, onChange }: Props) {
       {/* Dropdown */}
       {showDropdown && (
         <div
-          className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-[rgba(255,255,255,0.08)] overflow-hidden z-[100]"
+          className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-[var(--ps-border)] overflow-hidden z-[100]"
           style={{
             boxShadow:
               "0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.03)",
-            background: "rgba(10, 10, 12, 0.95)",
+            background: "var(--ps-bg-surface)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
           }}
@@ -234,7 +245,7 @@ export function SearchBar({ value, onChange }: Props) {
                   <button
                     key={query}
                     onClick={() => handleHotKeyword(query)}
-                    className="px-2 py-0.5 rounded text-[10px] border border-[rgba(255,255,255,0.08)] text-[var(--ps-text-secondary)] hover:text-[var(--ps-text-primary)] hover:border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.02)] cursor-pointer flex items-center gap-1 transition-colors"
+                    className="px-2 py-0.5 rounded text-[10px] border border-[var(--ps-border)] text-[var(--ps-text-secondary)] hover:text-[var(--ps-text-primary)] hover:border-[rgba(255,255,255,0.2)] bg-[var(--ps-bg-input)] cursor-pointer flex items-center gap-1 transition-colors"
                   >
                     <RiTimeLine className="w-2.5 h-2.5" />
                     {query}
@@ -285,13 +296,14 @@ export function SearchBar({ value, onChange }: Props) {
 
           {/* Results */}
           {!searching && results.length > 0 && (
-            <div className="max-h-72 overflow-y-auto">
+            <div id={listId} role="listbox" aria-label="Search suggestions" className="max-h-72 overflow-y-auto">
               {results.map((skill, i) => {
                 const isHighValue = skill.stars >= 200 || skill.score >= 80;
                 const isVerified = skill.quality_score >= 70;
                 return (
                   <div
                     key={skill.id}
+                    id={`${listId}-${skill.id}`} role="option" aria-selected={i === activeIdx}
                     onClick={() => {
                       navigate(`/skill/${skill.repo_full_name}`);
                       setShowDropdown(false);
@@ -311,7 +323,7 @@ export function SearchBar({ value, onChange }: Props) {
                       alt=""
                       width={28}
                       height={28}
-                      className="w-7 h-7 rounded-full shrink-0 border border-[rgba(255,255,255,0.1)]"
+                      className="w-7 h-7 rounded-full shrink-0 border border-[var(--ps-border)]"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -351,7 +363,7 @@ export function SearchBar({ value, onChange }: Props) {
                         </span>
                       ) : isVerified ? (
                         <span className="text-[9px] px-1 py-0.2 rounded border border-[var(--ps-neon-green)]/20 text-[var(--ps-neon-green)] bg-[var(--ps-neon-green)]/5 shrink-0 font-medium">
-                          Verified
+                          Auto-scored
                         </span>
                       ) : null}
                     </div>
