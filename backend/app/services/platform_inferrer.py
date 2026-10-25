@@ -71,12 +71,8 @@ class PlatformInferrer:
             return 0
         from datetime import datetime, timezone, timedelta
         from sqlalchemy import or_, and_
-        from sqlalchemy.orm import load_only
 
-        query = db.query(Skill).options(load_only(
-            Skill.id, Skill.language, Skill.topics, Skill.description,
-            Skill.repo_name, Skill.platforms, Skill.readme_content, raiseload=True
-        ))
+        query = db.query(Skill)
         if changed_ids is not None:
             query = query.filter(Skill.id.in_(changed_ids))
         else:

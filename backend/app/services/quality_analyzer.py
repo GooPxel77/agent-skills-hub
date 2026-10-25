@@ -36,15 +36,8 @@ class QualityAnalyzer:
             return 0
         from datetime import datetime, timezone, timedelta
         from sqlalchemy import or_, and_
-        from sqlalchemy.orm import load_only
 
-        query = db.query(Skill).options(load_only(
-            Skill.id, Skill.stars, Skill.readme_content, Skill.description, Skill.license,
-            Skill.topics, Skill.repo_name, Skill.language, Skill.category, Skill.total_commits,
-            Skill.quality_completeness, Skill.quality_clarity, Skill.quality_specificity,
-            Skill.quality_examples, Skill.readme_structure_score, Skill.quality_agent_readiness,
-            Skill.quality_score, raiseload=True
-        ))
+        query = db.query(Skill)
         if changed_ids is not None:
             query = query.filter(Skill.id.in_(changed_ids))
         else:
