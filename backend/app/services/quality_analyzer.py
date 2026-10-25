@@ -34,9 +34,27 @@ class QualityAnalyzer:
     def analyze_all(self, db: Session, changed_ids: set[int] | None = None) -> int:
         if changed_ids is not None and not changed_ids:
             return 0
-        query = db.query(Skill)
+        from datetime import datetime, timezone, timedelta
+        from sqlalchemy import or_, and_
+        from sqlalchemy.orm import load_only
+
+        query = db.query(Skill).options(load_only(
+            Skill.id, Skill.stars, Skill.readme_content, Skill.description, Skill.license,
+            Skill.topics, Skill.repo_name, Skill.language, Skill.category, Skill.total_commits,
+            Skill.quality_completeness, Skill.quality_clarity, Skill.quality_specificity,
+            Skill.quality_examples, Skill.readme_structure_score, Skill.quality_agent_readiness,
+            Skill.quality_score, raiseload=True
+        ))
         if changed_ids is not None:
             query = query.filter(Skill.id.in_(changed_ids))
+        else:
+            since_30d = datetime.now(timezone.utc) - timedelta(days=30)
+            candidate_filter = or_(
+                Skill.stars >= 20,
+                and_(Skill.stars >= 5, or_(Skill.last_commit_at >= since_30d, Skill.category != "uncategorized"))
+            )
+            query = query.filter(candidate_filter)
+
         skills = query.all()
         for skill in skills:
             self._analyze(skill)

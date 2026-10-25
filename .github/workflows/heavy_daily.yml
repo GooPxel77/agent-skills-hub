@@ -2,7 +2,7 @@ name: Daily Heavy Compute
 
 on:
   schedule:
-    - cron: '30 2 * * *'  # Run every day at 02:30 UTC
+    - cron: '0 5 * * *'  # Run every day at 05:00 UTC (after sync completes)
   workflow_dispatch:
     inputs:
       limit:

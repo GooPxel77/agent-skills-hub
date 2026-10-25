@@ -89,26 +89,40 @@ if (process.env.CATALOG_REUSE_SNAPSHOT === '1') {
   if ([...liveIds].some(id => !byId.has(id))) throw new Error('Catalog changed during export; retry');
   const skills = [...byId.values()].filter(row => liveIds.has(row.id)).sort((a,b) => a.id-b.id);
   if (!skills.length) throw new Error('Empty export; keeping previous published site');
-  const compositions=[];
-  let compCursor=0;
-  while (true) {
-    const page=await query('v_skill_composition_export',{
-      select:'id,skill_id,compatible_skill_id,compatibility_score,reason',
-      id:`gt.${compCursor}`,order:'id.asc',limit:'1000'
-    });
-    if (!page.length) break;
-    if (page.some(row => !Number.isSafeInteger(row.id) || row.id <= compCursor)) throw new Error('Invalid composition cursor');
-    compositions.push(...page.filter(row => liveIds.has(row.skill_id) && liveIds.has(row.compatible_skill_id)));
-    compCursor=page.at(-1).id;
-    if (page.length < 1000) break;
+  let compositions = [];
+  if (incremental && fetched === 0 && Array.isArray(previous?.compositions) && previous.compositions.length > 0) {
+    compositions = previous.compositions.filter(row => liveIds.has(row.skill_id) && liveIds.has(row.compatible_skill_id));
+    console.log(`Reused ${compositions.length} compositions from previous snapshot (no changed skills)`);
+  } else {
+    let compCursor = 0;
+    while (true) {
+      const page = await query('v_skill_composition_export', {
+        select: 'id,skill_id,compatible_skill_id,compatibility_score,reason',
+        id: `gt.${compCursor}`, order: 'id.asc', limit: '1000'
+      });
+      if (!page.length) break;
+      if (page.some(row => !Number.isSafeInteger(row.id) || row.id <= compCursor)) throw new Error('Invalid composition cursor');
+      compositions.push(...page.filter(row => liveIds.has(row.skill_id) && liveIds.has(row.compatible_skill_id)));
+      compCursor = page.at(-1).id;
+      if (page.length < 1000) break;
+    }
   }
   const [masters, orgs, weeks] = await Promise.all([
     query('rpc/get_masters', {}, {}), query('rpc/get_org_builders', {}, {}), query('rpc/get_trending_weeks', {}, {})
   ]);
+  const today = new Date();
+  const day = today.getUTCDay() || 7;
+  const currentWeekDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - day + 1));
+  const currentWeekStart = currentWeekDate.toISOString().slice(0, 10);
+
   const history = {};
   for (const week of weeks) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(week.week_start)) throw new Error('Invalid history date');
-    history[week.week_start] = await query('rpc/get_trending_history', {}, {p_week_start:week.week_start});
+    if (incremental && week.week_start !== currentWeekStart && Array.isArray(previous?.history?.[week.week_start]) && previous.history[week.week_start].length > 0) {
+      history[week.week_start] = previous.history[week.week_start];
+    } else {
+      history[week.week_start] = await query('rpc/get_trending_history', {}, {p_week_start:week.week_start});
+    }
   }
   const endRevision = await query('sync_logs', { select:'id,status,started_at,finished_at', order:'started_at.desc', limit:'1' });
   if (JSON.stringify(revision) !== JSON.stringify(endRevision)) throw new Error('Catalog changed during export; retry after sync');

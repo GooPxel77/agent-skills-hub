@@ -323,7 +323,6 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
 
     try:
         all_repos: dict[str, dict] = {}
-        owner_cache: dict[str, int] = {}
 
         # ── Incremental sync: determine pushed:> filter ──
         pushed_filter = ""
@@ -479,50 +478,14 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
             logger.info("Phase 3 complete: %d unique repos total", len(all_repos))
 
             # ═══════════════════════════════════════════════════════
-            # Phase 4: Enrich with owner followers
+            # Phase 4: Basic repo metrics enrichment (owner followers query removed)
             # ═══════════════════════════════════════════════════════
-            if not only_extra_repos:
-                try:
-                    existing_skills = db.query(Skill.author_name, Skill.author_followers).all()
-                    for name, followers in existing_skills:
-                        if name and name not in owner_cache:
-                            owner_cache[name] = followers or 0
-                    if owner_cache:
-                        logger.info("Pre-loaded %d owner followers from DB cache", len(owner_cache))
-                except Exception:
-                    pass
+            for fn, repo in all_repos.items():
+                repo["_owner_followers"] = 0
+                repo["_total_issues"] = repo.get("open_issues_count", 0) + repo.get("_closed_issues", 0)
+                repo["_total_commits"] = repo.get("_total_commits", 0)
 
-                # Check budget before enrichment
-                await _ensure_rate_limit(client, min_remaining=100)
-
-                enriched_count = 0
-                skipped_enrichment = 0
-                ENRICHMENT_BUDGET = 500  # Max API calls for enrichment per sync
-                for fn, repo in all_repos.items():
-                    owner_login = repo.get("owner", {}).get("login", "")
-                    if owner_login and owner_login not in owner_cache:
-                        if enriched_count >= ENRICHMENT_BUDGET:
-                            owner_cache[owner_login] = 0
-                            skipped_enrichment += 1
-                        else:
-                            try:
-                                user_data = await _github_request(
-                                    client, f"https://api.github.com/users/{owner_login}"
-                                )
-                                owner_cache[owner_login] = user_data.get("followers", 0)
-                                enriched_count += 1
-                                await asyncio.sleep(0.3)
-                            except Exception:
-                                owner_cache[owner_login] = 0
-                                skipped_enrichment += 1
-                    repo["_owner_followers"] = owner_cache.get(owner_login, 0)
-                    repo["_total_issues"] = repo.get("open_issues_count", 0) + repo.get("_closed_issues", 0)
-                    repo["_total_commits"] = repo.get("_total_commits", 0)
-
-            if not only_extra_repos:
-                logger.info("Phase 4 complete: enriched %d owners, skipped %d (budget %d)", enriched_count, skipped_enrichment, ENRICHMENT_BUDGET)
-            else:
-                logger.info("Phase 4 skipped (only_extra_repos=True)")
+            logger.info("Phase 4 complete: initialized repo metrics for %d repos", len(all_repos))
 
         # ═══════════════════════════════════════════════════════
         # Phase 5: Fetch README content
@@ -574,7 +537,7 @@ async def sync_all_skills(sync_log_id: Optional[int] = None, incremental: bool =
                                 headers=readme_headers,
                             )
                             if resp.status_code == 200:
-                                readme_cache[full_name] = resp.text[:50000]
+                                readme_cache[full_name] = resp.text[:15000]
                             elif resp.status_code in (403, 429):
                                 reset_ts = int(resp.headers.get("X-RateLimit-Reset", "0"))
                                 if reset_ts:
@@ -707,8 +670,14 @@ def maybe_take_weekly_snapshot(db: "Session") -> None:
         # Compute star velocity for ALL skills with enough stars
         # Uses stars/age formula — covers both new and established projects
         now = datetime.now(timezone.utc)
+        from sqlalchemy.orm import load_only
         candidates = (
             db.query(Skill)
+            .options(load_only(
+                Skill.id, Skill.created_at, Skill.stars, Skill.repo_full_name, Skill.repo_name,
+                Skill.author_name, Skill.author_avatar_url, Skill.description, Skill.repo_url,
+                Skill.category, Skill.last_commit_at, raiseload=True
+            ))
             .filter(Skill.stars >= 20)
             .filter(Skill.created_at.isnot(None))
             .all()

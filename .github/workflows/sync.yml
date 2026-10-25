@@ -2,7 +2,7 @@ name: Sync Skills Data
 
 on:
   schedule:
-    - cron: "0 */8 * * *" # Every 8 hours
+    - cron: "0 3 * * *" # Daily at 03:00 UTC (reduced from every 8h to save Supabase egress)
   push:
     branches: [main]
     paths:
