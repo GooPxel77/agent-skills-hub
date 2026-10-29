@@ -298,8 +298,6 @@ export function SearchBar({ value, onChange }: Props) {
           {!searching && results.length > 0 && (
             <div id={listId} role="listbox" aria-label="Search suggestions" className="max-h-72 overflow-y-auto">
               {results.map((skill, i) => {
-                const isHighValue = skill.stars >= 200 || skill.score >= 80;
-                const isVerified = skill.quality_score >= 70;
                 return (
                   <div
                     key={skill.id}
@@ -357,15 +355,7 @@ export function SearchBar({ value, onChange }: Props) {
                         />
                         {skill.stars.toLocaleString()}
                       </span>
-                      {isHighValue ? (
-                        <span className="text-[9px] px-1 py-0.2 rounded border border-[var(--ps-neon-amber)]/20 text-[var(--ps-neon-amber)] bg-[var(--ps-neon-amber)]/5 shrink-0 font-medium">
-                          High Value
-                        </span>
-                      ) : isVerified ? (
-                        <span className="text-[9px] px-1 py-0.2 rounded border border-[var(--ps-neon-green)]/20 text-[var(--ps-neon-green)] bg-[var(--ps-neon-green)]/5 shrink-0 font-medium">
-                          Auto-scored
-                        </span>
-                      ) : null}
+
                     </div>
                   </div>
                 );

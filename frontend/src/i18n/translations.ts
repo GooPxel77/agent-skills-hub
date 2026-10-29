@@ -1,7 +1,7 @@
 export const translations = {
   zh: {
     // Header
-    "header.subtitle": "GitHub AI 技能自动收录与评分平台 · 每 8 小时同步",
+    "header.subtitle": "GitHub AI 技能目录 · 自动收录与评分",
     "header.lastUpdated": "最后更新:",
     "header.wechat": "微信联系",
     "header.wechatScan": "微信扫码添加好友",
@@ -269,7 +269,7 @@ export const translations = {
     "hero.badgeDefault": "AI Agent 技能与工具索引库",
     "hero.badgeSkills": "个高质量技能已收录",
     "hero.badgeCollection": "10,000+ 技能",
-    "hero.autoSync": "每 8 小时自动同步",
+    "hero.autoSync": "定期同步",
     "hero.trending": "热门",
     "hero.searchPlaceholder": "搜索 MCP 服务器、Claude 技能、Codex 工具、Agent 插件...",
     "hero.step1Title": "找工具",
@@ -287,11 +287,11 @@ export const translations = {
 
     // Live Data Stream & New This Week
     "dataStream.title": "技能更新",
-    "dataStream.subtitle": "GitHub 探索与自动评分快照，每 8 小时安排更新",
+    "dataStream.subtitle": "GitHub 探索与自动评分的已发布快照",
     "dataStream.tabNew": "本周最新",
     "dataStream.tabTrending": "热门飙升",
     "dataStream.tabMostStars": "Stars 排行",
-    "dataStream.liveSync": "数据快照 · 每 8h 安排更新",
+    "dataStream.liveSync": "数据快照",
     "dataStream.viewAllInExplore": "进入 Explorer 查看全部流动资产 →",
     "dataStream.starVelocity": "增速",
     "newThisWeek.title": "本周新增",
@@ -303,7 +303,7 @@ export const translations = {
     // FAQ
     "faq.title": "常见问题",
     "faq.q1": "这是什么？",
-    "faq.a1": "这是我的个人 Agent Skills 收藏库，自动从 GitHub 收集和评分 MCP 服务器、Claude 技能和 Agent 工具。每 8 小时自动更新。",
+    "faq.a1": "这是我的个人 Agent Skills 收藏库，自动从 GitHub 收集和评分 MCP 服务器、Claude 技能和 Agent 工具。定期更新。",
     "faq.q2": "质量评分是如何计算的？",
     "faq.a2": "质量评分基于 8 个维度：完整性、清晰度、具体性、示例质量、README 结构、Agent 适配度等，综合计算得出 0-100 的评分。",
     "faq.q3": "如何添加 Skill？",
@@ -315,11 +315,11 @@ export const translations = {
 
     // Footer
     "footer.source": "Agent Skills Hub · 数据来自 GitHub",
-    "footer.autoUpdated": "每8小时自动更新",
+    "footer.autoUpdated": "定期更新",
   },
   en: {
     "header.subtitle":
-      "Auto-indexed AI skill platform · GitHub-powered · Updated every 8h",
+      "A searchable index of GitHub agent tools",
     "header.lastUpdated": "Last updated:",
     "header.wechat": "WeChat",
     "header.wechatScan": "Scan to add on WeChat",
@@ -500,7 +500,7 @@ export const translations = {
 
     // Sort
     "sort.qualityScore": "Quality",
-    "sort.momentum": "Trending",
+    "sort.momentum": "Star momentum",
 
     // Badges
     "badge.new": "NEW",
@@ -589,7 +589,7 @@ export const translations = {
     "hero.badgeDefault": "AI Agent Skills & MCP Server Index",
     "hero.badgeSkills": "Skills Indexed",
     "hero.badgeCollection": "10,000+ Skills",
-    "hero.autoSync": "Auto-synced every 8h",
+    "hero.autoSync": "Updated periodically",
     "hero.trending": "Trending",
     "hero.searchPlaceholder": "Search MCP servers, Claude skills, Codex tools, agent plugins...",
     "hero.step1Title": "Find Tools",
@@ -601,11 +601,11 @@ export const translations = {
 
     // Live Data Stream & New This Week
     "dataStream.title": "Skill Updates",
-    "dataStream.subtitle": "Published snapshots of GitHub discovery and automated scoring; refresh scheduled every 8h",
+    "dataStream.subtitle": "Published snapshots of GitHub discovery and automated scoring",
     "dataStream.tabNew": "New This Week",
     "dataStream.tabTrending": "Trending",
     "dataStream.tabMostStars": "Most Stars",
-    "dataStream.liveSync": "Snapshot · Scheduled every 8h",
+    "dataStream.liveSync": "Published snapshot",
     "dataStream.viewAllInExplore": "View full dynamic stream in Explorer →",
     "dataStream.starVelocity": "Velocity",
     "newThisWeek.title": "New This Week",
@@ -617,7 +617,7 @@ export const translations = {
     // FAQ
     "faq.title": "FAQ",
     "faq.q1": "What is this?",
-    "faq.a1": "My personal Agent Skills collection, auto-synced from GitHub. It collects and scores MCP servers, Claude skills, and agent tools every 8 hours.",
+    "faq.a1": "My personal Agent Skills collection, auto-synced from GitHub. It collects and scores MCP servers, Claude skills, and agent tools periodically.",
     "faq.q2": "How are quality scores calculated?",
     "faq.a2": "Based on 8 dimensions: completeness, clarity, specificity, examples, README structure, agent readiness, etc. Each weighted differently to produce a 0-100 composite score.",
     "faq.q3": "How do I add a skill?",
@@ -628,7 +628,7 @@ export const translations = {
     "faq.a5": "Ranks projects by stars/day, snapshotted weekly. Higher velocity indicates more community interest.",
 
     "footer.source": "Agent Skills Hub · Data sourced from GitHub",
-    "footer.autoUpdated": "Auto-updated every 8 hours",
+    "footer.autoUpdated": "Updated periodically",
   },
 } as const;
 

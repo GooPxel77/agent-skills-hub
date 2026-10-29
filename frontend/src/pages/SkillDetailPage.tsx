@@ -161,7 +161,7 @@ export function SkillDetailPage() {
             <span className="px-2.5 py-1 text-xs rounded-full bg-[rgba(0,240,255,0.08)] text-[var(--ps-neon-cyan)] border border-[rgba(0,240,255,0.25)] font-medium">
               {detail.category}
             </span>
-            <ProjectTypeBadge type={detail.project_type} />
+            {detail.project_type !== detail.category && <ProjectTypeBadge type={detail.project_type} />}
             {detail.language && (
               <span className="px-2.5 py-1 text-xs rounded-full bg-[var(--ps-bg-elevated)] text-[var(--ps-text-secondary)] border border-[var(--ps-border)]">
                 {detail.language}
@@ -176,7 +176,7 @@ export function SkillDetailPage() {
               </span>
             )}
             {detail.platforms && detail.platforms !== "[]" && (
-              <PlatformBadges platforms={detail.platforms} max={8} />
+              <PlatformBadges platforms={detail.platforms} max={8} exclude={[detail.language, detail.project_type?.replace(/-skill$/, "")].filter(Boolean)} />
             )}
           </div>
 
@@ -206,7 +206,7 @@ export function SkillDetailPage() {
             <h3 className="text-xs font-medium text-[var(--ps-text-muted)] uppercase tracking-wide mb-4">
               {t("detail.stats")}
             </h3>
-            <div className="grid grid-cols-2 gap-3">
+            <dl className="divide-y divide-[var(--ps-border)]">
               {[
                 { label: t("detail.stars"), value: detail.stars.toLocaleString(), icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", color: "text-amber-400" },
                 { label: t("detail.forks"), value: detail.forks.toLocaleString(), icon: "M6 3a3 3 0 00-3 3v2.6a3 3 0 001 2.24V18a3 3 0 003 3h10a3 3 0 003-3v-7.16A3 3 0 0021 8.6V6a3 3 0 00-3-3H6z", color: "text-[var(--ps-text-muted)]" },
@@ -215,15 +215,15 @@ export function SkillDetailPage() {
                 { label: t("detail.commits"), value: detail.total_commits.toLocaleString(), icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2", color: "text-[var(--ps-text-muted)]" },
                 { label: t("detail.followers"), value: detail.author_followers.toLocaleString(), icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z", color: "text-[var(--ps-text-muted)]" },
               ].map((stat) => (
-                <div key={stat.label} className="bg-[var(--ps-bg-elevated)] rounded-lg p-3 text-center">
-                  <svg className={`w-4 h-4 mx-auto ${stat.color} mb-1`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div key={stat.label} className="flex items-center gap-3 py-3">
+                  <svg className={`w-4 h-4 shrink-0 ${stat.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={stat.icon} />
                   </svg>
-                  <div className="text-sm font-bold text-[var(--ps-text-primary)]">{stat.value}</div>
-                  <div className="text-[10px] text-[var(--ps-text-muted)]">{stat.label}</div>
+                  <dt className="text-sm text-[var(--ps-text-secondary)] flex-1">{stat.label}</dt>
+                  <dd className="text-sm font-semibold tabular-nums text-[var(--ps-text-primary)]">{stat.value}</dd>
                 </div>
               ))}
-            </div>
+            </dl>
           </div>
 
           {/* Quality Radar Card */}

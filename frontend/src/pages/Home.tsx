@@ -172,7 +172,7 @@ export function Home() {
             />
             <div id="new-this-week" className="scroll-mt-44 mt-6">
               <LazySection>
-                <NewThisWeek onShowDetail={handleShowDetail} />
+                <NewThisWeek />
               </LazySection>
             </div>
             <div id="picks" className="scroll-mt-44 mt-6">
@@ -207,7 +207,7 @@ export function Home() {
                 <p>
                   Agent Skills Hub is an automated indexing platform that continuously crawls GitHub
                   to discover, classify, and score AI skills, MCP servers, agent tools, and automation scripts.
-                  The index currently covers 10,000+ repositories and is refreshed every 8 hours.
+                  The index currently covers 10,000+ repositories and is refreshed periodically.
                 </p>
                 <p>
                   Built and maintained by{" "}

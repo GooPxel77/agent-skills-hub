@@ -1,6 +1,7 @@
 interface Props {
   platforms: string; // JSON string
   max?: number;
+  exclude?: string[];
 }
 
 const PLATFORM_CONFIG: Record<string, { label: string; borderColor: string; bgColor: string; textColor: string }> = {
@@ -21,7 +22,7 @@ const PLATFORM_CONFIG: Record<string, { label: string; borderColor: string; bgCo
   shell: { label: "Shell", borderColor: "rgba(148,163,184,0.3)", bgColor: "rgba(148,163,184,0.08)", textColor: "var(--ps-text-secondary)" },
 };
 
-export function PlatformBadges({ platforms, max = 4 }: Props) {
+export function PlatformBadges({ platforms, max = 4, exclude = [] }: Props) {
   let parsed: string[] = [];
   try {
     parsed = JSON.parse(platforms);
@@ -29,6 +30,7 @@ export function PlatformBadges({ platforms, max = 4 }: Props) {
     return null;
   }
 
+  parsed = [...new Set(parsed)].filter(p => !exclude.some(value => value.toLowerCase() === p.toLowerCase()));
   if (parsed.length === 0) return null;
 
   const shown = parsed.slice(0, max);

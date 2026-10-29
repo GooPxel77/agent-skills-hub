@@ -249,7 +249,7 @@ export function SiteFooter() {
             className="w-1.5 h-1.5 rounded-full animate-pulse"
             style={{ background: "var(--ps-neon-green)" }}
           />
-          Auto-updated every 8 hours.
+          Updated periodically.
         </span>
       </div>
     </footer>

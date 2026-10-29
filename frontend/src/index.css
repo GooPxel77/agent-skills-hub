@@ -195,20 +195,6 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* CSS-only grid background — color adapts to theme via --grid-color */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-image:
-    linear-gradient(var(--grid-color) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-  background-size: 60px 60px;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-
 /* ══════════════════════════════════════════════════════════════
    PostSoma Component Classes
    ══════════════════════════════════════════════════════════════ */
@@ -258,15 +244,14 @@ body::before {
 }
 
 .ps-btn-primary {
-  background: var(--ps-gradient-neon);
+  background: var(--ps-neon-cyan);
   border: none;
   color: var(--ps-on-selected);
   font-weight: 600;
 }
 
 .ps-btn-primary:hover {
-  box-shadow: 0 0 24px rgba(0, 240, 255, 0.4);
-  background: var(--ps-gradient-neon);
+  filter: brightness(0.92);
 }
 
 /* ── Neon Input ── */
@@ -337,10 +322,7 @@ body::before {
 
 /* ── Neon text utility ── */
 .ps-neon-text {
-  background: var(--ps-gradient-neon);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--ps-text-primary);
 }
 
 /* ══════════════════════════════════════════════════════════════

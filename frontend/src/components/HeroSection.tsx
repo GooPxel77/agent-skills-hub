@@ -4,10 +4,6 @@ import {
   RiSearch2Line,
   RiCloseLine,
   RiStarFill,
-  RiSparklingLine,
-  RiCompass3Line,
-  RiShieldCheckLine,
-  RiTerminalBoxLine,
 } from "@remixicon/react";
 import { fetchQuickSearch } from "../api/client";
 import { useI18n } from "../i18n/I18nContext";
@@ -103,25 +99,7 @@ export function HeroSection({ onSearch }: Props) {
 
   return (
     <section className="hero-gradient -mx-4 px-4 pt-6 pb-8 sm:pt-10 sm:pb-10 mb-6 relative z-20">
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 40% at 50% 20%, rgba(56,189,248,0.03), transparent)",
-        }}
-      />
-
       <div className="max-w-4xl mx-auto text-center relative z-[1]">
-        {/* Byline pill: minimal and dynamic */}
-        <div className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 mb-4 rounded-full border border-[var(--ps-border)] bg-[var(--ps-bg-elevated)] text-xs font-medium text-[var(--ps-text-secondary)] shadow-sm">
-          <RiSparklingLine className="w-3.5 h-3.5 text-[var(--ps-neon-cyan)] animate-pulse" />
-          <span>
-            {t("hero.badgeCollection")}
-            {" · "}
-            {t("hero.autoSync")}
-          </span>
-        </div>
-
         {/* Main headline */}
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-3 text-[var(--ps-text-primary)]">
           {t("hero.title")}
@@ -187,8 +165,6 @@ export function HeroSection({ onSearch }: Props) {
               {!searching && results.length > 0 && (
                 <div id={listId} role="listbox" aria-label="Search suggestions" className="max-h-72 overflow-y-auto">
                   {results.map((skill, i) => {
-                    const isHighValue = skill.stars >= 200 || skill.score >= 80;
-                    const isVerified = skill.quality_score >= 70;
                     return (
                       <div
                         key={skill.id}
@@ -230,15 +206,7 @@ export function HeroSection({ onSearch }: Props) {
                               ? `${(skill.stars / 1000).toFixed(1)}k`
                               : skill.stars.toLocaleString()}
                           </span>
-                          {isHighValue ? (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded border border-[var(--ps-neon-amber)]/30 text-[var(--ps-neon-amber)] bg-[var(--ps-neon-amber)]/10 shrink-0 font-medium">
-                              High Value
-                            </span>
-                          ) : isVerified ? (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded border border-[var(--ps-neon-green)]/30 text-[var(--ps-neon-green)] bg-[var(--ps-neon-green)]/10 shrink-0 font-medium">
-                              Auto-scored
-                            </span>
-                          ) : null}
+
                         </div>
                       </div>
                     );
@@ -256,7 +224,7 @@ export function HeroSection({ onSearch }: Props) {
 
         {/* Quick search suggestion tags */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-6 text-xs">
-          <span className="text-[var(--ps-text-muted)] font-medium">{t("hero.trending")}:</span>
+          <span className="text-[var(--ps-text-muted)] font-medium">{t("tab.explore")}:</span>
           {quickTags.map((tag) => (
             <button
               key={tag.query}
@@ -268,70 +236,6 @@ export function HeroSection({ onSearch }: Props) {
           ))}
         </div>
 
-        {/* 3-Step Quick Guide */}
-        <div className="pt-5 border-t border-[var(--ps-border)]/60 max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
-            {/* Step 1 */}
-            <div className="group p-3.5 rounded-xl border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-neon-cyan)]/50 hover:bg-[var(--ps-bg-card-hover)] transition-all duration-300 flex items-start gap-3 shadow-xs">
-              <div className="w-8 h-8 rounded-lg bg-[var(--ps-neon-cyan)]/10 text-[var(--ps-neon-cyan)] border border-[var(--ps-neon-cyan)]/25 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                <RiCompass3Line className="w-4 h-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-mono font-bold text-[var(--ps-neon-cyan)] px-1 rounded bg-[var(--ps-neon-cyan)]/10">
-                    01
-                  </span>
-                  <h3 className="text-xs sm:text-sm font-semibold text-[var(--ps-text-primary)]">
-                    {t("hero.step1Title")}
-                  </h3>
-                </div>
-                <p className="text-xs text-[var(--ps-text-secondary)] mt-0.5 leading-snug">
-                  {t("hero.step1Desc")}
-                </p>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="group p-3.5 rounded-xl border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-neon-purple)]/50 hover:bg-[var(--ps-bg-card-hover)] transition-all duration-300 flex items-start gap-3 shadow-xs">
-              <div className="w-8 h-8 rounded-lg bg-[var(--ps-neon-purple)]/10 text-[var(--ps-neon-purple)] border border-[var(--ps-neon-purple)]/25 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                <RiShieldCheckLine className="w-4 h-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-mono font-bold text-[var(--ps-neon-purple)] px-1 rounded bg-[var(--ps-neon-purple)]/10">
-                    02
-                  </span>
-                  <h3 className="text-xs sm:text-sm font-semibold text-[var(--ps-text-primary)]">
-                    {t("hero.step2Title")}
-                  </h3>
-                </div>
-                <p className="text-xs text-[var(--ps-text-secondary)] mt-0.5 leading-snug">
-                  {t("hero.step2Desc")}
-                </p>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="group p-3.5 rounded-xl border border-[var(--ps-border)] bg-[var(--ps-bg-card)] hover:border-[var(--ps-neon-green)]/50 hover:bg-[var(--ps-bg-card-hover)] transition-all duration-300 flex items-start gap-3 shadow-xs">
-              <div className="w-8 h-8 rounded-lg bg-[var(--ps-neon-green)]/10 text-[var(--ps-neon-green)] border border-[var(--ps-neon-green)]/25 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                <RiTerminalBoxLine className="w-4 h-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-mono font-bold text-[var(--ps-neon-green)] px-1 rounded bg-[var(--ps-neon-green)]/10">
-                    03
-                  </span>
-                  <h3 className="text-xs sm:text-sm font-semibold text-[var(--ps-text-primary)]">
-                    {t("hero.step3Title")}
-                  </h3>
-                </div>
-                <p className="text-xs text-[var(--ps-text-secondary)] mt-0.5 leading-snug">
-                  {t("hero.step3Desc")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

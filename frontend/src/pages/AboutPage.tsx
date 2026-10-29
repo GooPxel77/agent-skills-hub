@@ -122,8 +122,8 @@ export function AboutPage() {
             </h3>
             <p className="text-sm leading-relaxed" style={{ color: "var(--ps-text-secondary)" }}>
               {lang === "zh"
-                ? "持续扫描 GitHub 全球开源生态，筛选 8,700+ 高质量结构化 Agent 工具，每 8 小时自动增量同步。"
-                : "Continuously scans global open-source ecosystems, curating 8,700+ high-quality agent tools auto-synced every 8 hours."}
+                ? "持续扫描 GitHub 全球开源生态，筛选 8,700+ 高质量结构化 Agent 工具，定期自动增量同步。"
+                : "Continuously scans global open-source ecosystems, curating 8,700+ high-quality agent tools updated periodically."}
             </p>
           </div>
 

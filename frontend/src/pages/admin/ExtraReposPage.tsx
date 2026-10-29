@@ -88,7 +88,7 @@ export function ExtraReposPage({ token }: Props) {
         )}
       </div>
       <p className="text-xs text-gray-400 mb-4">
-        Approved repos will be fetched from GitHub and added to Skills on the next sync run (every 8 hours or manual trigger).
+        Approved repos will be fetched from GitHub and added to Skills on the next sync run (periodically or by manual trigger).
       </p>
 
       {error && <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">{error}</div>}
